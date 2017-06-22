@@ -1,0 +1,87 @@
+/*Customização padrão*/
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    font-size: 13px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/*CUSTOMIZACAO DE COMPONENTES DO PRIMEFACES*/
+
+.ui-outputtext.log {
+    font-weight:normal;
+    color: #a9a9a9;
+    font-size: 12px;
+    text-align: right;
+    margin-top: 4px;
+    float: right;
+    font-family: helvetica, sans-serif;
+}
+
+.ui-outputtext.textogrande {
+    font-weight:bold;
+    font-size: 36px;    
+    font-family: helvetica, sans-serif;
+}
+
+.ui-outputtext {
+    font-weight:bold;
+    font-size: 12px;
+    margin: 5px;
+    color: #a9a9a9;
+    font-family: helvetica, sans-serif;
+}
+
+/*TABELA DE DADOS QUE LISTA DADOS (DATATABLE)*/
+.ui-datatable {
+    margin-top: 20px;
+}
+
+/*TABELA COM ABAS (TABVIEW)*/
+.ui-tabs {
+    margin-top: 10px;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected a {
+    color: #555;
+}
+
+/*Dialog*/
+.ui-dialog-footer.nir-importacao-sigtap {
+    font-weight:normal;
+    color:#a9a9a9;
+    font-size:10px;
+    text-align:left;
+    font-family:helvetica, sans-serif;
+}
+
+/*Growl*/
+.ui-growl{
+    position:fixed;
+    margin-top: 30px;
+    top:10%;
+    right:10%;
+    width:301px;
+}
+
+@media (max-width: 640px) {
+    .ui-tabs.ui-tabs-top > .ui-tabs-nav li {
+        width: 100%;
+    }
+}
+
+/*PANELGRID*/
+.ui-panelgrid.semborda .ui-grid-responsive{
+    border: none;
+}
+
+@media (max-width: 640px){
+    .ui-panelgrid.semborda .ui-grid-responsive .ui-grid-row{
+        border: none;
+    }
+}

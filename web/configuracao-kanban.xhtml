@@ -1,0 +1,47 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+        <h1 class="nir-titulopagina">Configuração Kanban - #{configuracaoKanbanBean.configuracaoKanban.hospital.nomeHospital}</h1>
+
+        <center>
+            <h:form id="frm" >
+                
+                <h:outputText id="ultimolog" styleClass="ui-outputtext" style="font-weight: normal; float: left" value="#{configuracaoKanbanBean.ultimoLog()}" />
+                <br />
+
+                <p:messages autoUpdate="false" closable="true"/>
+
+                <div class="ui-fluid">                    
+                     
+                    <h:panelGrid columns="1" style="margin-bottom: 20px; margin-top: 30px;">
+                        <center><h3 style="margin: 0; color: green;">VERDE</h3></center>
+                        <p:inputText style="border: 2px solid green;" id="verdeKanban" maxlength="3" value="#{configuracaoKanbanBean.configuracaoKanban.valorVerdeKanban}" required="true" requiredMessage="Preencher o valor para verde" />
+                        <p:slider id="sliderVerdeKanban" for="verdeKanban" style="background-color: green;" />
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="1" style="margin-bottom: 20px">
+                        <center><h3 style="margin: 0; color: gold;">AMARELO</h3></center>
+                        <p:inputText style="border: 2px solid gold" id="amareloKanban" maxlength="3" value="#{configuracaoKanbanBean.configuracaoKanban.valorAmareloKanban}" required="true" requiredMessage="Preencher o valor para amarelo" />
+                        <p:slider id="sliderAmareloKanban" for="amareloKanban" style="background-color: gold;" />
+
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="1" style="margin-bottom: 20px">
+                        <center><h3 style="margin: 0; color: red;">VERMELHO</h3></center>
+                        <p:inputText style="border: 2px solid red;" id="vermelhoKanban" maxlength="3" value="#{configuracaoKanbanBean.configuracaoKanban.valorVermelhoKanban}" required="true" requiredMessage="Preencher o valor para vermelho"  />
+                        <p:slider id="sliderVermelhoKanban" for="vermelhoKanban" style="background-color: red;" />
+                    </h:panelGrid>
+
+                </div>
+
+                <p:commandButton icon="fa fa-save" value="Salvar" actionListener="#{configuracaoKanbanBean.salvar()}" update="@form" />
+                
+            </h:form>
+        </center>
+    </ui:define>
+</ui:composition>

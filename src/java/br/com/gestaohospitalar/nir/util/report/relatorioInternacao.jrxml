@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioInternacao" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="719d0261-dd2b-4e18-961d-d14bd2b837a7">
+	<property name="ireport.zoom" value="2.8531167061100207"/>
+	<property name="ireport.x" value="100"/>
+	<property name="ireport.y" value="359"/>
+	<parameter name="LOGO" class="java.awt.Image"/>
+	<field name="idInternacao" class="java.lang.String"/>
+	<field name="dataEntrada" class="java.util.Date"/>
+	<field name="dataPrevisaoAlta" class="java.util.Date"/>
+	<field name="dataAlta" class="java.util.Date"/>
+	<field name="dataSaidaLeito" class="java.util.Date"/>
+	<field name="codigoInternacaoHospital" class="java.lang.String"/>
+	<field name="dataHoraLimiteVermelho" class="java.util.Date"/>
+	<field name="paciente.nomePessoa" class="java.lang.String"/>
+	<field name="medico.nomePessoa" class="java.lang.String"/>
+	<field name="procedimento.CO_PROCEDIMENTO" class="java.lang.String"/>
+	<field name="procedimento.NO_PROCEDIMENTO" class="java.lang.String"/>
+	<field name="cid.CO_CID" class="java.lang.String"/>
+	<field name="cid.NO_CID" class="java.lang.String"/>
+	<field name="leito.idLeito" class="java.lang.String"/>
+	<field name="leito.descricaoLeito" class="java.lang.String"/>
+	<field name="statusInternacao" class="java.lang.String"/>
+	<group name="Group3">
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="Group4">
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="54">
+			<staticText>
+				<reportElement x="0" y="0" width="800" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="b43dcb0d-ef7e-43fd-a110-43d606e81bc4"/>
+				<textElement textAlignment="Center">
+					<font size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Internações]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="49">
+			<staticText>
+				<reportElement x="0" y="29" width="55" height="20" uuid="e3295250-1659-4110-90b4-a6d41b3d7f7b"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Código]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="152" y="5" width="146" height="20" uuid="a590a30b-8308-4c27-b897-1d2f4b0239f9"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Médico]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="427" y="5" width="75" height="20" uuid="296716db-4568-45eb-9a76-9ecf44520000"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Entrada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="298" y="5" width="129" height="20" uuid="51120f8f-6819-4216-a059-a21031b660af"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Leito]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="802" height="1" uuid="9ac8bdeb-78ce-4a5f-9078-2011eefaf0a1"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="5" width="152" height="20" uuid="87cfd9de-834f-45d6-885c-367bb1c26d99"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Paciente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="5" width="75" height="20" uuid="84162ffe-9043-45c2-8bd1-3a70effd6dde"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vencimento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="577" y="5" width="75" height="20" uuid="5066ffd6-d043-40a2-93f3-166227e86a02"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Previsão]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="652" y="5" width="75" height="20" uuid="91439f52-8af6-432f-b1dc-b92b12e4b467"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Alta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="727" y="5" width="75" height="20" uuid="0ec10b61-d894-4fbf-9455-06ea18a89fcb"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saída]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="732" y="29" width="70" height="20" uuid="7cb2eadb-9600-48cf-add1-11e10d6ec218"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="29" width="384" height="20" uuid="453adbde-f7ef-43c7-8fc3-e5dc06569504"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Procedimento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="29" width="258" height="20" uuid="e2f3694b-aeef-43a1-aed2-7b781fef5b52"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CID]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="60">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="802" height="1" uuid="ff0a18af-a15b-448f-8a5f-61f3667b2a7c"/>
+			</line>
+			<textField>
+				<reportElement x="0" y="9" width="55" height="20" uuid="f0432111-1a0b-4164-8d0e-a6f6df9059df"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idInternacao} + "-" + $F{codigoInternacaoHospital}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="152" y="34" width="146" height="20" uuid="eb16b99d-8963-4d1d-b57f-3275c1865a36"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{medico.nomePessoa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="298" y="34" width="129" height="20" uuid="d6c998ce-9ae7-4fed-8426-d6aad19e68bf"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{leito.idLeito} + " - " + $F{leito.descricaoLeito}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="34" width="152" height="20" uuid="d0861a9f-e59e-4a0a-bbb4-91cd09a537ea"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{paciente.nomePessoa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="427" y="34" width="75" height="20" uuid="c1bc3290-8f7e-426a-8e55-ea860891730c"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dataEntrada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="502" y="34" width="75" height="20" uuid="5e3d37e2-9d44-4d3a-943f-1ddcedd3a5a5"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dataHoraLimiteVermelho}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="577" y="34" width="75" height="20" uuid="b8a553a8-5506-4364-b0fb-5a045142ad89"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dataPrevisaoAlta}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="652" y="34" width="75" height="20" uuid="a9780ca8-b293-455e-8c16-d644ce4f2580"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{dataAlta}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="727" y="34" width="75" height="20" uuid="13a1cf3d-6bc6-4259-aa40-8c6b81960427"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{dataSaidaLeito}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="732" y="9" width="70" height="20" uuid="25b6d482-ccbf-433e-9b49-471efa30aafb"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{statusInternacao}.equals("AB") ? "Aberta" :
+$F{statusInternacao}.equals("EN") ? "Encerrada" :
+$F{statusInternacao}.equals("C") ? "Cancelada" :
+$F{statusInternacao}.equals("H") ? "Higienização" :
+$F{statusInternacao}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="55" y="9" width="384" height="20" uuid="d1f78632-bf21-48af-945d-8c966b35b094"/>
+				<textFieldExpression><![CDATA[$F{procedimento.CO_PROCEDIMENTO} + " - " + $F{procedimento.NO_PROCEDIMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="451" y="9" width="258" height="20" uuid="d29a7c2f-6b38-4ed9-a3ec-fd5901496d48"/>
+				<textFieldExpression><![CDATA[$F{cid.CO_CID} + " - " + $F{cid.NO_CID}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="39">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="802" height="1" uuid="671242f0-7b4c-4092-8485-7f12e27c523c"/>
+			</line>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="9" width="274" height="13" uuid="1d437cfd-2bbc-4c2b-a2fb-b8aabe7634ae"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="32" y="22" width="165" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="c7da197a-1536-4c4c-8807-6ee6ae5edd2e"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[N.I.R. Gestão de Leitos Hospitalares]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="760" y="9" width="40" height="13" backcolor="#FFFFFF" uuid="80db7b56-9dc6-4101-be10-54c0f62efcef"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="519" y="9" width="241" height="13" backcolor="#FFFFFF" uuid="5b471937-5bba-41fe-b93c-cb9ddb43375d"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="22" width="30" height="14" uuid="e1810ecc-f259-4216-8dc2-bf6b9953c00c"/>
+				<imageExpression><![CDATA[$P{LOGO}]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+</jasperReport>

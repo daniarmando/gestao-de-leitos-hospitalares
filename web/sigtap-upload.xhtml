@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+        <h1 class="nir-titulopagina">Importar Tabela SigTap</h1>
+
+        <h:panelGroup id="msg" >
+            <h:panelGroup id="msgAlerta" layout="block" class="nir-msgAlerta" rendered="#{sigtapUploadBean.verificarTabela() eq true}">
+                <i class="fa faMsgAlerta  fa-warning"></i>
+                <h:outputText value="Atenção! Tabela do mês de #{sigtapUploadBean.mostrarMes()} já foi importada para o Sistema." />
+            </h:panelGroup>
+
+            <h:panelGroup id="msgAlertaUrgente" layout="block" class="nir-msgAlertaUrgente" rendered="#{sigtapUploadBean.verificarTabela() eq false}">
+                <i class="fa faMsgAlerta  fa-warning"></i>
+                <h:outputText value="Atenção! Tabela do mês de #{sigtapUploadBean.mostrarMes()} ainda não foi importada para o Sistema." />
+            </h:panelGroup>
+        </h:panelGroup>
+
+        <h:form id="frm" enctype="multipart/form-data"> 
+
+            <p:fileUpload id="upload" label="Procurar..." 
+                          fileUploadListener="#{sigtapUploadBean.upload}" 
+                          auto="true" allowTypes="/(.|\/)(zip)$/" sizeLimit="5000000" 
+                          invalidSizeMessage="Tamanho de arquivo excede o limite de 5mb por arquivo"
+                          invalidFileMessage="Tipo de Arquivo inválido, envie apenas arquivos no formato .zip" 
+                          oncomplete="#{sigtapUploadBean.exibirDialogo()}" 
+                          update=":dlgprogresso"/>
+        </h:form>
+
+        <h:outputText id="ultimolog" styleClass="ui-outputtext log" value="#{sigtapUploadBean.ultimoLog()}" />        
+        <br />
+        <br />
+        <p:messages escape="false" showDetail="false" 
+                    autoUpdate="true" closable="true"/>
+
+        <p:dialog id="dlgimportar" width="400" header="Importação Sigtap" widgetVar="dlgimportar" modal="true" responsive="true" closeOnEscape="true" >
+            <h:form id="importar">
+                <h:outputText id="info" value="Arquivo #{sigtapUploadBean.nomeArquivo} recebido. Deseja importá-lo para o sistema?"/>                
+                <br />
+                <br />
+                <p:commandButton icon="ui-icon-check" value="Sim" onclick="PF('dlgimportar').hide(); PF('pb').start(); PF('poll').start();" onstart="PF('dlgprogresso').show()" oncomplete="PF('dlgprogresso').hide(); PF('pb').cancel(); PF('poll').stop();" 
+                                 update=":msg :frm:upload :prg :ultimolog" actionListener="#{sigtapUploadBean.importarSigtap()}"/>
+                <p:commandButton icon="ui-icon-close" value="Não" onclick="PF('dlgimportar').hide();" />
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlgreimportar" width="400" header="Importação Sigtap" widgetVar="dlgreimportar" modal="true" responsive="true" closeOnEscape="true" >
+            <h:form id="reimportar">
+                <h:outputText id="info" value="Tabela do mês de #{sigtapUploadBean.mostrarMes()} já foi importada, deseja substituí-la?"/>
+                <br />
+                <br />
+                <p:commandButton icon="ui-icon-check" value="Sim" onclick="PF('dlgreimportar').hide(); PF('pb').start(); PF('poll').start();" onstart="PF('dlgprogresso').show()" oncomplete="PF('dlgprogresso').hide(); PF('pb').cancel(); PF('poll').stop();" 
+                                 update=":msg :frm:upload :prg" actionListener="#{sigtapUploadBean.importarSigtap()}"/>
+                <p:commandButton icon="ui-icon-close" value="Não" onclick="PF('dlgreimportar').hide();" />
+            </h:form>
+        </p:dialog> 
+
+        <p:dialog id="dlgnaoimportar" width="400" header="Tabela não será Importada!" widgetVar="dlgnaoimportar" modal="true" responsive="true" closeOnEscape="true" >
+            <h:form id="naoimportar">
+                <h:outputText id="info" value="Tabela do mês de #{sigtapUploadBean.mostrarMes()} já foi importada e não poderá ser substituída pois já existem registros que dependem de suas informações."/>
+                <br />
+                <br />
+                <p:commandButton icon="ui-icon-check" value="OK" onclick="PF('dlgnaoimportar').hide();" />
+            </h:form>
+        </p:dialog> 
+
+        <p:dialog styleClass="ui-dialog-footer nir-importacao-sigtap" id="dlgprogresso" widgetVar="dlgprogresso" appendTo="@(body)" modal="true" width="400"
+                  header="Importação Sigtap" footer="#{sigtapUploadBean.nomeArquivo}" draggable="false" closable="false" closeOnEscape="false"
+                  resizable="false" minimizable="false" responsive="true">
+            <h:form id="prg">
+                <p:poll id="poll" interval="1" widgetVar="poll" autoStart="false" async="true" update=":prg:msgProgresso" immediate="true" />
+                <h:outputText value="#{sigtapUploadBean.mensagem}" id="msgProgresso" />
+                <br />
+
+                <p:progressBar id="pb" widgetVar="pb" ajax="true" value="#{sigtapUploadBean.progresso}" labelTemplate="{value}%"
+                               styleClass="animated" global="false" />
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

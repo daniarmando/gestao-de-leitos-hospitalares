@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+    <h:head>
+        <f:facet name="first">
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </f:facet>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Login</title>
+
+        <!--css-->
+        <h:outputStylesheet library="nir" name="css/login.css" />
+        <!--css-->
+
+        <!--js-->
+        <h:outputScript target="body" library="primefaces" name="jquery/jquery.js"/>
+        <h:outputScript target="body" library="nir" name="js/app.js" />
+        <!--js-->
+
+    </h:head>
+    <h:body>
+        <div class="nir-login-box-msgErro">
+            <h:panelGroup layout="block" class="nir-login-erro" rendered="#{param.erro}">
+                <center>
+                    <i class="fa faErro  fa-warning"></i>
+                    <h:outputText id="texto" value="Login ou senha incorretos!" />
+                </center>
+            </h:panelGroup>
+        </div>
+
+        <div class="nir-login-box">
+            <div class="nir-login-box-interno" >
+
+                <div class="nir-login-box-label"><h:graphicImage library="nir" name="imagens/logo2.png" /></div> 
+
+                <form action="j_spring_security_check" name="frmLogin" method="POST">
+                    <div class="nir-login-input-div" id="input-usuario" >
+                        <p:inputText id="j_username" required="true" label="j_username" placeholder="login" a:autofocus="true" />
+                    </div>
+
+                    <div class="nir-login-input-div" id="input-senha" >
+                        <p:password id="j_password" required="true" label="j_password" placeholder="senha" />
+                    </div>
+
+                    <div class="nir-login-botoes" >
+                        <h:commandButton class="nir-login-botao" value="Entrar" />
+                        <div class="nir-login-lembrar-senha"><input type="checkbox" name="remember-me" /> Lembrar minha senha</div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </h:body>
+</html>

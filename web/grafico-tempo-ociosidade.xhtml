@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+
+        <h1 class="nir-titulopagina">Gráfico Tempo de Ociosidade em Setores por Período</h1>
+
+        <h:form id="frm" rendered="#{usuarioBean.autorizacao le 3}">
+
+            <!--inicio barra de ferramentas superior com opções para filtrar o gráfico-->
+            <p:toolbar id="toolbar">
+
+                <p:toolbarGroup align="left">
+                    
+                    <p:selectOneMenu id="modeloGrafico" label="Modelo Gráfico" value="#{graficoTempoOciosidadeBean.modeloGrafico}" required="true" style="top: 7px;">
+                        <f:selectItem itemLabel="Modelo" />
+                        <f:selectItem itemLabel="Linha" itemValue="1" />
+                        <f:selectItem itemLabel="Área" itemValue="2" />
+                        <f:selectItem itemLabel="Barra" itemValue="3" />
+                    </p:selectOneMenu>
+                    
+                    <p:selectOneMenu id="tipoCalculo" label="Tipo Cálculo" value="#{graficoTempoOciosidadeBean.tipoCalculo}" required="true" style="top: 7px; margin: 0 3px 0 3px;">
+                        <f:selectItem itemLabel="Tipo Cálculo" />
+                        <f:selectItem itemLabel="Média" itemValue="1" />
+                        <f:selectItem itemLabel="Soma" itemValue="2" />                        
+                    </p:selectOneMenu>
+
+                    <p:inputMask id="mesanoinicial" label="Mês/Ano Inicial" placeholder="Mês/Ano Inicial" required="true" mask="99/9999" value="#{graficoTempoOciosidadeBean.dataInicial}" style="margin: 0 3px 0 3px;" >
+                        <f:convertDateTime pattern="MM/yyyy" />
+                    </p:inputMask>
+                    <h:outputLabel value="até" style="margin: 0 3px 0 3px;"/>
+                    <p:inputMask id="mesanofinal" label="Mês/Ano Final" placeholder="Mês/Ano Final" required="true" mask="99/9999" value="#{graficoTempoOciosidadeBean.dataFinal}" style="margin: 0 3px 0 3px;" >
+                        <f:convertDateTime pattern="MM/yyyy" />
+                    </p:inputMask>
+
+                    <p:commandButton icon="fa fa-bar-chart" value="Montar" actionListener="#{graficoTempoOciosidadeBean.prepararGrafico()}" update="@form" style="margin-left: 10px;"/>
+
+                </p:toolbarGroup>
+
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com opções para filtrar o gráfico-->
+
+            <p:growl showDetail="true" id="growl" />
+
+            <br />
+            <br />
+
+            <center>
+                <h:outputText styleClass="ui-outputtext textogrande"  value="Selecione as opções acima para montar o gráfico." rendered="#{empty graficoTempoOciosidadeBean.modeloLinha and empty graficoTempoOciosidadeBean.modeloBarra}"/>
+                <br />
+                <p:graphicImage id="grafico" library="nir" name="imagens/chart.png" rendered="#{empty graficoTempoOciosidadeBean.modeloLinha and empty graficoTempoOciosidadeBean.modeloBarra}" />
+            </center>
+
+            <p:chart type="line" model="#{graficoTempoOciosidadeBean.modeloLinha}" rendered="#{not empty graficoTempoOciosidadeBean.modeloLinha}" style="height: 300px;" responsive="true" />
+
+            <p:chart type="bar" model="#{graficoTempoOciosidadeBean.modeloBarra}" rendered="#{not empty graficoTempoOciosidadeBean.modeloBarra}" style="height:300px" responsive="true" />
+            
+        </h:form>
+    </ui:define>
+</ui:composition>

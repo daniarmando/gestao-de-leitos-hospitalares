@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+        <h1 class="nir-titulopagina">Parâmetros - #{parametrosBean.parametros.hospital.nomeHospital}</h1>
+
+        <h:form id="frm" >
+
+            <p:messages id="msg" closable="true"/>
+
+            <!--inicio tabela com abas-->
+            <div class="ui-fluid">
+                <p:tabView id="tabview"> 
+
+                    <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                    <p:tab title="Liberar internação quando">
+                        <p:panelGrid columns="2" layout="grid" 
+                                     columnClasses="ui-grid-col-5"
+                                     styleClass="semborda">
+
+                            <h:outputText value="Leito for incompatível com idade e/ou sexo do paciente" title="Liberar internação em leito incompatível com idade e/ou sexo do paciente" />
+                            <p:inputSwitch value="#{parametrosBean.parametros.leitoIncompativelPaciente}">
+                                <p:ajax listener="#{parametrosBean.salvar('leitoPaciente')}" update="frm:msg :frm:ultimolog" />
+                            </p:inputSwitch>  
+
+                            <h:outputText value="Procedimento for incompatível com leito" title="Liberar internação com procedimento incompatível com leito" />
+                            <p:inputSwitch value="#{parametrosBean.parametros.procedimentoIncompativelLeito}">
+                                <p:ajax listener="#{parametrosBean.salvar('procedimentoLeito')}" update="frm:msg :frm:ultimolog" />
+                            </p:inputSwitch>  
+
+                            <h:outputText value="Procedimento for incompatível com idade e/ou sexo do paciente" title="Liberar internação com procedimento incompatível com idade e/ou sexo do paciente" />
+                            <p:inputSwitch value="#{parametrosBean.parametros.procedimentoIncompativelPaciente}">
+                                <p:ajax listener="#{parametrosBean.salvar('procedimentoPaciente')}" update="frm:msg :frm:ultimolog" />
+                            </p:inputSwitch>  
+
+                            <h:outputText value="CID for incompatível com tipo sexo do leito" title="Liberar internação com cid incompatível com tipo de sexo do leito" />
+                            <p:inputSwitch value="#{parametrosBean.parametros.cidIncompativelLeito}">
+                                <p:ajax listener="#{parametrosBean.salvar('cidLeito')}" update="frm:msg :frm:ultimolog" />
+                            </p:inputSwitch>  
+
+                            <h:outputText value="CID for incompatível com sexo do paciente" title="Liberar internação com cid incompatível com sexo do paciente" />
+                            <p:inputSwitch value="#{parametrosBean.parametros.cidIncompativelPaciente}">
+                                <p:ajax listener="#{parametrosBean.salvar('cidPaciente')}" update="frm:msg :frm:ultimolog" />
+                            </p:inputSwitch>  
+
+                        </p:panelGrid>
+                    </p:tab>
+                    <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+
+                </p:tabView>
+            </div>
+            <!--fim tabela com abas-->
+
+            <h:outputText id="ultimolog" styleClass="ui-outputtext log" value="#{parametrosBean.ultimoLog()}" />
+
+        </h:form>
+    </ui:define>
+</ui:composition>

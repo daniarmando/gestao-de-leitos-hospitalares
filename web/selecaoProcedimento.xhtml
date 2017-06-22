@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"      
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Seleção do Procedimento</title>
+        <h:outputStylesheet library="nir" name="css/customizacao.css" />
+    </h:head>
+    <h:body>
+
+        <h:form id="frm">
+
+            <div style="margin-top: 5px; margin-bottom: 5px;">
+                <p:inputText id="pesquisa" size="40" required="true" value="#{selecaoProcedimentoBean.paramPesquisa}" placeholder="Código ou Descrição" />
+                <p:spacer width="10px"/>
+
+                <p:splitButton icon="fa fa-search" rendered="#{selecaoProcedimentoBean.isParamProcedimento() eq false}">
+                    <p:menuitem value="Pesquisar Por Leito" actionListener="#{selecaoProcedimentoBean.listarProcedimentoPorLeito()}" update=":frm" icon="fa fa-search" />
+                </p:splitButton>
+
+                <p:splitButton icon="fa fa-search" rendered="#{selecaoProcedimentoBean.isParamProcedimento() eq true}">
+                    <p:menuitem value="Pesquisar Por Leito" actionListener="#{selecaoProcedimentoBean.listarProcedimentoPorLeito()}" update=":frm"  icon="fa fa-search" />
+                    <p:menuitem value="Pesquisar Todos" actionListener="#{selecaoProcedimentoBean.listarTodosProcedimentos()}" update=":frm" icon="fa fa-search" />
+                </p:splitButton>
+
+                <br /><br />
+                <h:outputText styleClass="ui-outputtext" value="#{selecaoProcedimentoBean.msgTipoPesq()}" />                
+            </div>
+            <!--inicio tabela de dados que lista dados-->
+            <p:dataTable id="tabelaDeDados"
+                         value="#{selecaoProcedimentoBean.procedimentos}" var="procedimento"
+                         widgetVar="tabelaDeDados"
+                         paginator="true"     
+                         rows="6"
+                         paginatorPosition="bottom"                         
+                         paginatorAlwaysVisible="false"
+                         emptyMessage="Não há dados de Procedimento">
+
+                <p:column headerText="Código" style="width: 40px; font-size:14px; text-align: center;">
+                    <h:outputText value="#{procedimento.CO_PROCEDIMENTO}" />
+                </p:column> 
+                <p:column headerText="Descrição" style="width: 160px; font-size:14px;" >
+                    <h:outputText value="#{procedimento.NO_PROCEDIMENTO}" />
+                </p:column> 
+                <p:column headerText="Dias" style="width: 15px; font-size:14px; text-align: center;">
+                    <h:outputText value="#{procedimento.QT_DIAS_PERMANENCIA}" />
+                </p:column> 
+                <p:column headerText="Idade Min/Máx" style="width: 30px; font-size:14px; text-align: center;">
+                    <h:outputText value="#{selecaoProcedimentoBean.idadeMinMax(procedimento.VL_IDADE_MINIMA, procedimento.VL_IDADE_MAXIMA)}" />
+                </p:column>
+                <p:column headerText="Tipo Sexo" style="width: 15px; font-size:14px; text-align: center;">
+                    <h:outputText value="#{procedimento.TP_SEXO}" />
+                </p:column>
+                <p:column style="width: 10px; text-align: center" >
+                    <p:commandButton id="btnSelecionar" style="width: 25px; height: 25px;" icon="fa fa-check" title="Selecionar" actionListener="#{selecaoProcedimentoBean.selecionar(procedimento)}" process="@this" update="@form" />
+                </p:column> 
+
+            </p:dataTable>
+            <!--fim tabela de dados que lista dados-->
+
+            <p:dialog id="dlgmsgValidacao" width="400" header="Erro de validação" widgetVar="dlgmsgValidacao" modal="true" responsive="true" resizable="false" closeOnEscape="true" >
+                <h:form id="mensagem">
+                    <h:outputText id="info" value="#{selecaoProcedimentoBean.msgValidacao}"/>                
+                    <br />
+                    <br />
+                    <p:commandButton icon="ui-icon-check" value="Sim" actionListener="#{selecaoProcedimentoBean.liberar()}" rendered="#{selecaoProcedimentoBean.permiteLiberar eq true}" />
+                    <p:commandButton icon="ui-icon-close" value="Não" onclick="PF('dlgmsgValidacao').hide();" rendered="#{selecaoProcedimentoBean.permiteLiberar eq true}" />
+                    <p:commandButton icon="ui-icon-check" value="Ok" onclick="PF('dlgmsgValidacao').hide();" rendered="#{selecaoProcedimentoBean.permiteLiberar eq false}" />
+                </h:form>
+            </p:dialog>
+
+
+        </h:form>
+    </h:body>
+</html>
+

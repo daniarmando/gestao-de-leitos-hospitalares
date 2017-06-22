@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"      
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Seleção do Paciente</title>
+    </h:head>
+    <h:body>
+
+        <h:form id="frm">
+
+            <div style="margin-top: 5px; margin-bottom: 20px">
+                <p:inputText id="pesquisa" size="40" value="#{selecaoPacienteBean.paramPesquisa}" placeholder="Nome, Código SUS ou CPF " />
+
+                <p:spacer width="10px"/>
+
+                <p:commandButton value="Pesquisar" action="#{selecaoPacienteBean.pesquisarPaciente()}" update=":frm:tabelaDeDados" />
+            </div>
+            
+            <!--inicio tabela de dados que lista dados-->
+            <p:dataTable id="tabelaDeDados"
+                         value="#{selecaoPacienteBean.pacientes}" var="paciente"
+                         widgetVar="tabelaDeDados"
+                         paginator="true"     
+                         rows="7"
+                         paginatorPosition="bottom"
+                         paginatorAlwaysVisible="false"
+                         emptyMessage="Não há dados de Pacientes">
+
+                <p:column headerText="Cód. SUS" style="width: 70px; font-size:14px;">
+                    <h:outputText value="#{paciente.codigoSusPaciente}" />
+                </p:column>
+                <p:column headerText="Nome" style="width: 120px; font-size:14px;">
+                    <h:outputText value="#{paciente.nomePessoa}" />
+                </p:column> 
+                <p:column headerText="CPF" style="width: 60px; font-size:14px;">
+                    <h:outputText value="#{paciente.cpfPessoa}" />
+                </p:column>
+                <p:column headerText="Idade" style="width: 15px; font-size:14px; text-align: center;">
+                    <h:outputText value="#{selecaoPacienteBean.idadePaciente(paciente.dataNascimentoPessoa)}" />
+                </p:column>
+                <p:column headerText="Sexo" style="width: 15px; font-size:14px; text-align: center;">
+                    <h:outputText value="#{paciente.sexoPessoa}" />
+                </p:column>
+                <p:column style="width: 10px; text-align: center" >
+                    <p:commandButton id="btnSelecionar" style="width: 25px; height: 25px;" icon="fa fa-check" title="Selecionar" actionListener="#{selecaoPacienteBean.selecionar(paciente)}" process="@this" update="@form" />
+                </p:column> 
+            </p:dataTable>
+            <!--fim tabela de dados que lista dados-->
+
+            <p:dialog id="dlgmsgValidacao" width="400" header="Erro de validação" widgetVar="dlgmsgValidacao" modal="true" responsive="true" resizable="false" closeOnEscape="true" >
+                <h:form id="mensagem">
+                    <h:outputText id="info" value="#{selecaoPacienteBean.msgValidacao}"/>                
+                    <br />
+                    <br />
+                    <p:commandButton icon="ui-icon-check" value="Sim" actionListener="#{selecaoPacienteBean.liberar()}" rendered="#{selecaoPacienteBean.permiteLiberar eq true}" />
+                    <p:commandButton icon="ui-icon-close" value="Não" onclick="PF('dlgmsgValidacao').hide();" rendered="#{selecaoPacienteBean.permiteLiberar eq true}" />
+                    <p:commandButton icon="ui-icon-check" value="Ok" onclick="PF('dlgmsgValidacao').hide();" rendered="#{selecaoPacienteBean.permiteLiberar eq false}" />
+                </h:form>
+            </p:dialog>
+
+        </h:form>
+    </h:body>
+</html>
+

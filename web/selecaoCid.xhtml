@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"      
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Seleção do CID</title>
+        <h:outputStylesheet library="nir" name="css/customizacao.css" />
+    </h:head>
+    <h:body>
+
+        <h:form>
+
+            <div style="margin-top: 5px; margin-bottom: 5px">
+                <p:inputText id="pesquisa" size="40" required="true" value="#{selecaoCidBean.paramPesquisa}" placeholder="Código ou Descrição" />
+                <p:spacer width="10px"/>
+
+                <p:commandButton style="margin-bottom: 10px;" value="Pesquisar" actionListener="#{selecaoCidBean.listarCid()}" update="@form" icon="fa fa-search" />
+
+                <br />
+                <h:outputText styleClass="ui-outputtext" value="*Pesquisando por CIDs para Procedimento #{selecaoCidBean.procedimentoSelecionado.CO_PROCEDIMENTO} - #{selecaoCidBean.procedimentoSelecionado.NO_PROCEDIMENTO}" />
+            </div>
+            <!--inicio tabela de dados que lista dados-->
+            <p:dataTable id="tabelaDeDados"
+                         value="#{selecaoCidBean.cids}" var="cid"
+                         widgetVar="tabelaDeDados"
+                         paginator="true"     
+                         rows="8"
+                         paginatorPosition="bottom"
+                         paginatorAlwaysVisible="false"
+                         emptyMessage="Não há dados de CID">
+
+                <p:column headerText="Código" style="width: 40px; font-size: 14px; text-align: center;">
+                    <h:outputText value="#{cid.CO_CID}" />
+                </p:column> 
+                <p:column headerText="Descrição"  style="width: 200px; font-size: 14px;">
+                    <h:outputText value="#{cid.NO_CID}" />
+                </p:column> 
+                <p:column headerText="Tipo Agravo" style="width: 40px; font-size: 14px;">
+                    <h:outputText value="#{cid.TP_AGRAVO}" />
+                </p:column>
+                <p:column headerText="Tipo Sexo" style="width: 15px; font-size: 14px; text-align: center;">
+                    <h:outputText value="#{cid.TP_AGRAVO}" />
+                </p:column> 
+                <p:column style="width: 10px; text-align: center" >
+                    <p:commandButton id="btnSelecionar" style="width: 25px; height: 25px;" icon="fa fa-check" title="Selecionar" actionListener="#{selecaoCidBean.selecionar(cid)}" process="@this" update="@form" />
+                </p:column> 
+            </p:dataTable>
+            <!--fim tabela de dados que lista dados-->
+
+            <p:dialog id="dlgmsgValidacao" width="400" header="Erro de validação" widgetVar="dlgmsgValidacao" modal="true" responsive="true" resizable="false" closeOnEscape="true" >
+                <h:form id="mensagem">
+                    <h:outputText id="info" value="#{selecaoCidBean.msgValidacao}"/>                
+                    <br />
+                    <br />
+                    <p:commandButton icon="ui-icon-check" value="Sim" actionListener="#{selecaoCidBean.liberar()}" rendered="#{selecaoCidBean.permiteLiberar eq true}" />
+                    <p:commandButton icon="ui-icon-close" value="Não" onclick="PF('dlgmsgValidacao').hide();" rendered="#{selecaoCidBean.permiteLiberar eq true}" />
+                    <p:commandButton icon="ui-icon-check" value="Ok" onclick="PF('dlgmsgValidacao').hide();" rendered="#{selecaoCidBean.permiteLiberar eq false}" />
+                </h:form>
+            </p:dialog>
+
+        </h:form>
+    </h:body>
+</html>
+

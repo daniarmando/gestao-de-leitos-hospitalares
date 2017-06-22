@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+
+        <f:metadata>
+            <f:viewAction action="#{higienizacaoBean.inicializarPaginaCadastro()}" />
+        </f:metadata>
+
+        <h1 class="nir-titulopagina">Cadastro de Higienização</h1>
+
+        <h:panelGroup id="msgAlerta" layout="block" class="nir-msgAlerta" rendered="#{higienizacaoBean.habilitaCampos eq false}">
+            <i class="fa faMsgAlerta  fa-warning"></i>
+            <h:outputText value="Não existem Leitos pós Internação para Higienização." />
+        </h:panelGroup>
+
+        <h:form id="frm">
+
+            <!--inicio barra de ferramentas superior com botoes para salvar, cadastrar e pesquisar dados-->
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton icon="fa fa-save" value="Salvar" actionListener="#{higienizacaoBean.salvar()}"
+                                     process="tabview @this" update="@form" disabled="#{higienizacaoBean.habilitaCampos eq false}" />
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton icon="fa fa-plus" value="Novo" action="#{higienizacaoBean.novo()}"
+                                     process="@this" update="@form" disabled="#{higienizacaoBean.habilitaCampos eq false}" />
+                    <p:button icon="fa fa-search" value="Pesquisa" outcome="pesquisa-higienizacao" />
+                </p:toolbarGroup>
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com botoes para salvar, cadastrar e pesquisar dados-->
+
+            <p:messages autoUpdate="false" closable="true" />
+
+            <!--inicio tabela com abas-->
+            <div class="ui-fluid">
+                <p:tabView id="tabview"> 
+
+                    <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                    <p:tab title="Higienização">
+                        <p:panelGrid columns="4" layout="grid" 
+                                     columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4"
+                                     styleClass="semborda">
+
+                            <h:outputLabel value="Leito / Internação" for="internacao" />
+                            <p:inputText value="#{higienizacaoBean.higienizacao.internacao.paciente.nomePessoa}" rendered="#{empty higienizacaoBean.internacoes}" disabled="true" />
+                            <p:selectOneMenu label="Internação" id="internacao" value="#{higienizacaoBean.higienizacao.internacao}" required="true" converter="converterInternacao" rendered="#{not empty higienizacaoBean.internacoes}" disabled="#{higienizacaoBean.habilitaCampos eq false}" >
+                                <f:selectItem itemLabel="Selecione" />
+                                <f:selectItems value="#{higienizacaoBean.internacoes}" var="internacao" 
+                                               itemValue="#{internacao}" itemLabel="#{internacao.leito.descricaoLeito} / #{internacao.idInternacao}-#{internacao.codigoInternacaoHospital}" />
+                                 <p:ajax update="@form" />
+                            </p:selectOneMenu>
+                            
+                            <p:outputLabel value="Paciente" for="paciente" />
+                            <p:inputText id="paciente" value="#{higienizacaoBean.higienizacao.internacao.paciente.nomePessoa}" disabled="true" />
+                            
+                            <p:outputLabel value="Médico" for="medico" />
+                            <p:inputText id="medico" value="#{higienizacaoBean.higienizacao.internacao.medico.nomePessoa}" disabled="true" />
+                            
+                            <p:outputLabel value="Saída" for="saida" />
+                            <p:inputText id="saida" value="#{higienizacaoBean.higienizacao.internacao.dataSaidaLeito}" disabled="true">
+                                <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss" locale="pt_BR" />
+                            </p:inputText>
+
+                            <p:outputLabel for="datahorainicial" value="Data e hora inicial" />
+                            <p:calendar id="datahorainicial" locale="pt" mask="99/99/9999 99:99" value="#{higienizacaoBean.higienizacao.dataHoraInicio}" required="true" pattern="dd/MM/yyyy HH:mm" disabled="#{higienizacaoBean.habilitaCampos eq false}" />
+
+                            <p:outputLabel for="datahorafinal" value="Data e hora final" />
+                            <p:calendar id="datahorafinal" locale="pt" mask="99/99/9999 99:99" value="#{higienizacaoBean.higienizacao.dataHoraFim}" required="true" pattern="dd/MM/yyyy HH:mm" disabled="#{higienizacaoBean.habilitaCampos eq false}" />
+
+                            <p:outputLabel value="Funcionário(s)" for="funcionario" />
+                            <p:selectManyMenu label="Funcionário" id="funcionario" value="#{higienizacaoBean.higienizacao.funcionarios}" required="true" converter="converterFuncionario"
+                                              var="f" filter="true" filterMatchMode="contains" showCheckbox="true" disabled="#{higienizacaoBean.habilitaCampos eq false}" >
+                                <f:selectItems value="#{higienizacaoBean.funcionarios}" var="funcionario" itemLabel="#{funcionario.nomePessoa}" itemValue="#{funcionario}" />
+                                <p:column>
+                                    <h:outputText value="#{f.nomePessoa}" />
+                                </p:column>
+                            </p:selectManyMenu>
+                        </p:panelGrid>
+                    </p:tab>
+                    <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+                     <!--inicio campos para cadastrar ou alterar dados na segunda aba-->
+                    <p:tab title="Observações" >
+                        <p:inputTextarea rows="7" maxlength="500" value="#{higienizacaoBean.higienizacao.observacoesHigienizacao}" disabled="#{higienizacaoBean.habilitaCampos eq false}"/>
+                    </p:tab>
+                    <!--fim campos para cadastrar ou alterar dados na segunda aba-->
+
+                </p:tabView>
+            </div>
+            <!--fim tabela com abas-->
+
+        </h:form>
+    </ui:define>
+</ui:composition>

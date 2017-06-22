@@ -1,0 +1,190 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+        
+         <f:metadata>
+             <f:viewAction action="#{funcionarioBean.inicializarPaginaPesquisa()}"  />
+        </f:metadata>
+        
+        <h1 class="nir-titulopagina">Pesquisa de Funcionários</h1>
+
+        <h:form id="frm">
+
+            <!--inicio barra de ferramentas superior com botao para cadastrar novos dados-->
+            <p:toolbar rendered="#{usuarioBean.autorizacao eq 1}">
+                <p:toolbarGroup align="right">
+                    <p:commandButton icon="fa fa-file-text" value="Relatório" action="#{funcionarioBean.gerarRelatorio()}"
+                                     ajax="false" onclick="this.form.target = '_blank'" disabled="#{empty funcionarioBean.funcionarios}"/>
+                    <p:commandButton icon="fa fa-plus" value="Novo Funcionário" action="#{funcionarioBean.novo()}"
+                                     process="@this" />
+                </p:toolbarGroup>
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com botao para cadastrar novos dados-->
+
+            <p:messages autoUpdate="true" closable="true" />
+            
+            <!--inicio tabela de dados que lista dados-->
+            <p:dataTable id="tabelaDeDados" 
+                         value="#{funcionarioBean.funcionarios}" var="funcionario"
+                         widgetVar="tabelaDeDados"
+                         paginator="true"     
+                         rows="10"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         selectionMode="single" selection="#{funcionarioBean.funcionario}"
+                         rowKey="#{funcionario.idPessoa}" reflow="true" emptyMessage="Não há dados de funcionário"
+                         sortBy="#{funcionario.idPessoa}"
+                         filteredValue="#{funcionarioBean.filtrarLista}">
+
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <p:inputText id="globalFilter" onkeyup="PF('tabelaDeDados').filter()" style="width:auto" placeholder="Digite aqui para consultar"/>
+                    </p:outputPanel>
+                </f:facet>
+
+                <p:column headerText="Código" sortBy="#{funcionario.idPessoa}" filterBy="#{funcionario.idPessoa}">
+                    <h:outputText value="#{funcionario.idPessoa}" />
+                </p:column> 
+                <p:column headerText="Nome" sortBy="#{funcionario.nomePessoa}" filterBy="#{funcionario.nomePessoa}">
+                    <h:outputText value="#{funcionario.nomePessoa}" />
+                </p:column> 
+                <p:column headerText="E-mail" filterBy="#{funcionario.emailPessoa}" filterStyle="display: none;">
+                    <h:outputText value="#{funcionario.emailPessoa  }" />
+                </p:column> 
+                <p:column headerText="Telefone" filterBy="#{funcionario.telefonePessoa}" filterStyle="display: none;">
+                    <h:outputText value="#{funcionario.telefonePessoa}" />
+                </p:column> 
+
+                <f:facet name="footer">
+                    <p:commandButton icon="fa fa-search-plus" process="tabelaDeDados" update=":frm:detalhes" 
+                                     value="Detalhes" oncomplete="PF('detalhesDialog').show()" />
+                    <p:commandButton icon="ui-icon-pencil" value="Editar" 
+                                     action="cadastro-funcionario?faces-redirect=true" 
+                                     rendered="#{usuarioBean.autorizacao eq 1}" />
+                     <p:commandButton value="Excluir" 
+                                     rendered="#{usuarioBean.autorizacao eq 1}"
+                                     actionListener="#{funcionarioBean.excluir()}"
+                                     icon="fa fa-trash"
+                                     update=":frm:tabelaDeDados :frm:ultimolog">
+                        <p:confirm header="Confirmação" message="Confirma inativação do registro selecionado?" icon="ui-icon-alert" />
+                    </p:commandButton>
+                    <p:commandButton icon="fa fa-calendar" process="tabelaDeDados" update=":frm:logs" 
+                                     value="Eventos" oncomplete="PF('logsDialog').show()" 
+                                     actionListener="#{funcionarioBean.gerarLogs()}" />
+                </f:facet>
+
+            </p:dataTable>
+            <!--fim tabela de dados que lista dados-->
+            
+            <h:outputText id="ultimolog" styleClass="ui-outputtext log" value="#{funcionarioBean.ultimoLog()}" />
+
+            <!--inicio janela modal que exibe detalhes do cadastro selecionado-->
+            <p:dialog header="Detalhes" widgetVar="detalhesDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" >
+                <p:outputPanel id="detalhes" style="text-align:center;">
+                    <p:panelGrid columns="2" rendered="#{not empty funcionarioBean.funcionario}" columnClasses="label,value">
+ 
+                        <h:outputText value="Código" />
+                        <h:outputText value="#{funcionarioBean.funcionario.idPessoa}" />
+                        
+                        <h:outputText value="Nome" />
+                        <h:outputText value="#{funcionarioBean.funcionario.nomePessoa}" />
+                        
+                        <h:outputText value="Data Nascimento" rendered="#{not empty funcionarioBean.funcionario.dataNascimentoPessoa}" />
+                        <h:outputText value="#{funcionarioBean.funcionario.dataNascimentoPessoa}" rendered="#{not empty funcionarioBean.funcionario.dataNascimentoPessoa}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+                        </h:outputText>
+                        
+                        <h:outputText value="CPF" />
+                        <h:outputText value="#{funcionarioBean.funcionario.cpfPessoa}" />
+                        
+                        <h:outputText value="RG" />
+                        <h:outputText value="#{funcionarioBean.funcionario.rgPessoa}" />
+                        
+                        <h:outputText value="Sexo" />
+                        <h:outputText value="Masculino" rendered="#{funcionarioBean.funcionario.sexoPessoa eq 'M'}" />
+                        <h:outputText value="Feminino" rendered="#{funcionarioBean.funcionario.sexoPessoa eq 'F'}" />
+                        
+                        <h:outputText value="Endereço" />
+                        <h:outputText value="#{funcionarioBean.funcionario.enderecoPessoa}" />
+                        
+                        <h:outputText value="Número" />
+                        <h:outputText value="#{funcionarioBean.funcionario.numeroPessoa}" />
+                        
+                        <h:outputText value="Bairro" />
+                        <h:outputText value="#{funcionarioBean.funcionario.bairroPessoa}" />
+                        
+                        <h:outputText value="Cidade" />
+                        <h:outputText value="#{funcionarioBean.funcionario.cidade.nomeCidade}" />
+                        
+                        <h:outputText value="Estado" />
+                        <h:outputText value="#{funcionarioBean.funcionario.estado.nomeEstado}" />
+                        
+                        <h:outputText value="CEP" />
+                        <h:outputText value="#{funcionarioBean.funcionario.cepPessoa}" />
+                        
+                        <h:outputText value="Telefone" rendered="#{not empty funcionarioBean.funcionario.telefonePessoa}" />
+                        <h:outputText value="#{funcionarioBean.funcionario.telefonePessoa}" rendered="#{not empty funcionarioBean.funcionario.telefonePessoa}"/>
+                        
+                        <h:outputText value="Celular" />
+                        <h:outputText value="#{funcionarioBean.funcionario.celularPessoa}" />
+                        
+                        <h:outputText value="E-mail" />
+                        <h:outputText value="#{funcionarioBean.funcionario.emailPessoa}" />
+                        
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+            <!--fim janela modal que exibe detalhes do cadastro selecionado-->
+            
+            <!--inicio janela modal que pede confirmação de exclusão -->
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+            <!--fim janela modal que pede confirmação de exclusão -->
+            
+            <!--inicio janela modal que exibe logs do cadastro selecionado-->
+            <p:dialog width="550px" header="Eventos" widgetVar="logsDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" >
+                <p:dataList id="logs" value="#{funcionarioBean.logs}" var="log" type="definition" 
+                            paginator="true" rows="5" 
+                            paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                            paginatorPosition="bottom"
+                            emptyMessage="Não há eventos">
+                    <f:facet name="header">     
+                        #{funcionarioBean.funcionario.nomePessoa}
+                    </f:facet>
+                    <h:outputText value="#{log.dataHora}" style="margin-left: 10px;">
+                        <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss '-'" locale="pt_BR" />
+                    </h:outputText>
+                    <h:outputText value=" #{log.tipo}" style="font-weight: bold" />
+                    <h:outputText value=" feita por" />
+                    <h:outputText value=" #{log.usuario.login}. " id="usuario" />
+                    <p:tooltip id="toolTipUsuario" for="usuario" value="#{log.usuario.pessoa.nomePessoa}" position="right"/>
+
+                    <p:commandLink update=":frm:detalhesLog" id="detalhes" oncomplete="PF('dlgDetalhesLog').show()" title="Detalhes" styleClass="ui-icon ui-icon-search" style="float:right;margin-right:10px" rendered="#{not empty log.detalhe}">
+                        <f:setPropertyActionListener value="#{log}" target="#{funcionarioBean.log}" />
+                    </p:commandLink>
+                    <p:tooltip id="toolTipDetalhes" for="detalhes" value="Detalhes" position="right"/>
+                    <p:separator  style="margin: 5px;"/>                    
+
+                </p:dataList>
+
+            </p:dialog>
+            <!--fim janela modal que exibe logs do cadastro selecionado-->
+
+            <!--inicio janela modal que exibe detalhes do log do cadastro selecionado-->
+            <p:dialog header="Detalhes" widgetVar="dlgDetalhesLog" modal="true" showEffect="blind" hideEffect="explode" width="460px" resizable="false" closeOnEscape="true" >
+                <p:outputPanel id="detalhesLog" style="text-align: justify;">
+                    <h:outputText value="#{funcionarioBean.log.detalhe}" />
+                </p:outputPanel>
+            </p:dialog>
+            <!--fim janela modal que exibe detalhes do log do cadastro selecionado-->
+
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,516 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+        <h1 class="nir-titulopagina">Controle de Leitos e Internações</h1>
+
+        <h:form id="frm" rendered="#{usuarioBean.autorizacao le 3}">
+
+            <p:notificationBar id="resumoInternacao" position="top" effect="slide" style="z-index: 9999; width: 99%;" widgetVar="nbResumoInternacao">
+                <center>
+                    <h:outputText value="Internação: " style="font-size:16px; font-weight: bold;" />
+                    <h:outputText value="#{internacaoBean.resumoInternacao.idInternacao}-#{internacaoBean.resumoInternacao.codigoInternacaoHospital} | " style="font-size:16px;" />
+                    <h:outputText value="Entrada: " style="font-size:16px; font-weight: bold;" />
+                    <h:outputText value="#{internacaoBean.resumoInternacao.dataEntrada}" style="font-size:16px;" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm ' | '" locale="pt_BR" />
+                    </h:outputText>
+                    <h:outputText value="Vencimento: " style="font-size:16px; font-weight: bold;" />   
+                    <h:outputText value="#{internacaoBean.resumoInternacao.dataHoraLimiteVermelho}" style="font-size:16px;" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                    </h:outputText><br />
+
+                    <h:outputText value="Paciente: " style="font-size:16px; font-weight: bold;" />
+                    <h:outputText value="#{internacaoBean.resumoInternacao.paciente.nomePessoa} | " style="font-size:16px;" />
+                    <h:outputText value="Médico: " style="font-size:16px; font-weight: bold;" />
+                    <h:outputText value="#{internacaoBean.resumoInternacao.medico.nomePessoa}" style="font-size:16px;" /><br/>
+
+                    <h:outputText value="Procedimento: " style="font-size:16px; font-weight: bold;" />
+                    <h:outputText value="#{internacaoBean.resumoInternacao.procedimento.NO_PROCEDIMENTO} | " style="font-size:16px;" />
+                    <h:outputText value="CID: " style="font-size:16px; font-weight: bold;" />
+                    <h:outputText value="#{internacaoBean.resumoInternacao.cid.NO_CID}" style="font-size:16px;" /><br/><br />
+
+                    <p:commandButton value="Recolher" onclick="PF('nbResumoInternacao').hide()" type="button" icon="fa fa-arrow-up"/>
+                </center>
+            </p:notificationBar>
+
+            <p:growl id="growlmsg" life="8000" />
+            <p:poll id="poll" interval="300" update=":frm:leitoDataGrid" />
+
+            <!--inicio legenda cores-->
+            <div class="nir-boxlegenda" id="legendacores" >                
+                <h:outputLink class="nir-legenda cinza-escuro" id="tpCinzaEscuro" value="#" />
+                <p:tooltip id="toolTipFadeCinzaEscuro" for="tpCinzaEscuro" value="Aguardando Higienização do Leito " position="left"/>
+
+                <h:outputLink class="nir-legenda cinza-claro" id="tpCinzaClaro" value="#" />
+                <p:tooltip id="toolTipFadeCinzaClaro" for="tpCinzaClaro" value="Aguardando Paciente Liberar Leito" position="left"/>
+
+                <h:outputLink class="nir-legenda vermelho" id="tpVermelho" value="#"/>
+                <p:tooltip id="toolTipFadeVermelho" for="tpVermelho" value="Internação em Andamento - Urgente" position="left"/>
+
+                <h:outputLink class="nir-legenda amarelo" id="tpAmarelo" value="#" />
+                <p:tooltip id="toolTipFadeAmarelo" for="tpAmarelo" value="Internação em Andamento - Atenção" position="left"/>
+
+                <h:outputLink class="nir-legenda verde" id="tpVerde" value="#" />                    
+                <p:tooltip id="toolTipFadeVerde" for="tpVerde" value="Internação em Andamento - Normal" position="left"/>
+
+                <h:outputLink class="nir-legenda azul" id="tpAzul" value="#" />
+                <p:tooltip id="toolTipFadeAzul" for="tpAzul" value="Leito Disponível" position="left"/>
+            </div>
+            <!--fim legenda cores-->
+
+            <!--inicio barra de ferramentas superior-->
+            <p:toolbar id="toolbar">
+                <p:toolbarGroup align="left">
+                    <p:selectOneMenu id="tipoPesq" value="#{leitoBean.tipoPesq}">
+                        <p:ajax listener="#{leitoBean.verificarTipoPesq()}" update=":frm:exibirCampoPesq :frm:leitoDataGrid" />
+                        <f:selectItem itemLabel="Setor" itemValue="1" />
+                        <f:selectItem itemLabel="Médico" itemValue="2" />
+                    </p:selectOneMenu>
+                </p:toolbarGroup>
+
+                <p:toolbarGroup align="left">
+                    <h:panelGroup id="exibirCampoPesq">
+                        <p:inputText placeholder="Código do Setor" id="setor" maxlength="10" value="#{leitoBean.pesqSetor}" rendered="#{leitoBean.exibePesqSetor eq true}" style="margin: 0 5px 0 5px;"/>
+
+                        <p:selectOneMenu label="Medico" id="medico" value="#{leitoBean.pesqMedico}" effect="fade" var="m" 
+                                         filter="true" filterMatchMode="startsWith" converter="converterMedico" rendered="#{leitoBean.exibePesqMedico eq true}" style="margin: 0 3px 0 3px;" >
+                            <f:selectItem itemLabel="Selecione o Médico" />
+                            <f:selectItems value="#{leitoBean.medicos}" var="medico" 
+                                           itemValue="#{medico}" itemLabel="#{medico.nomePessoa}" />
+                            <p:column>
+                                <h:outputText value="#{m.nomePessoa}" />
+                            </p:column>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <p:commandButton id="pesq" icon="fa fa-search" update=":frm:leitoDataGrid" style="position: absolute"/>
+                    <p:tooltip id="toolTipFadePesq" for="pesq" position="right" value="Buscar Leitos"/>
+                </p:toolbarGroup>
+
+                <p:toolbarGroup align="right">
+                    <p:clock id="relogio" pattern="dd/MM/yyyy HH:mm:ss" />
+                    <p:commandButton id="atualizarPainel" icon="fa fa-refresh" update=":frm:leitoDataGrid"/>
+                    <p:tooltip id="toolTipFadeAtualizarPainel" for="atualizarPainel" position="bottom" value="Atualizar"/>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <!--fim barra de ferramentas superior-->
+
+            <!--inicio tabela de dados que lista dados-->
+            <p:dataGrid value="#{leitoBean.listarLeitos()}" var="leito" columns="4" layout="grid"
+                        rows="12" id="leitoDataGrid" emptyMessage="Não existem dados de leitos" >
+                <f:facet name="header" >
+                    Leitos
+                </f:facet>
+
+                <p:panel id="painel" header="S.#{leito.quarto.setor.idSetor} | Q.#{leito.quarto.idQuarto} | L.#{leito.codigoLeito}" style="text-align:center">
+                    <h:panelGrid columns="1" style="width:100%">
+                        
+                        <h:outputText id="descricaoLeito" value="#{leito.descricaoLeito}" />                        
+                        
+                        <h:outputText id="nomePaciente" value="Paciente: #{leitoBean.nomeReduzidoPaciente(leito.internacao.paciente.nomePessoa)}" rendered="#{leito.statusLeito eq 'INT'}"/>
+                        <p:tooltip id="toolTipFadeNomePaciente" for="nomePaciente" position="bottom" value="#{leito.internacao.paciente.nomePessoa}" rendered="#{leito.statusLeito eq 'INT'}"/>
+                        
+                        <h:outputText id="descricao1" value="Disponível para nova internação" rendered="#{leito.statusLeito eq 'D'}" />
+                        <h:outputText id="descricao2" value="Aguardando saída do paciente" rendered="#{leito.statusLeito eq 'ES'}" />
+                        <h:outputText id="descricao3" value="Aguardando higienização" rendered="#{leito.statusLeito eq 'H'}" />
+                        
+                        <h:outputText id="descricao4" value="#{leito.internacao.dataPrevisaoAlta}" rendered="#{leito.statusLeito eq 'INT' and not empty leito.internacao.dataPrevisaoAlta}" >
+                            <f:convertDateTime pattern="'Previsão de Alta:' dd/MM/yyyy HH:mm" locale="pt_BR" />
+                        </h:outputText>
+                        <h:outputText id="descricao5" value="Previsão de Alta: Não Informado" rendered="#{leito.statusLeito eq 'INT' and empty leito.internacao.dataPrevisaoAlta}" />
+                        
+                        <p:spacer rendered="#{leito.statusLeito ne 'INT'}"/>
+
+                        <p:graphicImage id="corleito1" library="nir" name="imagens/leitoAzul.png" rendered="#{leito.statusLeito eq 'D'}" />
+                        <p:graphicImage id="corleito2" library="nir" name="imagens/leitoCinzaEscuro.png" rendered="#{leito.statusLeito eq 'H'}" />
+                        <p:graphicImage id="corleito3" library="nir" name="imagens/leitoCinzaClaro.png" rendered="#{leito.statusLeito eq 'ES'}" />
+                        
+                        <!--Cores Kanban-->
+                        <p:graphicImage id="corleito4" library="nir" name="imagens/leitoVerde.png" rendered="#{leito.statusLeito eq 'INT' and leito.internacao.dataHoraLimiteVerde.compareTo(leitoBean.dataAtual) ge 0 and leito.internacao.dataHoraLimiteAmarelo.compareTo(leitoBean.dataAtual) ge 0}" />
+                        <p:graphicImage id="corleito5" library="nir" name="imagens/leitoAmarelo.png" rendered="#{leito.statusLeito eq 'INT' and leito.internacao.dataHoraLimiteVerde.compareTo(leitoBean.dataAtual) le 0 and leito.internacao.dataHoraLimiteAmarelo.compareTo(leitoBean.dataAtual) ge 0}" />
+                        <p:graphicImage id="corleito6" library="nir" name="imagens/leitoVermelho.png" rendered="#{leito.statusLeito eq 'INT' and leito.internacao.dataHoraLimiteVerde.compareTo(leitoBean.dataAtual) le 0 and leito.internacao.dataHoraLimiteAmarelo.compareTo(leitoBean.dataAtual) le 0}" />
+                        <!--Cores Kanban-->
+                        
+                        <h:panelGroup>
+                            
+                            <p:commandButton id="internacao" actionListener="#{internacaoBean.prepararInternacao()}" icon="fa  fa-bed" value="Internação" oncomplete="PF('dlginternacao').show();" update=":forminternacao" rendered="#{leito.statusLeito eq 'D'}">
+                                <f:setPropertyActionListener value="#{leito}" target="#{internacaoBean.leitoSelecionado}" />
+                            </p:commandButton>
+                            <p:tooltip id="toolTipFadeInternacao" for="internacao" position="bottom" value="Nova Internação"/>
+
+                            <p:commandButton id="alta" icon="fa  fa-check-square" value="Alta" actionListener="#{internacaoBean.prepararAlta()}" oncomplete="PF('dlgalta').show();" update=":formalta" rendered="#{leito.statusLeito eq 'INT'}">
+                                <f:setPropertyActionListener value="#{leito.internacao}" target="#{internacaoBean.internacaoSelecionada}" />
+                            </p:commandButton>
+                            <p:tooltip id="toolTipFadeAlta" for="alta" position="bottom" value="Registrar Alta"/>
+
+                            <p:commandButton id="altaQualificada" icon="fa  fa-check-square-o" actionListener="#{internacaoBean.prepararAltaQualificada()}" oncomplete="PF('dlgaltaqualificada').show();" update=":formaltaqualificada" rendered="#{leito.statusLeito eq 'INT' and empty leito.internacao.dataPrevisaoAlta}">
+                                <f:setPropertyActionListener value="#{leito.internacao}" target="#{internacaoBean.internacaoSelecionada}" />
+                            </p:commandButton>
+                            <p:tooltip id="toolTipFadeAltaQualificada" for="altaQualificada" position="bottom" value="Registrar Alta Qualificada"/>
+
+                            <p:commandButton id="saida" icon="fa  fa-thumbs-up" value="Saída" oncomplete="PF('dlgsaida').show();" update=":formsaida" rendered="#{leito.statusLeito eq 'ES'}">
+                                <f:setPropertyActionListener value="#{leito.internacao}" target="#{internacaoBean.internacaoSelecionada}" />
+                            </p:commandButton>
+                            <p:tooltip id="toolTipFadeSaida" for="saida" position="bottom" value="Registrar Saída"/>
+
+                            <p:commandButton id="higienizacao" icon="fa  fa-asterisk" value="Higienização" actionListener="#{internacaoBean.prepararHigienizacao()}" oncomplete="PF('dlghigienizacao').show();" update=":formhigienizacao" rendered="#{leito.statusLeito eq 'H'}" >
+                                <f:setPropertyActionListener value="#{leito.internacao}" target="#{internacaoBean.internacaoSelecionada}" />
+                            </p:commandButton>
+                            <p:tooltip id="toolTipFadeHigienizacao" for="higienizacao" position="bottom" value="Registrar Higienização"/>
+
+                            <p:commandButton id="resumo" icon="fa  fa-file-text" actionListener="#{internacaoBean.internacaoPorId(leito.internacao.idInternacao)}" update=":frm:resumoInternacao" oncomplete="PF('nbResumoInternacao').show();" rendered="#{leito.statusLeito eq 'INT'}" />
+                            <p:tooltip id="toolTipFadeResumo" for="resumo" position="bottom" value="Resumo da Internação"/>
+
+                            <p:commandButton id="historico" icon="fa  fa-history" actionListener="#{leitoBean.listarHistoricoInternacoes(leito.idLeito)}" update=":historicoleito" oncomplete="PF('dlghistorico').show()" />                           
+                            <p:tooltip id="toolTipFadeHistorico" for="historico" position="bottom" value="Histórico do Leito"/>
+
+                            <p:commandButton id="cancelarInternacao" icon="fa  fa-close" actionListener="#{internacaoBean.cancelarInternacao(leito.internacao)}" update=":frm:growlmsg :frm:leitoDataGrid" rendered="#{leito.statusLeito eq 'INT'}">
+                                <p:confirm header="Confirmação" message="Confirma o cancelamento da Internação #{leito.internacao.idInternacao}-#{leito.internacao.codigoInternacaoHospital}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:tooltip id="toolTipFadeCancelarInternacao" for="cancelarInternacao" position="bottom" value="Cancelar Internação"/>
+                            
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </p:panel>
+            </p:dataGrid>
+        </h:form>
+
+        <p:dialog id="dlginternacao" header="Registrar Internação" widgetVar="dlginternacao" showEffect="explode" hideEffect="explode" modal="true" closeOnEscape="true" >
+            <h:form id="forminternacao">
+
+                <!--inicio tabela com abas-->
+                <div class="ui-fluid">
+                    <p:tabView id="tabview"> 
+
+                        <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                        <p:tab title="Internação">
+                            <p:panelGrid columns="4" layout="grid" 
+                                         columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4"
+                                         styleClass="semborda">
+
+                                <p:outputLabel value="Código Interno Hospital" for="codigo" />
+                                <p:inputText id="codigo" maxlength="9" required="true" value="#{internacaoBean.internacao.codigoInternacaoHospital}" />
+                                
+                                <p:outputLabel value="Leito" for="leito" />
+                                <p:inputText id="leito" value="#{internacaoBean.internacao.leito.descricaoLeito}" disabled="true" />
+
+                                <p:outputLabel for="paciente" value="Paciente" />
+                                <h:panelGroup >
+                                    <p:commandButton style="width: 40px" icon="fa fa-search" title="Pesquisa" action="#{selecaoPacienteBean.abrirDialogo()}" process="@this" update="@none" >
+                                        <f:setPropertyActionListener value="#{internacaoBean.internacao.leito}" target="#{selecaoPacienteBean.leitoSelecionado}" />
+                                        <p:ajax event="dialogReturn" listener="#{internacaoBean.pacienteSelecionado}" process="@this" update="paciente procedimento procedimentobt"/>
+                                        <p:resetInput target="paciente" />
+                                    </p:commandButton>
+                                    <p:inputText style="width: auto" required="true" id="paciente" value="#{internacaoBean.descricaoPaciente}" readonly="#{facesContext.renderResponse}" />
+                                </h:panelGroup>
+
+                                <h:outputLabel value="Médico" for="medico" />
+                                <p:selectOneMenu label="Médico" id="medico" value="#{internacaoBean.internacao.medico}" required="true" 
+                                                 effect="fade" var="m" filter="true" filterMatchMode="startsWith" converter="converterMedico" >
+                                    <f:selectItem itemLabel="Selecione" />
+                                    <f:selectItems value="#{internacaoBean.medicos}" var="medico" 
+                                                   itemValue="#{medico}" itemLabel="#{medico.nomePessoa}" />
+                                    <p:column>
+                                        <h:outputText value="#{m.nomePessoa}" />
+                                    </p:column>
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="procedimento" value="Procedimento" />
+                                <h:panelGroup>
+                                    <p:commandButton id="procedimentobt" style="width: 40px" icon="fa fa-search" title="Pesquisa" action="#{selecaoProcedimentoBean.abrirDialogo()}" process="@this" update="@none" disabled="#{empty internacaoBean.internacao.paciente.idPessoa}">
+                                        <f:setPropertyActionListener value="#{internacaoBean.internacao.leito}" target="#{selecaoProcedimentoBean.leitoSelecionado}" />
+                                        <f:setPropertyActionListener value="#{internacaoBean.internacao.paciente}" target="#{selecaoProcedimentoBean.pacienteSelecionado}" />
+                                        <p:ajax event="dialogReturn" listener="#{internacaoBean.procedimentoSelecionado}" process="@this" update="procedimento cid cidbt"/>
+                                        <p:resetInput target="procedimento" />
+                                    </p:commandButton>
+                                    <p:inputText style="width: auto" required="true" id="procedimento" value="#{internacaoBean.descricaoProcedimento}" readonly="#{facesContext.renderResponse}" disabled="#{empty internacaoBean.internacao.paciente.idPessoa}" />
+                                </h:panelGroup>
+
+                                <p:outputLabel for="cid" value="CID" />
+                                <h:panelGroup>
+                                    <p:commandButton id="cidbt" style="width: 40px" icon="fa fa-search" title="Pesquisa" action="#{selecaoCidBean.abrirDialogo()}" process="@this" update="@none" disabled="#{empty internacaoBean.internacao.procedimento.CO_PROCEDIMENTO}" >
+                                        <f:setPropertyActionListener value="#{internacaoBean.internacao.leito}" target="#{selecaoCidBean.leitoSelecionado}" />
+                                        <f:setPropertyActionListener value="#{internacaoBean.internacao.paciente}" target="#{selecaoCidBean.pacienteSelecionado}" />
+                                        <f:setPropertyActionListener value="#{internacaoBean.internacao.procedimento}" target="#{selecaoCidBean.procedimentoSelecionado}" />
+                                        <p:ajax event="dialogReturn" listener="#{internacaoBean.cidSelecionado}" process="@this" update="cid"/>
+                                        <p:resetInput target="cid" />
+                                    </p:commandButton>
+                                    <p:inputText style="width: auto" required="true" id="cid" value="#{internacaoBean.descricaoCid}" readonly="#{facesContext.renderResponse}" disabled="#{empty internacaoBean.internacao.procedimento.CO_PROCEDIMENTO}"/>
+                                </h:panelGroup>
+
+                                <p:outputLabel for="dataentrada" value="Data e hora da Entrada" />
+                                <p:calendar id="dataentrada" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.internacao.dataEntrada}" required="true" pattern="dd/MM/yyyy HH:mm" />
+
+                                <p:commandButton style="width: auto;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarInternacao()}"
+                                                 process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :forminternacao " oncomplete="PF('dlginternacao').hide();" />
+
+                                <p:commandButton icon="fa fa-close" value="Cancelar"
+                                                 update=":forminternacao" immediate="true" onclick="PF('dlginternacao').hide();" />
+
+                            </p:panelGrid>
+                        </p:tab>
+                        <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+
+                    </p:tabView>
+                </div>
+                <!--fim tabela com abas-->
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlgaltaqualificada" header="Registrar Alta Qualificada" widgetVar="dlgaltaqualificada" showEffect="explode" hideEffect="explode" modal="true" closeOnEscape="true" >
+            <h:form id="formaltaqualificada">
+                <div class="ui-fluid">
+                    <p:tabView id="tabview"> 
+
+                        <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                        <p:tab title="Alta Qualificada">
+                            <p:panelGrid columns="4" layout="grid" 
+                                         columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4"
+                                         styleClass="semborda">
+
+                                <p:outputLabel value="Paciente" for="paciente" />
+                                <p:inputText id="paciente" value="#{internacaoBean.altaQualificada.internacao.paciente.nomePessoa}" disabled="true" />
+
+                                <p:outputLabel value="Internação" for="internacao" />
+                                <p:inputMask id="internacao" mask="99-99999" value="#{internacaoBean.altaQualificada.internacao.idInternacao}-#{internacaoBean.altaQualificada.internacao.codigoInternacaoHospital}" disabled="true" />
+
+                                <p:outputLabel value="Leito" for="leito" />
+                                <p:inputText id="leito" value="#{internacaoBean.altaQualificada.internacao.leito.descricaoLeito}" disabled="true" />
+
+                                <p:outputLabel value="Médico" for="medico" />
+                                <p:inputText id="medico" value="#{internacaoBean.altaQualificada.internacao.medico.nomePessoa}" disabled="true" />
+
+                                <p:outputLabel for="dataaltaqualificada" value="Previsão da Alta" />
+                                <p:calendar id="dataaltaqualificada" required="true" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.altaQualificada.dataHoraPrevisao}" pattern="dd/MM/yyyy HH:mm" />
+
+                                <p:commandButton style="width: auto;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarAltaQualificada()}"
+                                                 process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :formaltaqualificada" oncomplete="PF('dlgaltaqualificada').hide();" />
+
+                                <p:commandButton icon="fa fa-close" value="Cancelar"
+                                                 update=":formaltaqualificada" immediate="true" onclick="PF('dlgaltaqualificada').hide();" />
+
+                            </p:panelGrid>
+                        </p:tab>
+                        <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+
+                    </p:tabView>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlgalta" header="Registrar Alta" widgetVar="dlgalta" showEffect="explode" hideEffect="explode" modal="true" closeOnEscape="true" >
+            <h:form id="formalta">
+                <div class="ui-fluid">
+                    <p:tabView id="tabview"> 
+
+                        <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                        <p:tab title="Alta">
+                            <p:panelGrid columns="4" layout="grid" 
+                                         columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4"
+                                         styleClass="semborda">
+
+                                <p:outputLabel value="Paciente" for="paciente" />
+                                <p:inputText id="paciente" value="#{internacaoBean.alta.internacao.paciente.nomePessoa}" disabled="true" />
+
+                                <p:outputLabel value="Internação" for="internacao" />
+                                <p:inputMask id="internacao" mask="99-99999" value="#{internacaoBean.alta.internacao.idInternacao}-#{internacaoBean.alta.internacao.codigoInternacaoHospital}" disabled="true" />
+
+                                <p:outputLabel value="Leito" for="leito" />
+                                <p:inputText id="leito" value="#{internacaoBean.alta.internacao.leito.descricaoLeito}" disabled="true" />
+                                
+                                <p:outputLabel value="Médico" for="medico" />
+                                <p:inputText id="medico" value="#{internacaoBean.alta.internacao.medico.nomePessoa}" disabled="true" />
+                                
+                                <p:outputLabel value="Data Alta" for="dataalta" />
+                                <p:calendar id="dataalta" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.alta.dataHoraRealizacao}" pattern="dd/MM/yyyy HH:mm" />
+
+                                <h:outputLabel value="Médico Alta" for="medicoalta" />
+                                <p:selectOneMenu label="Médico" id="medicoalta" value="#{internacaoBean.alta.medico}" required="true" 
+                                                 effect="fade" var="m" filter="true" filterMatchMode="startsWith" converter="converterMedico" >
+                                    <f:selectItem itemLabel="Selecione" />
+                                    <f:selectItems value="#{internacaoBean.medicos}" var="medico" 
+                                                   itemValue="#{medico}" itemLabel="#{medico.nomePessoa}" />
+                                    <p:column>
+                                        <h:outputText value="#{m.nomePessoa}" />
+                                    </p:column>
+                                </p:selectOneMenu>
+
+                                <p:commandButton style="width: auto;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarAlta()}"
+                                                 process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :formalta" oncomplete="PF('dlgalta').hide();" />
+
+                                <p:commandButton icon="fa fa-close" value="Cancelar"
+                                                 update=":formalta" immediate="true" onclick="PF('dlgalta').hide();" />
+
+                            </p:panelGrid>
+                        </p:tab>
+                        <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+
+                    </p:tabView>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlgsaida" header="Registrar Saída" widgetVar="dlgsaida" showEffect="explode" hideEffect="explode" modal="true" closeOnEscape="true" >
+
+            <h:form id="formsaida">
+                <div class="ui-fluid">
+                    <p:tabView id="tabview"> 
+
+                        <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                        <p:tab title="Liberação do Leito">
+                            <p:panelGrid columns="4" layout="grid" 
+                                         columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4"
+                                         styleClass="semborda">
+
+                                <p:outputLabel value="Paciente" for="paciente" />
+                                <p:inputText id="paciente" value="#{internacaoBean.internacaoSelecionada.paciente.nomePessoa}" disabled="true" />
+
+                                <p:outputLabel value="Leito" for="leito" />
+                                <p:inputText id="leito" value="#{internacaoBean.internacaoSelecionada.leito.descricaoLeito}" disabled="true" />
+
+                                <p:outputLabel for="datasaida" value="Data e hora Saída" />
+                                <p:calendar id="datasaida" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.internacaoSelecionada.dataSaidaLeito}" pattern="dd/MM/yyyy HH:mm" />
+
+                                <p:commandButton style="width: auto;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarSaida()}"
+                                                 process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :formsaida" oncomplete="PF('dlgsaida').hide();" />
+
+                                <p:commandButton icon="fa fa-close" value="Cancelar"
+                                                 update=":formsaida" immediate="true" onclick="PF('dlgsaida').hide();" />
+
+                            </p:panelGrid>
+                        </p:tab>
+                        <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+
+                    </p:tabView>
+                </div>
+
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlghigienizacao" width="700px" header="Registrar Higienização" widgetVar="dlghigienizacao" showEffect="explode" hideEffect="explode" modal="true" resizable="false" closeOnEscape="true" >
+
+            <h:form id="formhigienizacao">
+                <div class="ui-fluid">
+                    <p:tabView id="tabview" > 
+
+                        <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                        <p:tab title="Higienização">
+                            <p:panelGrid columns="4" layout="grid" 
+                                         columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4"
+                                         styleClass="semborda">
+
+                                <p:outputLabel value="Leito" for="leito" />
+                                <p:inputText id="leito" value="#{internacaoBean.higienizacao.internacao.leito.descricaoLeito}" disabled="true" />
+
+                                <p:outputLabel value="Último Paciente" for="paciente" />
+                                <p:inputText id="paciente" value="#{internacaoBean.higienizacao.internacao.paciente.nomePessoa}" disabled="true" />
+
+                                <p:outputLabel value="Saída" for="saida" />
+                                <p:inputText id="saida" value="#{internacaoBean.higienizacao.internacao.dataSaidaLeito}" readonly="true" >
+                                    <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy 'as' hh'h'mm'min'" locale="pt_BR" />
+                                </p:inputText>
+
+                                <p:outputLabel for="datahorainicial" value="Data e hora inicial" />
+                                <p:calendar id="datahorainicial" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.higienizacao.dataHoraInicio}" required="true" pattern="dd/MM/yyyy HH:mm" />
+
+                                <p:outputLabel for="datahorafinal" value="Data e hora final" />
+                                <p:calendar id="datahorafinal" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.higienizacao.dataHoraFim}" required="true" pattern="dd/MM/yyyy HH:mm" />
+
+                                <p:outputLabel value="Funcionário(s)" for="funcionario" />
+                                <p:selectManyMenu label="Funcionário" id="funcionario" value="#{internacaoBean.higienizacao.funcionarios}" required="true" converter="converterFuncionario"
+                                                  var="f" filter="true" filterMatchMode="contains" showCheckbox="true">
+                                    <f:selectItems value="#{internacaoBean.funcionarios}" var="funcionario" itemLabel="#{funcionario.nomePessoa}" itemValue="#{funcionario}" />
+                                    <p:column>
+                                        <h:outputText value="#{f.nomePessoa}" />
+                                    </p:column>
+                                </p:selectManyMenu>
+                            </p:panelGrid>
+
+                        </p:tab>
+                        <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+                        <!--inicio campos para cadastrar ou alterar dados na segunda aba-->
+                        <p:tab title="Observações">
+                            <p:inputTextarea id="observacoeshigienizacao" rows="7" value="#{internacaoBean.higienizacao.observacoesHigienizacao}" />
+                        </p:tab>
+                    </p:tabView>
+                    <!--fim campos para cadastrar ou alterar dados na segunda aba-->
+                    <p:commandButton style="width: auto; margin: 10px; left: 64%;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarHigienizacao()}"
+                                     process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :formhigienizacao" oncomplete="PF('dlghigienizacao').hide();" />
+
+                    <p:commandButton style="width: auto; left: 64%;" icon="fa fa-close" value="Cancelar"
+                                     update=":formhigienizacao" immediate="true" onclick="PF('dlghigienizacao').hide();" />
+                </div>
+
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dlghistorico" width="500" header="Histórico de Internações" widgetVar="dlghistorico" modal="true" showEffect="fade" hideEffect="fade" resizable="false" responsive="true" closeOnEscape="true" >
+
+            <p:dataTable reflow="true" id="historicoleito" var="historico" 
+                         value="#{leitoBean.historicoInternacoesPorLeito}"
+                         emptyMessage="Não há dados de internações para o leito selecionado."
+                         scrollable="true" scrollWidth="900" scrollHeight="200">
+
+                <p:column headerText="Internação">
+                    <h:outputText value="#{historico.idInternacao}-#{historico.codigoInternacaoHospital}" />
+                </p:column>
+                
+                <p:column headerText="Paciente">
+                    <h:outputText value="#{historico.paciente.nomePessoa}" />
+                </p:column>
+
+                <p:column headerText="Médico">
+                    <h:outputText value="#{historico.medico.nomePessoa}" />
+                </p:column>
+            
+                <p:column headerText="Entrada">
+                    <h:outputText value="#{historico.dataEntrada}" >
+                        <f:convertDateTime pattern="dd/MM/yy 'as' HH:mm" locale="pt_BR" />
+                    </h:outputText>
+                </p:column>
+                
+                 <p:column headerText="Vencimento">
+                     <h:outputText value="#{historico.dataHoraLimiteVermelho}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Previsão" >
+                    <h:outputText value="Não informado" rendered="#{empty historico.dataPrevisaoAlta}" />
+                    <h:outputText value="#{historico.dataPrevisaoAlta}" rendered="#{not empty historico.dataPrevisaoAlta}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Alta" >
+                    <h:outputText value="Não informado" rendered="#{empty historico.dataAlta}" />
+                    <h:outputText value="#{historico.dataAlta}" rendered="#{not empty historico.dataAlta}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Saída" >
+                    <h:outputText value="Não informado" rendered="#{empty historico.dataSaidaLeito}"/>
+                    <h:outputText value="#{historico.dataSaidaLeito}" rendered="#{not empty historico.dataSaidaLeito}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                    </h:outputText>
+                </p:column>
+
+            </p:dataTable>
+        </p:dialog>
+
+        <h:form>
+            <!--inicio janela modal que pede confirmação de cancelamento -->
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+            <!--fim janela modal que pede confirmação de cancelamento -->
+        </h:form>
+
+    </ui:define>
+</ui:composition>

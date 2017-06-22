@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioLeito" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="719d0261-dd2b-4e18-961d-d14bd2b837a7">
+	<property name="ireport.zoom" value="1.6105100000000077"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="115"/>
+	<parameter name="LOGO" class="java.awt.Image"/>
+	<field name="idLeito" class="java.lang.String"/>
+	<field name="codigoLeito" class="java.lang.String"/>
+	<field name="descricaoLeito" class="java.lang.String"/>
+	<field name="tipo_leito.NO_TIPO_LEITO" class="java.lang.String"/>
+	<field name="tipoSexo" class="java.lang.String"/>
+	<field name="idadeMinima" class="java.lang.String"/>
+	<field name="idadeMaxima" class="java.lang.String"/>
+	<field name="quarto.idQuarto" class="java.lang.String"/>
+	<field name="quarto.setor.idSetor" class="java.lang.String"/>
+	<field name="quarto.setor.tipoSetor" class="java.lang.String"/>
+	<field name="quarto.setor.hospital.nomeHospital" class="java.lang.String"/>
+	<field name="quarto.tipoQuarto" class="java.lang.String"/>
+	<group name="Group3">
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="Group4">
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band/>
+	</background>
+	<title>
+		<band height="54">
+			<staticText>
+				<reportElement x="75" y="0" width="440" height="30" forecolor="#000000" backcolor="#FFFFFF" uuid="b43dcb0d-ef7e-43fd-a110-43d606e81bc4"/>
+				<textElement textAlignment="Center">
+					<font size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório Cadastro de Leitos]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="53">
+			<staticText>
+				<reportElement x="1" y="5" width="23" height="20" uuid="e3295250-1659-4110-90b4-a6d41b3d7f7b"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cód.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="112" y="5" width="130" height="20" uuid="a590a30b-8308-4c27-b897-1d2f4b0239f9"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descrição]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="5" width="103" height="20" uuid="296716db-4568-45eb-9a76-9ecf44520000"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo Sexo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="247" y="5" width="121" height="20" uuid="51120f8f-6819-4216-a059-a21031b660af"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="555" height="1" uuid="9ac8bdeb-78ce-4a5f-9078-2011eefaf0a1"/>
+			</line>
+			<staticText>
+				<reportElement x="30" y="5" width="74" height="20" uuid="87cfd9de-834f-45d6-885c-367bb1c26d99"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cód. Hospital]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="373" y="5" width="78" height="20" uuid="5066ffd6-d043-40a2-93f3-166227e86a02"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Idade Min./Máx.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="59" y="30" width="129" height="20" uuid="b4bc518d-986f-4e02-a9d2-cf137fa6bd27"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Quarto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="198" y="30" width="129" height="20" uuid="0040b8c8-3889-49b2-acb7-7e51997e9052"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Setor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="337" y="29" width="156" height="20" uuid="18b203b3-1826-4eff-be51-6f24922fce82"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hospital]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="57">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="555" height="1" uuid="ff0a18af-a15b-448f-8a5f-61f3667b2a7c"/>
+			</line>
+			<textField>
+				<reportElement x="1" y="30" width="23" height="20" uuid="f0432111-1a0b-4164-8d0e-a6f6df9059df"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idLeito}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="30" width="132" height="20" uuid="eb16b99d-8963-4d1d-b57f-3275c1865a36"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descricaoLeito}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="247" y="30" width="119" height="20" uuid="d6c998ce-9ae7-4fed-8426-d6aad19e68bf"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tipo_leito.NO_TIPO_LEITO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="28" y="30" width="76" height="20" uuid="d0861a9f-e59e-4a0a-bbb4-91cd09a537ea"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigoLeito}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="451" y="30" width="103" height="20" uuid="c1bc3290-8f7e-426a-8e55-ea860891730c"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tipoSexo}.equals("M") ? "Masculino"  : 
+$F{tipoSexo}.equals("F" )? "Feminino" :
+$F{tipoSexo}.equals("I") ? "Indiferente/Ambos" :
+$F{tipoSexo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="371" y="30" width="78" height="20" uuid="b8a553a8-5506-4364-b0fb-5a045142ad89"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idadeMinima} + "/" + $F{idadeMaxima}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="59" y="7" width="129" height="20" uuid="71f87d2e-a236-4450-8b8a-5fdd1cae88f0"/>
+				<textFieldExpression><![CDATA[$F{quarto.idQuarto} + " - " + $F{quarto.tipoQuarto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="198" y="7" width="129" height="20" uuid="3ff396dc-8ef8-4aa1-8e30-7557036c5fff"/>
+				<textFieldExpression><![CDATA[$F{quarto.setor.idSetor} + " - " + $F{quarto.setor.tipoSetor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="337" y="7" width="156" height="20" uuid="b6dc2a47-aa2a-4ea0-b491-9fc444c9e900"/>
+				<textFieldExpression><![CDATA[$F{quarto.setor.hospital.nomeHospital}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band/>
+	</columnFooter>
+	<pageFooter>
+		<band height="39">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="555" height="1" uuid="671242f0-7b4c-4092-8485-7f12e27c523c"/>
+			</line>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="9" width="274" height="13" uuid="1d437cfd-2bbc-4c2b-a2fb-b8aabe7634ae"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="32" y="22" width="165" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="c7da197a-1536-4c4c-8807-6ee6ae5edd2e"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[N.I.R. Gestão de Leitos Hospitalares]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="515" y="9" width="40" height="13" backcolor="#FFFFFF" uuid="80db7b56-9dc6-4101-be10-54c0f62efcef"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="274" y="9" width="241" height="13" backcolor="#FFFFFF" uuid="5b471937-5bba-41fe-b93c-cb9ddb43375d"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="22" width="30" height="14" uuid="aae1add8-92fc-4f4b-bf25-2ffbc760be63"/>
+				<imageExpression><![CDATA[$P{LOGO}]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+</jasperReport>

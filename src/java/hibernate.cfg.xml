@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN" "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/bdghnir?zeroDateTimeBehavior=convertToNull</property>
+    <property name="hibernate.connection.username">root</property>
+    <property name="hibernate.connection.password">123456</property>
+    
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="hibernate.show_sql">true</property>
+    <property name="hibernate.format_sql">true</property>
+    
+    <mapping class="br.com.gestaohospitalar.nir.model.Alta" />
+    <mapping class="br.com.gestaohospitalar.nir.model.AltaQualificada" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Autorizacao" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Cidade" /> 
+    <mapping class="br.com.gestaohospitalar.nir.model.ConfiguracaoKanban" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Enfermeiro" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Estado" /> 
+    <mapping class="br.com.gestaohospitalar.nir.model.Estatisticas" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Fisioterapeuta" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Funcionario" />
+    <mapping class="br.com.gestaohospitalar.nir.model.GerenteEnfermagem" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Higienizacao" /> 
+    <mapping class="br.com.gestaohospitalar.nir.model.Hospital" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Internacao" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Leito" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Log" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Medico" />
+    <mapping class="br.com.gestaohospitalar.nir.model.NIR" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Paciente" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Parametros" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Pessoa" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Quarto" />
+    <mapping class="br.com.gestaohospitalar.nir.model.Setor" />
+    <mapping class="br.com.gestaohospitalar.nir.model.SigtapUploadLog" />
+    <mapping class="br.com.gestaohospitalar.nir.model.TerapeutaOcupacional" /> 
+    <mapping class="br.com.gestaohospitalar.nir.model.Usuario" />
+    
+    <mapping class="br.com.gestaohospitalar.nir.model.sigtap.RL_PROCEDIMENTO_CID" />
+    <mapping class="br.com.gestaohospitalar.nir.model.sigtap.RL_PROCEDIMENTO_LEITO" />
+    <mapping class="br.com.gestaohospitalar.nir.model.sigtap.TB_CID" />
+    <mapping class="br.com.gestaohospitalar.nir.model.sigtap.TB_FINANCIAMENTO" />
+    <mapping class="br.com.gestaohospitalar.nir.model.sigtap.TB_MODALIDADE" />
+    <mapping class="br.com.gestaohospitalar.nir.model.sigtap.TB_PROCEDIMENTO" />
+    <mapping class="br.com.gestaohospitalar.nir.model.sigtap.TB_RUBRICA" />
+    <mapping class="br.com.gestaohospitalar.nir.model.sigtap.TB_TIPO_LEITO" />
+    
+  </session-factory>
+</hibernate-configuration>

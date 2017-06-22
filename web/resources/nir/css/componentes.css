@@ -1,0 +1,106 @@
+/*ALTERNA MENU - ÍCONE*/
+.nir-alternarmenu{
+    float: right;
+    line-height: 50px;
+    margin-right: 17px;
+
+    color: #fff;
+}
+
+/*MENU*/
+.ui-panelmenu-panel {
+
+}
+.ui-panelmenu-panel a{
+    text-decoration: none;
+    background-color: #fff;
+    font-size: 1.1em;
+    font-weight: 500;
+    margin: 0;
+    padding: 10px 0 0 0 ;
+}
+
+.ui-panelmenu-panel a:hover{
+    background-color: #f6f6f6;
+    zoom: 1;
+}
+
+.ui-panelmenu-panel .ui-panelmenu-header a{
+    color: #373737;
+}
+
+/*TITULO PAGINA*/
+.nir-titulopagina {
+    margin: 0;
+    padding: 20px 0;
+
+    font-size: 1.5em;
+    color: #373737;
+}
+.ui-panelmenu-header a{
+    color: #000;
+}
+
+/*MENSAGEM DE ALERTA*/
+.nir-msgAlerta{
+    border: 1px solid;
+    margin: 10px 0px;
+    padding: 15px 10px 15px 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.3em;
+    color: #9F6000;
+    background-color: #FEEFB3;
+}
+
+.nir-msgAlertaUrgente{
+    border: 1px solid;
+    margin: 10px 0px;
+    padding: 15px 10px 15px 30px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.3em;
+    color: #D8000C;
+    background-color: #FFBABA;
+}
+
+.faMsgAlerta{
+    margin-right: 10px;
+}
+
+/*LEGENDA DE CORES DA DASHBOARD*/
+.nir-boxlegenda {
+    width: auto;
+    height: auto;
+    padding-bottom: 25px; 
+}
+
+.nir-legenda {
+    width:15px;
+    height:15px;
+    float: right;
+    margin: 3px;
+    border-radius: 3px;
+ }
+
+.nir-legenda.azul {
+    background-color: #007fbe;
+ }
+
+.nir-legenda.verde {
+    background-color: #008000;
+ }
+
+.nir-legenda.amarelo {
+    background-color: #ffd700;
+ }
+
+.nir-legenda.vermelho{
+    background-color: #ff0000;
+ }
+
+.nir-legenda.cinza-claro {
+    background-color: #727171;
+ }
+
+.nir-legenda.cinza-escuro {
+    background-color: #373737;
+ }

@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioEstatisticas" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f1c520fc-2c6f-4cf3-9127-5d8447895d80">
+	<property name="ireport.zoom" value="1.9487171000000227"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="164"/>
+	<parameter name="data_inicial" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="data_final" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_setor" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOGO" class="java.awt.Image"/>
+	<parameter name="usuario" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+estatisticas.`tempoInternacao` AS tempoInternacaoSegundos,
+     truncate(estatisticas.`tempoInternacao` / 86400, 0) AS tempoInternacaoDias,
+     truncate(estatisticas.`tempoInternacao` / 3600, 0) - (truncate(estatisticas.`tempoInternacao` / 86400, 0) * 24) AS tempoInternacaoHoras,
+     truncate(estatisticas.`tempoInternacao` / 60, 0) - ((truncate(estatisticas.`tempoInternacao` / 86400, 0) * 1440) + ((truncate(estatisticas.`tempoInternacao` / 3600, 0) - (truncate(estatisticas.`tempoInternacao` / 86400, 0) * 24))*60)) AS tempoInternacaoMinutos,
+     
+     estatisticas.`tempoAltaQualificadaAteAlta` AS tempoAltaQualificadaAteAltaSegundos,
+     truncate(estatisticas.`tempoAltaQualificadaAteAlta` / 86400, 0) AS tempoAltaQualificadaAteAltaDias,
+     truncate(estatisticas.`tempoAltaQualificadaAteAlta` / 3600, 0) - (truncate(estatisticas.`tempoAltaQualificadaAteAlta` / 86400, 0) * 24) AS tempoAltaQualificadaAteAltaHoras,
+     truncate(estatisticas.`tempoAltaQualificadaAteAlta` / 60, 0) - ((truncate(estatisticas.`tempoAltaQualificadaAteAlta` / 86400, 0) * 1440) + ((truncate(estatisticas.`tempoAltaQualificadaAteAlta` / 3600, 0) - (truncate(estatisticas.`tempoAltaQualificadaAteAlta` / 86400, 0) * 24))*60)) AS tempoAltaQualificadaAteAltaMinutos,
+     
+     estatisticas.`tempoSaidaPaciente` AS tempoSaidaPacienteSegundos,
+     truncate(estatisticas.`tempoSaidaPaciente` / 86400, 0) AS tempoSaidaPacienteDias,
+     truncate(estatisticas.`tempoSaidaPaciente` / 3600, 0) - (truncate(estatisticas.`tempoSaidaPaciente` / 86400, 0) * 24) AS tempoSaidaPacienteHoras,
+     truncate(estatisticas.`tempoSaidaPaciente` / 60, 0) - ((truncate(estatisticas.`tempoSaidaPaciente` / 86400, 0) * 1440) + ((truncate(estatisticas.`tempoSaidaPaciente` / 3600, 0) - (truncate(estatisticas.`tempoSaidaPaciente` / 86400, 0) * 24))*60)) AS tempoSaidaPacienteMinutos,
+     
+     estatisticas.`tempoSaidaAteHigienizacao` AS tempoSaidaAteHigienizacaoSegundos,
+     truncate(estatisticas.`tempoSaidaAteHigienizacao` / 86400, 0) AS tempoSaidaAteHigienizacaoDias,
+     truncate(estatisticas.`tempoSaidaAteHigienizacao` / 3600, 0) - (truncate(estatisticas.`tempoSaidaAteHigienizacao` / 86400, 0) * 24) AS tempoSaidaAteHigienizacaoHoras,
+     truncate(estatisticas.`tempoSaidaAteHigienizacao` / 60, 0) - ((truncate(estatisticas.`tempoSaidaAteHigienizacao` / 86400, 0) * 1440) + ((truncate(estatisticas.`tempoSaidaAteHigienizacao` / 3600, 0) - (truncate(estatisticas.`tempoSaidaAteHigienizacao` / 86400, 0) * 24))*60)) AS tempoSaidaAteHigienizacaoMinutos,
+     estatisticas.`tempoHigienizacao` AS tempoHigienizacaoSegundos,
+     truncate(estatisticas.`tempoHigienizacao` / 86400, 0) AS tempoHigienizacaoDias,
+     truncate(estatisticas.`tempoHigienizacao` / 3600, 0) - (truncate(estatisticas.`tempoHigienizacao` / 86400, 0) * 24) AS tempoHigienizacaoHoras,
+     truncate(estatisticas.`tempoHigienizacao` / 60, 0) - ((truncate(estatisticas.`tempoHigienizacao` / 86400, 0) * 1440) + ((truncate(estatisticas.`tempoHigienizacao` / 3600, 0) - (truncate(estatisticas.`tempoHigienizacao` / 86400, 0) * 24))*60)) AS tempoHigienizacaoMinutos,
+     
+	 estatisticas.`tempoOciosidade` AS tempoOciosidadeSegundos,
+     truncate(estatisticas.`tempoOciosidade` / 86400, 0) AS tempoOciosidadeDias,
+     truncate(estatisticas.`tempoOciosidade` / 3600, 0) - (truncate(estatisticas.`tempoOciosidade` / 86400, 0) * 24) AS tempoOciosidadeHoras,
+     truncate(estatisticas.`tempoOciosidade` / 60, 0) - ((truncate(estatisticas.`tempoOciosidade` / 86400, 0) * 1440) + ((truncate(estatisticas.`tempoOciosidade` / 3600, 0) - (truncate(estatisticas.`tempoOciosidade` / 86400, 0) * 24))*60)) AS tempoOciosidadeMinutos,
+     internacao.`idInternacao` AS internacao_idInternacao,
+     internacao.`dataEntrada` AS internacao_dataEntrada,
+     internacao.`dataPrevisaoAlta` AS internacao_dataPrevisaoAlta,
+     internacao.`dataAlta` AS internacao_dataAlta,
+     internacao.`dataSaidaLeito` AS internacao_dataSaidaLeito,
+     internacao.`codigoInternacaoHospital` AS internacao_codigoInternacaoHospital,
+     internacao.`dataHoraLimiteVermelho` AS internacao_dataHoraLimiteVermelho,
+     setor.`idSetor` AS setor_idSetor,
+     setor.`tipoSetor` AS setor_tipoSetor,
+     quarto.`idQuarto` AS quarto_idQuarto,
+     quarto.`tipoQuarto` AS quarto_tipoQuarto,
+     leito.`idLeito` AS leito_idLeito,
+     leito.`codigoLeito` AS leito_codigoLeito,
+     leito.`descricaoLeito` AS leito_descricaoLeito,
+     tb_procedimento.`QT_DIAS_PERMANENCIA` AS tb_procedimento_QT_DIAS_PERMANENCIA,
+     estatisticas.`idEstatisticas` AS estatisticas_idEstatisticas
+FROM
+     `higienizacao` higienizacao LEFT OUTER JOIN `estatisticas` estatisticas ON higienizacao.`idHigienizacao` = estatisticas.`idHigienizacao`
+     LEFT OUTER JOIN `internacao` internacao ON estatisticas.`idInternacao` = internacao.`idInternacao`
+     AND internacao.`idInternacao` = higienizacao.`idInternacao`
+     RIGHT OUTER JOIN `leito` leito ON internacao.`idLeito` = leito.`idLeito`
+     LEFT OUTER JOIN `tb_procedimento` tb_procedimento ON internacao.`CO_PROCEDIMENTO` = tb_procedimento.`CO_PROCEDIMENTO`
+     AND tb_procedimento.`chaveMesAno` = internacao.`chaveMesAnoProcedimento`
+     AND leito.`idLeito` = estatisticas.`idLeito`
+     LEFT OUTER JOIN `quarto` quarto ON leito.`idQuarto` = quarto.`idQuarto`
+     LEFT OUTER JOIN `setor` setor ON quarto.`idSetor` = setor.`idSetor`
+WHERE
+     internacao.`statusInternacao` = 'EN'
+ AND internacao.`dataEntrada` BETWEEN $P{data_inicial} AND $P{data_final}
+ AND setor.`idSetor` = $P{id_setor}
+ORDER BY
+     setor.`idSetor` ASC,
+     quarto.`idQuarto` ASC,
+     leito.`idLeito` ASC,
+     internacao.`dataEntrada` ASC]]>
+	</queryString>
+	<field name="tempoInternacaoSegundos" class="java.lang.Integer"/>
+	<field name="tempoInternacaoDias" class="java.math.BigDecimal"/>
+	<field name="tempoInternacaoHoras" class="java.math.BigDecimal"/>
+	<field name="tempoInternacaoMinutos" class="java.math.BigDecimal"/>
+	<field name="tempoAltaQualificadaAteAltaSegundos" class="java.lang.Integer"/>
+	<field name="tempoAltaQualificadaAteAltaDias" class="java.math.BigDecimal"/>
+	<field name="tempoAltaQualificadaAteAltaHoras" class="java.math.BigDecimal"/>
+	<field name="tempoAltaQualificadaAteAltaMinutos" class="java.math.BigDecimal"/>
+	<field name="tempoSaidaPacienteSegundos" class="java.lang.Integer"/>
+	<field name="tempoSaidaPacienteDias" class="java.math.BigDecimal"/>
+	<field name="tempoSaidaPacienteHoras" class="java.math.BigDecimal"/>
+	<field name="tempoSaidaPacienteMinutos" class="java.math.BigDecimal"/>
+	<field name="tempoSaidaAteHigienizacaoSegundos" class="java.lang.Integer"/>
+	<field name="tempoSaidaAteHigienizacaoDias" class="java.math.BigDecimal"/>
+	<field name="tempoSaidaAteHigienizacaoHoras" class="java.math.BigDecimal"/>
+	<field name="tempoSaidaAteHigienizacaoMinutos" class="java.math.BigDecimal"/>
+	<field name="tempoHigienizacaoSegundos" class="java.lang.Integer"/>
+	<field name="tempoHigienizacaoDias" class="java.math.BigDecimal"/>
+	<field name="tempoHigienizacaoHoras" class="java.math.BigDecimal"/>
+	<field name="tempoHigienizacaoMinutos" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tempoOciosidadeSegundos" class="java.lang.Integer"/>
+	<field name="tempoOciosidadeDias" class="java.math.BigDecimal"/>
+	<field name="tempoOciosidadeHoras" class="java.math.BigDecimal"/>
+	<field name="tempoOciosidadeMinutos" class="java.math.BigDecimal"/>
+	<field name="internacao_idInternacao" class="java.lang.Integer"/>
+	<field name="internacao_dataEntrada" class="java.sql.Timestamp"/>
+	<field name="internacao_dataPrevisaoAlta" class="java.sql.Timestamp"/>
+	<field name="internacao_dataAlta" class="java.sql.Timestamp"/>
+	<field name="internacao_dataSaidaLeito" class="java.sql.Timestamp"/>
+	<field name="internacao_codigoInternacaoHospital" class="java.lang.Integer"/>
+	<field name="internacao_dataHoraLimiteVermelho" class="java.sql.Timestamp"/>
+	<field name="setor_idSetor" class="java.lang.Integer"/>
+	<field name="setor_tipoSetor" class="java.lang.String"/>
+	<field name="quarto_idQuarto" class="java.lang.Integer"/>
+	<field name="quarto_tipoQuarto" class="java.lang.String"/>
+	<field name="leito_idLeito" class="java.lang.Integer"/>
+	<field name="leito_codigoLeito" class="java.lang.String"/>
+	<field name="leito_descricaoLeito" class="java.lang.String"/>
+	<field name="tb_procedimento_QT_DIAS_PERMANENCIA" class="java.lang.Integer"/>
+	<field name="estatisticas_idEstatisticas" class="java.lang.Integer"/>
+	<variable name="tempoTotalOciosidadeSegundos" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoOciosidadeSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalHigienizacaoSegundos" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoHigienizacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalSaidaAteHigienizacaoSegundos" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoSaidaAteHigienizacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalSaidaPacienteSegundos" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoSaidaPacienteSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalAltaQualificadaAteAltaSegundos" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoAltaQualificadaAteAltaSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalInternacaoSegundos" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoInternacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaOciosidadeSegundos" class="java.math.BigDecimal" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoOciosidadeSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaHigienizacaoSegundos" class="java.math.BigDecimal" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoHigienizacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaSaidaAteHigienizacaoSegundos" class="java.math.BigDecimal" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoSaidaAteHigienizacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaSaidaPacienteSegundos" class="java.math.BigDecimal" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoSaidaPacienteSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaAltaQualificadaAteAltaSegundos" class="java.math.BigDecimal" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoAltaQualificadaAteAltaSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaInternacaoSegundos" class="java.math.BigDecimal" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoInternacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalInternacaoGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoInternacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalSaidaPacienteGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoSaidaPacienteSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalAltaQualificadaAteAltaGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoAltaQualificadaAteAltaSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalOciosidadeGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoOciosidadeSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalHigienizacaoGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoHigienizacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoTotalSaidaAteHigienizacaoGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoSaidaAteHigienizacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaOciosidadeGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoOciosidadeSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaHigienizacaoGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoHigienizacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaSaidaAteHigienizacaoGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoSaidaAteHigienizacaoSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaSaidaPacienteGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoSaidaPacienteSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaAltaQualificadaAteAltaGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoAltaQualificadaAteAltaSegundos}]]></variableExpression>
+	</variable>
+	<variable name="tempoMediaInternacaoGrupo" class="java.math.BigDecimal" resetType="Group" resetGroup="leito_idLeito" calculation="Average">
+		<variableExpression><![CDATA[$F{tempoInternacaoSegundos}]]></variableExpression>
+	</variable>
+	<group name="quarto_idQuarto">
+		<groupExpression><![CDATA[$F{quarto_idQuarto}]]></groupExpression>
+	</group>
+	<group name="leito_idLeito">
+		<groupExpression><![CDATA[$F{leito_idLeito}]]></groupExpression>
+		<groupHeader>
+			<band height="18">
+				<textField>
+					<reportElement x="0" y="2" width="801" height="13" uuid="33d937f2-477b-4a9f-b5ad-171cc4fb1aa7"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Setor: " + $F{setor_idSetor} + " - " + $F{setor_tipoSetor} + "     /     " +
+"Quarto: " + $F{quarto_idQuarto} + " - " + $F{quarto_tipoQuarto} + "     /     " +
+"Leito: " + $F{leito_idLeito} + " - " + $F{leito_descricaoLeito}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="801" height="48" uuid="0068437f-2f09-4054-bbe4-838e90c0851d"/>
+				<textElement textAlignment="Center">
+					<font size="36" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório Tempo em Leitos]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyy">
+				<reportElement x="735" y="71" width="41" height="13" uuid="cd1b7a2f-2fea-45ae-b227-53080415f296"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{data_final}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="643" y="58" width="133" height="13" uuid="5b39c2d9-ed3d-4dd6-b2a7-4750be760eb3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Solicitado por: " + $P{usuario}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyy">
+				<reportElement x="685" y="71" width="41" height="13" uuid="407e5b26-43dc-4e48-8c45-8dcbcd452d33"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{data_inicial}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="642" y="71" width="41" height="13" uuid="6358f798-6a52-4a9d-ba58-aee87052b326"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Período:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="728" y="71" width="5" height="13" uuid="ecd7ed41-9921-49a8-8a98-182be1fb7ea8"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[a]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="29" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="23" width="802" height="1" uuid="99cc7724-892a-44c0-915f-f02677a36c59"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="78" height="20" uuid="98337219-bf23-4302-914b-5b94ce10c224"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data de Entrada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="0" width="85" height="20" uuid="49bf1eb4-0496-4f1a-806f-1395e4cd9e3a"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cód. Internação]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="164" y="0" width="53" height="20" uuid="079e3a61-e2aa-4f5d-aa35-baf0661e09f5"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Máx. Dias]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="216" y="0" width="78" height="20" uuid="a600a673-ef87-46fb-8b10-b453a972a7d3"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vencimento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="293" y="0" width="92" height="20" uuid="9f34649c-7532-4aba-acad-c1acb983b0ee"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tempo Internação]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="385" y="0" width="80" height="20" uuid="5a76c2a1-a0d4-44af-a512-41fe0d448f56"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ Previsão x Alta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="466" y="0" width="73" height="20" uuid="de52dd51-ec92-4f9e-bf2b-59774f6afcab"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saída Paciente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="537" y="0" width="94" height="20" uuid="52291a77-c6ea-4964-8a03-cd5729080965"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saída x Início Hig.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="633" y="0" width="68" height="20" uuid="ade1ea18-91f1-470d-84e5-e5b7a5142338"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Higienização]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="703" y="0" width="73" height="20" uuid="458f195b-5626-49bd-b5c2-c4da05248de9"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ociosidade]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="78" height="13" uuid="ceb36141-d49b-497f-b527-e118e41fd596"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{internacao_dataEntrada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="78" y="0" width="85" height="13" uuid="71da7786-d58a-4778-a0d7-e992a40ba14a"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{internacao_idInternacao} + "-" + 
+$F{internacao_codigoInternacaoHospital}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="164" y="0" width="53" height="13" uuid="2bb1859a-a356-4c3d-aec9-9e33c5aaabb2"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{tb_procedimento_QT_DIAS_PERMANENCIA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="216" y="0" width="78" height="13" uuid="042a917d-c1ae-47e9-ad3c-c321c29978d5"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{internacao_dataHoraLimiteVermelho}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="293" y="0" width="92" height="13" uuid="c5d82e3e-6559-4b61-8408-7859ca20ffeb"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tempoInternacaoDias} + "D " +
+$F{tempoInternacaoHoras} + "H " +
+$F{tempoInternacaoMinutos} + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="385" y="0" width="80" height="13" uuid="929ec59a-0d10-427f-a8c4-9b32fe8e479e"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tempoAltaQualificadaAteAltaMinutos} != null ? 
+$F{tempoAltaQualificadaAteAltaDias} + "D " +
+$F{tempoAltaQualificadaAteAltaHoras} + "H " +
+$F{tempoAltaQualificadaAteAltaMinutos} + "M" :
+$F{tempoAltaQualificadaAteAltaMinutos}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="466" y="0" width="73" height="13" uuid="f6c46994-0b96-4099-b0c8-1f5d67f194f8"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tempoSaidaPacienteDias} + "D " +
+$F{tempoSaidaPacienteHoras} + "H " +
+$F{tempoSaidaPacienteMinutos} + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="537" y="0" width="94" height="13" uuid="f8ee222c-4651-480c-aaf0-99880be48bc0"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tempoSaidaAteHigienizacaoDias} + "D " +
+$F{tempoSaidaAteHigienizacaoHoras} + "H " +
+$F{tempoSaidaAteHigienizacaoMinutos} + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="633" y="0" width="68" height="13" uuid="22c5da7f-3d51-4678-b180-01faee1be880"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tempoHigienizacaoHoras} + "H " +
+$F{tempoHigienizacaoMinutos} + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="703" y="0" width="73" height="13" uuid="87f3a084-18fc-446d-b8d7-689bdc649129"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tempoOciosidadeMinutos} != null ?
+$F{tempoOciosidadeDias} + "D " +
+$F{tempoOciosidadeHoras} + "H " +
+$F{tempoOciosidadeMinutos} + "M" :
+null]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="43" splitType="Stretch">
+			<staticText>
+				<reportElement x="32" y="23" width="165" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="5994bdbd-8e13-49d8-bd66-84110f662ed0"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[N.I.R. Gestão de Leitos Hospitalares]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Opaque" x="520" y="10" width="241" height="13" backcolor="#FFFFFF" uuid="0db70710-fd9c-46f4-a0b0-9ec0a5dc7ad4"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="761" y="10" width="40" height="13" backcolor="#FFFFFF" uuid="6f0a6199-0715-4674-bacf-9bbacc4af1ff"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="10" width="274" height="13" uuid="930c5fa5-fb39-43a9-9198-bcf85c3aa46f"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="802" height="1" uuid="af0036e5-3493-430d-b8a6-076b4923f5bc"/>
+			</line>
+			<image>
+				<reportElement x="0" y="23" width="30" height="14" uuid="f2323610-cc96-4df5-bb73-ed03ae64adc9"/>
+				<imageExpression><![CDATA[$P{LOGO}]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="703" y="22" width="73" height="13" uuid="2714bde7-678c-4c54-b48e-e80e5d9aa743"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoTotalOciosidadeSegundos} / 86400).intValue() + "D " +
+(($V{tempoTotalOciosidadeSegundos} / 3600).intValue() - (($V{tempoTotalOciosidadeSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoTotalOciosidadeSegundos} / 60).intValue() - (((($V{tempoTotalOciosidadeSegundos} / 86400).intValue()) * 1440) + (($V{tempoTotalOciosidadeSegundos} / 3600).intValue() - (($V{tempoTotalOciosidadeSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="634" y="22" width="67" height="13" uuid="e90f92e7-706d-4430-b48a-c27755423b07"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoTotalHigienizacaoSegundos} / 86400).intValue() + "D " +
+(($V{tempoTotalHigienizacaoSegundos} / 3600).intValue() - (($V{tempoTotalHigienizacaoSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoTotalHigienizacaoSegundos} / 60).intValue() - (((($V{tempoTotalHigienizacaoSegundos} / 86400).intValue()) * 1440) + (($V{tempoTotalHigienizacaoSegundos} / 3600).intValue() - (($V{tempoTotalHigienizacaoSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="537" y="22" width="94" height="13" uuid="7a7cdf90-48e5-49ec-89e0-4187e75a5c99"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoTotalSaidaAteHigienizacaoSegundos} / 86400).intValue() + "D " +
+(($V{tempoTotalSaidaAteHigienizacaoSegundos} / 3600).intValue() - (($V{tempoTotalSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoTotalSaidaAteHigienizacaoSegundos} / 60).intValue() - (((($V{tempoTotalSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 1440) + (($V{tempoTotalSaidaAteHigienizacaoSegundos} / 3600).intValue() - (($V{tempoTotalSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="466" y="22" width="73" height="13" uuid="3187a33a-caa0-4177-8980-7bf76ea4f47f"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoTotalSaidaPacienteSegundos} / 86400).intValue() + "D " +
+(($V{tempoTotalSaidaPacienteSegundos} / 3600).intValue() - (($V{tempoTotalSaidaPacienteSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoTotalSaidaPacienteSegundos} / 60).intValue() - (((($V{tempoTotalSaidaPacienteSegundos} / 86400).intValue()) * 1440) + (($V{tempoTotalSaidaPacienteSegundos} / 3600).intValue() - (($V{tempoTotalSaidaPacienteSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="385" y="22" width="80" height="13" uuid="b2a98e82-5110-4ce2-afb3-1fb2927e141d"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoTotalAltaQualificadaAteAltaSegundos} / 86400).intValue() + "D " +
+(($V{tempoTotalAltaQualificadaAteAltaSegundos} / 3600).intValue() - (($V{tempoTotalAltaQualificadaAteAltaSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoTotalAltaQualificadaAteAltaSegundos} / 60).intValue() - (((($V{tempoTotalAltaQualificadaAteAltaSegundos} / 86400).intValue()) * 1440) + (($V{tempoTotalAltaQualificadaAteAltaSegundos} / 3600).intValue() - (($V{tempoTotalAltaQualificadaAteAltaSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="293" y="22" width="92" height="13" uuid="4ee92701-8f5d-453d-b7fc-62b4f9e463fc"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoTotalInternacaoSegundos} / 86400).intValue() + "D " +
+(($V{tempoTotalInternacaoSegundos} / 3600).intValue() - (($V{tempoTotalInternacaoSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoTotalInternacaoSegundos} / 60).intValue() - (((($V{tempoTotalInternacaoSegundos} / 86400).intValue()) * 1440) + (($V{tempoTotalInternacaoSegundos} / 3600).intValue() - (($V{tempoTotalInternacaoSegundos} / 86400).intValue()) * 24)* 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="230" y="22" width="63" height="13" uuid="be166e27-d255-43b2-9ac8-0ae8217582ab"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Geral:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="9" width="63" height="13" uuid="913de8a5-e12f-47c3-90c1-8f2e8e90c03b"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Média Geral:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="293" y="9" width="92" height="13" uuid="3ee14e10-e9bb-4331-a861-50bef624d802"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoMediaInternacaoSegundos} / 86400).intValue() + "D " +
+(($V{tempoMediaInternacaoSegundos} / 3600).intValue() - (($V{tempoMediaInternacaoSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoMediaInternacaoSegundos} / 60).intValue() - (((($V{tempoMediaInternacaoSegundos} / 86400).intValue()) * 1440) + (($V{tempoMediaInternacaoSegundos} / 3600).intValue() - (($V{tempoMediaInternacaoSegundos} / 86400).intValue()) * 24)* 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="385" y="9" width="80" height="13" uuid="e2d0cc18-1e2c-48b6-a838-85e0bbdd658e"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoMediaAltaQualificadaAteAltaSegundos} / 86400).intValue() + "D " +
+(($V{tempoMediaAltaQualificadaAteAltaSegundos} / 3600).intValue() - (($V{tempoMediaAltaQualificadaAteAltaSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoMediaAltaQualificadaAteAltaSegundos} / 60).intValue() - (((($V{tempoMediaAltaQualificadaAteAltaSegundos} / 86400).intValue()) * 1440) + (($V{tempoMediaAltaQualificadaAteAltaSegundos} / 3600).intValue() - (($V{tempoMediaAltaQualificadaAteAltaSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="466" y="9" width="73" height="13" uuid="27140a82-9e74-4986-90f0-66429ae23825"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoMediaSaidaPacienteSegundos} / 86400).intValue() + "D " +
+(($V{tempoMediaSaidaPacienteSegundos} / 3600).intValue() - (($V{tempoMediaSaidaPacienteSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoMediaSaidaPacienteSegundos} / 60).intValue() - (((($V{tempoMediaSaidaPacienteSegundos} / 86400).intValue()) * 1440) + (($V{tempoMediaSaidaPacienteSegundos} / 3600).intValue() - (($V{tempoMediaSaidaPacienteSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="537" y="9" width="94" height="13" uuid="d2b9196b-0423-412b-b933-0c484854b204"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoMediaSaidaAteHigienizacaoSegundos} / 86400).intValue() + "D " +
+(($V{tempoMediaSaidaAteHigienizacaoSegundos} / 3600).intValue() - (($V{tempoMediaSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoMediaSaidaAteHigienizacaoSegundos} / 60).intValue() - (((($V{tempoMediaSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 1440) + (($V{tempoMediaSaidaAteHigienizacaoSegundos} / 3600).intValue() - (($V{tempoMediaSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="634" y="9" width="67" height="13" uuid="cf76f2d2-39cb-4e8a-9097-42bb56e9ed34"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoMediaHigienizacaoSegundos} / 86400).intValue() + "D " +
+(($V{tempoMediaHigienizacaoSegundos} / 3600).intValue() - (($V{tempoMediaHigienizacaoSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoMediaHigienizacaoSegundos} / 60).intValue() - (((($V{tempoMediaHigienizacaoSegundos} / 86400).intValue()) * 1440) + (($V{tempoMediaHigienizacaoSegundos} / 3600).intValue() - (($V{tempoMediaHigienizacaoSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="703" y="9" width="73" height="13" uuid="114d5e63-3ff3-4791-8708-9895a62648df"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoMediaOciosidadeSegundos} / 86400).intValue() + "D " +
+(($V{tempoMediaOciosidadeSegundos} / 3600).intValue() - (($V{tempoMediaOciosidadeSegundos} / 86400).intValue()) * 24) + "H " +
+(($V{tempoMediaOciosidadeSegundos} / 60).intValue() - (((($V{tempoMediaOciosidadeSegundos} / 86400).intValue()) * 1440) + (($V{tempoMediaOciosidadeSegundos} / 3600).intValue() - (($V{tempoMediaOciosidadeSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

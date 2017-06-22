@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+
+        <f:facet name="first">
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </f:facet>
+
+        <title>NIR - Gestão de Leitos</title>
+
+        <!--css-->
+        <h:outputStylesheet library="nir" name="css/customizacao.css" />
+        <h:outputStylesheet library="nir" name="css/componentes.css" />
+        <h:outputStylesheet library="nir" name="css/layout.css" />
+        <!--css-->
+
+        <!--js-->
+        <h:outputScript target="body" library="primefaces" name="jquery/jquery.js"/>
+        <h:outputScript target="body" library="nir" name="js/app.js" />
+        <h:outputScript target="body" library="nir" name="js/pflocaleptBR.js" />
+        <!--js-->
+
+    </h:head>
+    <h:body>
+        <h:form>
+            <!--inicio da barra superior-->
+            <header class="nir-topo">
+
+                <h:graphicImage library="nir" name="imagens/logo.png" />
+
+                <h:outputLink id="sair" title="Sair" class="nir-alternarmenu" value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
+                    <i class="fa fa-sign-out"></i>
+                </h:outputLink>
+                <p:tooltip id="toolTipSair" for="sair" position="bottom"/>
+
+                <!--Componente: icone que alterna (mostra ou oculta) a barra lateral e o menu lateral-->
+                <p:commandLink class="nir-alternarmenu js-alternarmenu" id="alternamenu" >
+                    <i class="fa fa-bars"></i>
+                </p:commandLink>
+                <p:tooltip id="toolTipAlternaMenu" for="alternamenu" position="bottom" value="Menu Lateral" />
+
+                <h:outputText id="usuario" title="usuário" class="nir-alternarmenu" value="${usuarioBean.usuario.login}" />
+                <p:tooltip id="toolTipUsuario" for="usuario" position="bottom" value="Usuário Logado" />
+
+            </header>
+            <!--fim da barra superior-->
+        </h:form>
+        <!--inicio da barra lateral-->
+        <aside class="nir-barralateral js-barralateral">
+
+            <!--inicio menu-->
+            <h:form styleClass="nir-menu" rendered="#{usuarioBean.autorizacao le 3}">
+                <p:panelMenu>
+
+                    <p:submenu label="Instituição">
+                        <p:menuitem value="Hospital" outcome="pesquisa-hospital" icon="fa  fa-fw  fa-hospital-o" />
+                        <p:menuitem value="Setores" outcome="pesquisa-setores" icon="fa  fa-fw  fa-th-large" />
+                        <p:menuitem value="Quartos" outcome="pesquisa-quartos" icon="fa  fa-fw  fa-square" />
+                        <p:menuitem value="Leitos" outcome="pesquisa-leitos" icon="fa  fa-fw  fa-hotel" />
+                    </p:submenu>
+
+                    <p:submenu label="Profissionais">
+                        <p:menuitem value="Médicos" outcome="pesquisa-medicos" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Ger. de Enfermagem" outcome="pesquisa-gerentes-enfermagem" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Enfermeiros" outcome="pesquisa-enfermeiros" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Fisioterapeutas" outcome="pesquisa-fisioterapeutas" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Terapeutas Oc." outcome="pesquisa-terapeutas-ocupacionais" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Funcionários" outcome="pesquisa-funcionarios" icon="fa  fa-fw  fa-group" />
+                    </p:submenu>
+
+                    <p:submenu label="SigTap" rendered="#{usuarioBean.autorizacao eq 1}">
+                        <p:menuitem value="Importar Tabela" outcome="sigtap-upload" icon="fa  fa-fw  fa-upload" />
+                    </p:submenu>
+
+                    <p:submenu label="Internação" >
+                        <p:menuitem value="Painel de Informações" outcome="dashboard" icon="fa  fa-fw  fa-dashboard" />
+                        <p:menuitem value="Internação" outcome="pesquisa-internacoes" icon="fa  fa-fw  fa-bed" />
+                        <p:menuitem value="Alta Qualificada" outcome="pesquisa-alta-qualificada" icon="fa  fa-fw  fa-check-square-o" />
+                        <p:menuitem value="Alta" outcome="pesquisa-alta" icon="fa  fa-fw  fa-check-square" />
+                        <p:menuitem value="Higienização" outcome="pesquisa-higienizacao" icon="fa  fa-fw  fa-asterisk" />
+                        <p:menuitem value="Pacientes" outcome="pesquisa-pacientes" icon="fa  fa-fw  fa-user" />
+                    </p:submenu>
+
+                    <p:submenu label="Estatísticas" >
+                        <p:submenu label="Gráficos" icon="fa  fa-fw  fa-bar-chart">
+                            <p:menuitem value="Tempo Internação" outcome="grafico-tempo-internacao" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Previsão x Alta" outcome="grafico-alta-qualificada-alta" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Tempo Saída" outcome="grafico-tempo-saida-paciente" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Saída x Higienização" outcome="grafico-saida-higienizacao" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Tempo Higienização" outcome="grafico-tempo-higienizacao" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Tempo Ociosidade" outcome="grafico-tempo-ociosidade" icon="fa  fa-fw  fa-line-chart" />                            
+                        </p:submenu>
+                        <p:submenu label="Relatórios" icon="fa fa-file-text-o" >
+                            <p:menuitem value="Tempo em Leitos" outcome="relatorio-estatisticas" icon="fa  fa-fw fa-file-text" />
+                        </p:submenu>
+                    </p:submenu>
+
+                    <p:submenu label="Configurações">
+                        <p:menuitem value="NIR" outcome="pesquisa-nir" icon="fa  fa-fw  fa-user-plus" />
+                        <p:menuitem value="Kanban" outcome="configuracao-kanban" icon="fa  fa-fw  fa-sliders" rendered="#{usuarioBean.autorizacao eq 1}" />
+                        <p:menuitem value="Parâmetros" outcome="parametros" icon="fa  fa-fw  fa-gears" rendered="#{usuarioBean.autorizacao eq 1}" />
+                    </p:submenu>
+
+                </p:panelMenu>
+            </h:form>   
+            <!--fim menu-->
+
+        </aside>
+        <!--fim da barra lateral-->
+
+        <!--inicio da area de conteudo-->
+        <section class="nir-conteudo js-conteudo">
+            <ui:insert name="conteudo" />
+        </section>
+        <!--fim da area de conteudo-->
+
+        <!--inicio da area de rodapé
+        <section class="nir-footer js-footer">
+            <h:outputText id="footer" title="NIR - Gestão de Leitos Hospitalares" value="NIR - Gestão de Leitos Hospitalares" />
+        </section>
+        fim da area de rodapé-->
+
+    </h:body>
+</html>
+

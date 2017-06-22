@@ -1,0 +1,139 @@
+body {
+    margin: 0;
+    font-size: 13px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #007fbe;
+}
+
+.nir-login-box {
+    background-color: #0179b4;
+    width: 380px;
+    height: 280px;
+    margin: 80px auto 0px;
+    border-radius: 5px;
+}
+
+.nir-login-box-interno {
+    width: 360px;
+    height: 260px;
+    background-color: #f6f6f6;
+    position: absolute;
+    margin: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px black;
+    overflow: hidden;
+}
+
+.nir-login-box-interno img {
+    margin-top: 10px;
+}
+
+.nir-login-box-label {
+    background: #f7f7f7; /* Old browsers */
+    background: -moz-linear-gradient(top,  #f7f7f7 0%, #dddddd 100%, #207cca 100%, #f6f6f6 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #f7f7f7 0%,#dddddd 100%,#207cca 100%,#f6f6f6 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #f7f7f7 0%,#dddddd 100%,#207cca 100%,#f6f6f6 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
+
+    border-bottom: 1px solid #bfc3c5;
+    box-shadow: 1px  0px 3px #dedede;
+    color: #555555;
+    text-shadow: 1px 0px white;
+
+    height: 45px;
+    text-align: center;
+    font: bold 14px/45px sans-serif;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.nir-login-input-div {
+    margin: 20px;
+    padding: 5px;
+    background-color: #f2f5f7;
+    border-radius: 3px;
+}
+
+.nir-login-input-div input {
+    width: 310px;
+    height: 35px;
+    padding-left: 5px;
+    font: normal 13px sans-serif;
+    color: #aeaeae;
+    border-radius: 3px;
+    border: 1px solid #bfc4c6;
+    outline: none;
+}
+
+.nir-login-input-div:hover {
+    background-color: #e0f1fc;
+}
+
+.nir-login-input-div:hover input {
+    border-color: #7d6cdd;
+}
+
+#nir-login-input-senha {
+    margin-top: -10px;
+}
+
+.nir-login-botoes {
+    width: 310px;
+    margin-left: 25px;
+}
+
+.nir-login-botao {
+    float: right;
+    padding: 5px 15px;
+    font: bold 12px sans-serif;
+    border-radius: 20px;
+    text-shadow: 0px 1px 0px white;
+    border: 1px solid #9eb9c3;
+
+    background: #e1e7ea; /* Old browsers */
+    background: -moz-linear-gradient(top,  #e1e7ea 0%, #cde5ee 100%, #207cca 100%, #f6f6f6 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #e1e7ea 0%,#cde5ee 100%,#207cca 100%,#f6f6f6 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #e1e7ea 0%,#cde5ee 100%,#207cca 100%,#f6f6f6 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e1e7ea', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
+    color: #527988;
+    box-shadow: 0px 0px 10px #c9c9c9;
+}
+
+.nir-login-botao:hover {
+    background: #f6f6f6; /* Old browsers */
+    background: -moz-linear-gradient(top,  #f6f6f6 0%, #207cca 0%, #cde5ee 0%, #e1e7ea 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #f6f6f6 0%,#207cca 0%,#cde5ee 0%,#e1e7ea 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #f6f6f6 0%,#207cca 0%,#cde5ee 0%,#e1e7ea 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f6f6', endColorstr='#e1e7ea',GradientType=0 ); /* IE6-9 */
+    
+    cursor: pointer;
+
+}
+
+.nir-login-lembrar-senha {
+    font: normal 12px sans-serif;
+}
+
+.nir-login-box-msgErro{
+   width: 100%;
+   height: 50px;
+   padding-top: 10px;
+}
+
+.nir-login-erro {    
+    width: 360px;
+    height: auto;
+    padding: 10px;
+    margin: 0px auto 0px;
+    border-radius: 5px;
+    font: bold 12px sans-serif;
+    font-size: 1.3em;
+    color: #D8000C;
+    background-color: #FFBABA;
+    border: 1px solid;
+}
+
+.faErro {
+    margin-right: 10px;
+}
+

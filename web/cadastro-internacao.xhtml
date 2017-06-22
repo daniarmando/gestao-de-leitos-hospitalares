@@ -1,0 +1,117 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+        
+        <f:metadata>
+            <f:viewAction action="#{internacaoBean.inicializarPaginaCadastro()}"  />
+        </f:metadata>
+        
+        <h1 class="nir-titulopagina">Cadastro de Internação</h1>
+        
+        <h:panelGroup layout="block" class="nir-msgAlerta" rendered="#{internacaoBean.habilitaCampos eq false}">
+                <i class="fa faMsgAlerta  fa-warning"></i>
+                <h:outputText value="Não existem Leitos disponíveis para Internação" />
+            </h:panelGroup>
+
+        <h:form id="frm" >
+
+            <!--inicio barra de ferramentas superior com botoes para salvar, cadastrar e pesquisar dados-->
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarInternacao()}"
+                                     process="tabview @this" update="@form" disabled="#{internacaoBean.habilitaCampos eq false}" />
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton icon="fa fa-plus" value="Novo" action="#{internacaoBean.novo()}"
+                                     process="@this" update="@form" disabled="#{internacaoBean.habilitaCampos eq false}" />
+                    <p:button icon="fa fa-search" value="Pesquisa" outcome="pesquisa-internacoes" />
+                </p:toolbarGroup>
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com botoes para salvar, cadastrar e pesquisar dados-->
+
+            <p:messages autoUpdate="false" />
+
+            <!--inicio tabela com abas-->
+            <div class="ui-fluid">
+                <p:tabView id="tabview"> 
+
+                    <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                    <p:tab title="Internação">
+                        <p:panelGrid columns="4" layout="grid" 
+                                     columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4"
+                                     styleClass="semborda">
+
+                            <p:outputLabel value="Código Interno Hospital" for="codigo" />
+                            <p:inputText id="codigo" maxlength="9" required="true" value="#{internacaoBean.internacao.codigoInternacaoHospital}" disabled="#{internacaoBean.habilitaCampos eq false}" />
+                            
+                            <h:outputLabel value="Leito" for="leito" />
+                            <p:selectOneMenu label="Leito" id="leito" value="#{internacaoBean.internacao.leito}" required="true" converter="converterLeito" disabled="#{internacaoBean.habilitaCampos eq false}" >
+                                <f:selectItem itemLabel="Selecione" />
+                                <f:selectItems value="#{internacaoBean.leitos}" var="leito" 
+                                               itemValue="#{leito}" itemLabel="#{leito.descricaoLeito}" />
+                                <p:ajax update="paciente pacientebt" immediate="true" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel for="paciente" value="Paciente" />
+                            <h:panelGroup >
+                                <p:commandButton style="width: 40px" id="pacientebt" icon="fa fa-search" title="Pesquisa" action="#{selecaoPacienteBean.abrirDialogo()}" process="@this" update="@none" disabled="#{internacaoBean.habilitaCampos eq false or empty internacaoBean.internacao.leito.idLeito}">
+                                    <f:setPropertyActionListener value="#{internacaoBean.internacao.leito}" target="#{selecaoPacienteBean.leitoSelecionado}" />
+                                    <p:ajax event="dialogReturn" listener="#{internacaoBean.pacienteSelecionado}" process="@this" update="paciente procedimento procedimentobt"/>
+                                    <p:resetInput target="paciente" />
+                                </p:commandButton>
+                                <p:inputText style="width: auto" required="true" id="paciente" value="#{internacaoBean.descricaoPaciente}" readonly="#{facesContext.renderResponse}" disabled="#{internacaoBean.habilitaCampos eq false or empty internacaoBean.internacao.leito.idLeito}" />
+                            </h:panelGroup>
+
+                            <h:outputLabel value="Médico" for="medico" />
+                            <p:selectOneMenu label="Medico" id="medico" value="#{internacaoBean.internacao.medico}" required="true" 
+                                             effect="fade" var="m" filter="true" filterMatchMode="startsWith" converter="converterMedico" disabled="#{internacaoBean.habilitaCampos eq false}">
+                                <f:selectItem itemLabel="Selecione" />
+                                <f:selectItems value="#{internacaoBean.medicos}" var="medico" 
+                                               itemValue="#{medico}" itemLabel="#{medico.nomePessoa}" />
+                                <p:column>
+                                    <h:outputText value="#{m.nomePessoa}" />
+                                </p:column>
+                            </p:selectOneMenu>
+                                
+                            <p:outputLabel for="procedimento" value="Procedimento" />
+                            <h:panelGroup>
+                                <p:commandButton id="procedimentobt" style="width: 40px" icon="fa fa-search" title="Pesquisa" action="#{selecaoProcedimentoBean.abrirDialogo()}" process="@this" update="@none" disabled="#{internacaoBean.habilitaCampos eq false or empty internacaoBean.internacao.paciente.idPessoa}">
+                                    <f:setPropertyActionListener value="#{internacaoBean.internacao.leito}" target="#{selecaoProcedimentoBean.leitoSelecionado}" />
+                                    <f:setPropertyActionListener value="#{internacaoBean.internacao.paciente}" target="#{selecaoProcedimentoBean.pacienteSelecionado}" />
+                                    <p:ajax event="dialogReturn" listener="#{internacaoBean.procedimentoSelecionado}" process="@this" update="procedimento cid cidbt"/>
+                                    <p:resetInput target="procedimento" />
+                                </p:commandButton>
+                                <p:inputText style="width: auto" required="true" id="procedimento" value="#{internacaoBean.descricaoProcedimento}" readonly="#{facesContext.renderResponse}" disabled="#{internacaoBean.habilitaCampos eq false or empty internacaoBean.internacao.paciente.idPessoa}" />
+                            </h:panelGroup>
+                            
+                            <p:outputLabel for="cid" value="CID" />
+                            <h:panelGroup>
+                                <p:commandButton id="cidbt" style="width: 40px" icon="fa fa-search" title="Pesquisa" action="#{selecaoCidBean.abrirDialogo()}" process="@this" update="@none" disabled="#{internacaoBean.habilitaCampos eq false or empty internacaoBean.internacao.procedimento.CO_PROCEDIMENTO}">
+                                    <f:setPropertyActionListener value="#{internacaoBean.internacao.leito}" target="#{selecaoCidBean.leitoSelecionado}" />
+                                        <f:setPropertyActionListener value="#{internacaoBean.internacao.paciente}" target="#{selecaoCidBean.pacienteSelecionado}" />
+                                    <f:setPropertyActionListener value="#{internacaoBean.internacao.procedimento}" target="#{selecaoCidBean.procedimentoSelecionado}" />
+                                    <p:ajax event="dialogReturn" listener="#{internacaoBean.cidSelecionado}" process="@this" update="cid"/>
+                                    <p:resetInput target="cid" />
+                                </p:commandButton>
+                                <p:inputText style="width: auto" required="true" id="cid" value="#{internacaoBean.descricaoCid}" readonly="#{facesContext.renderResponse}" disabled="#{internacaoBean.habilitaCampos eq false or empty internacaoBean.internacao.procedimento.CO_PROCEDIMENTO}"/>
+                            </h:panelGroup>
+
+                            <p:outputLabel for="dataentrada" value="Data e hora da Entrada" />
+                            <p:calendar id="dataentrada" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.internacao.dataEntrada}" required="true" pattern="dd/MM/yyyy HH:mm" disabled="#{internacaoBean.habilitaCampos eq false}"/>
+
+                        </p:panelGrid>
+                    </p:tab>
+                    <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+
+                </p:tabView>
+            </div>
+            <!--fim tabela com abas-->
+
+        </h:form>
+    </ui:define>
+</ui:composition>

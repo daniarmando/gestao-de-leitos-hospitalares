@@ -1,0 +1,168 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+
+        <f:metadata>
+            <f:viewAction action="#{higienizacaoBean.inicializarPaginaPesquisa()}"  />
+        </f:metadata>
+
+        <h1 class="nir-titulopagina">Pesquisa de Higienizações</h1>
+
+        <h:form id="frm">
+
+            <!--inicio barra de ferramentas superior com botao para cadastrar novos dados-->
+            <p:toolbar rendered="#{usuarioBean.autorizacao le 3}">
+                <p:toolbarGroup align="right">
+                    <p:commandButton icon="fa fa-file-text" value="Relatório" action="#{higienizacaoBean.gerarRelatorio()}"
+                                     ajax="false" onclick="this.form.target = '_blank'" disabled="#{empty higienizacaoBean.higienizacoes}" />
+                    <p:commandButton icon="fa fa-plus" value="Nova Higienização" action="#{higienizacaoBean.novo()}"
+                                     process="@this" />
+                </p:toolbarGroup>
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com botao para cadastrar novos dados-->
+
+            <p:messages autoUpdate="true" closable="true" />
+
+            <!--inicio tabela de dados que lista dados-->
+            <p:dataTable id="tabelaDeDados" 
+                         value="#{higienizacaoBean.higienizacoes}" var="higienizacao"
+                         widgetVar="tabelaDeDados"
+                         paginator="true"     
+                         rows="10"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         selectionMode="single" selection="#{higienizacaoBean.higienizacao}"
+                         rowKey="#{higienizacao.idHigienizacao}" reflow="true" emptyMessage="Não há dados de higienização"
+                         sortBy="#{higienizacao.idHigienizacao}"
+                         filteredValue="#{higienizacaoBean.filtrarLista}">
+
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <p:inputText id="globalFilter" onkeyup="PF('tabelaDeDados').filter()" style="width:auto" placeholder="Digite aqui para consultar"/>
+                    </p:outputPanel>
+                </f:facet>
+
+                <p:column headerText="Código" sortBy="#{higienizacao.idHigienizacao}" filterBy="#{higienizacao.idHigienizacao}">
+                    <h:outputText value="#{higienizacao.idHigienizacao}" />
+                </p:column> 
+                <p:column headerText="Início" sortBy="#{higienizacao.dataHoraInicio}" filterBy="#{higienizacao.dataHoraInicio}">
+                    <h:outputText value="#{higienizacao.dataHoraInicio}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                    </h:outputText>
+                </p:column> 
+                <p:column headerText="Fim" sortBy="#{higienizacao.dataHoraFim}" filterBy="#{higienizacao.dataHoraFim}">
+                    <h:outputText value="#{higienizacao.dataHoraFim}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                    </h:outputText>
+                </p:column> 
+                <p:column headerText="Leito" sortBy="#{higienizacao.internacao.leito.descricaoLeito}" filterBy="#{higienizacao.internacao.leito.descricaoLeito}">
+                    <h:outputText value="#{higienizacao.internacao.leito.descricaoLeito}" />
+                </p:column> 
+                <p:column headerText="Leito / Internação" sortBy="#{higienizacao.internacao.idInternacao}" filterBy="#{higienizacao.internacao.idInternacao}">
+                    <h:outputText value="#{higienizacao.internacao.leito.descricaoLeito} / #{higienizacao.internacao.idInternacao} - #{higienizacao.internacao.codigoInternacaoHospital}" />
+                </p:column> 
+                <p:column headerText="Duração" sortBy="#{higienizacao.tempoHigienizacaoMinutos}" filterBy="#{higienizacao.tempoHigienizacaoMinutos}">
+                    <h:outputText value="#{higienizacao.tempoHigienizacaoMinutos} minutos" />
+                </p:column> 
+
+                <f:facet name="footer">
+                    <p:commandButton icon="fa fa-search-plus" process="tabelaDeDados" update=":frm:funcionarios" 
+                                     value="Ver Funcionários" oncomplete="PF('funcionariosDialog').show()" />
+                    <p:commandButton icon="fa fa-eye" process="tabelaDeDados" update=":frm:observacoes" 
+                                     value="Observações" oncomplete="PF('observacoesDialog').show()" />
+                    <p:commandButton icon="ui-icon-pencil" value="Editar" 
+                                     action="cadastro-higienizacao?faces-redirect=true"
+                                     rendered="#{usuarioBean.autorizacao le 3}" disabled="true" />
+                    <p:commandButton value="Excluir" 
+                                     rendered="#{usuarioBean.autorizacao le 3}"
+                                     actionListener="#{higienizacaoBean.excluir()}"
+                                     icon="fa fa-trash"
+                                     update=":frm:tabelaDeDados :frm:ultimolog">
+                        <p:confirm header="Confirmação" message="Confirma exclusão do registro selecionado?" icon="ui-icon-alert" />
+                    </p:commandButton>
+                    <p:commandButton icon="fa fa-calendar" process="tabelaDeDados" update=":frm:logs" 
+                                     value="Eventos" oncomplete="PF('logsDialog').show()" 
+                                     actionListener="#{higienizacaoBean.gerarLogs()}" />
+                </f:facet>
+
+            </p:dataTable>
+            <!--fim tabela de dados que lista dados-->
+
+            <h:outputText id="ultimolog" styleClass="ui-outputtext log" value="#{higienizacaoBean.ultimoLog()}" />
+
+            <!--inicio janela modal que exibe Observações do cadastro selecionado-->
+            <p:dialog header="Leito #{higienizacaoBean.higienizacao.internacao.leito.descricaoLeito}" widgetVar="observacoesDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" >
+                <p:outputPanel id="observacoes" style="text-align:center;">
+                    <p:panelGrid rendered="#{not empty higienizacaoBean.higienizacao}" columnClasses="label,value">
+
+                        <p:inputTextarea rows="7" cols="80" readonly="true" value="#{higienizacaoBean.higienizacao.observacoesHigienizacao}" />
+
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+            <!--fim janela modal que exibe detalhes do cadastro selecionado-->
+
+            <!--inicio janela modal que exibe detalhes do cadastro selecionado-->
+            <p:dialog header="Higienização - Lista de Funcionários" widgetVar="funcionariosDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" >
+
+                <p:dataList id="funcionarios" value="#{higienizacaoBean.higienizacao.funcionarios}"  var="funcionario" type="ordered">
+                    <f:facet name="header">
+                        Nomes
+                    </f:facet>
+                    #{funcionario.nomePessoa}
+                </p:dataList>
+            </p:dialog>
+            <!--fim janela modal que exibe detalhes do cadastro selecionado-->
+
+            <!--inicio janela modal que pede confirmação de exclusão -->
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+            <!--fim janela modal que pede confirmação de exclusão -->
+
+            <!--inicio janela modal que exibe logs do cadastro selecionado-->
+            <p:dialog width="550px" header="Eventos" widgetVar="logsDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" >
+                <p:dataList id="logs" value="#{higienizacaoBean.logs}" var="log" type="definition" 
+                            paginator="true" rows="5" 
+                            paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                            paginatorPosition="bottom"
+                            emptyMessage="Não há eventos">
+                    <f:facet name="header">     
+                        #{higienizacaoBean.higienizacao.idHigienizacao}
+                    </f:facet>
+                    <h:outputText value="#{log.dataHora}" style="margin-left: 10px;">
+                        <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss '-'" locale="pt_BR" />
+                    </h:outputText>
+                    <h:outputText value=" #{log.tipo}" style="font-weight: bold" />
+                    <h:outputText value=" feita por" />
+                    <h:outputText value=" #{log.usuario.login}. " id="usuario" />
+                    <p:tooltip id="toolTipUsuario" for="usuario" value="#{log.usuario.pessoa.nomePessoa}" position="right"/>
+
+                    <p:commandLink update=":frm:detalhesLog" id="detalhes" oncomplete="PF('dlgDetalhesLog').show()" title="Detalhes" styleClass="ui-icon ui-icon-search" style="float:right;margin-right:10px" rendered="#{not empty log.detalhe}">
+                        <f:setPropertyActionListener value="#{log}" target="#{higienizacaoBean.log}" />
+                    </p:commandLink>
+                    <p:tooltip id="toolTipDetalhes" for="detalhes" value="Detalhes" position="right"/>
+                    <p:separator  style="margin: 5px;"/>                    
+
+                </p:dataList>
+
+            </p:dialog>
+            <!--fim janela modal que exibe logs do cadastro selecionado-->
+
+            <!--inicio janela modal que exibe detalhes do log do cadastro selecionado-->
+            <p:dialog header="Detalhes" widgetVar="dlgDetalhesLog" modal="true" showEffect="blind" hideEffect="explode" width="460px" resizable="false" closeOnEscape="true" >
+                <p:outputPanel id="detalhesLog" style="text-align: justify;">
+                    <h:outputText value="#{higienizacaoBean.log.detalhe}" />
+                </p:outputPanel>
+            </p:dialog>
+            <!--fim janela modal que exibe detalhes do log do cadastro selecionado-->
+
+        </h:form>
+    </ui:define>
+</ui:composition>

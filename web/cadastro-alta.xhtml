@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+
+        <f:metadata>
+            <f:viewAction action="#{altaBean.inicializarPaginaCadastro()}" />
+        </f:metadata>
+
+        <h1 class="nir-titulopagina">Cadastro de Alta</h1>
+
+
+
+        <h:form id="frm">
+
+            <h:panelGroup id="msgAlerta" layout="block" class="nir-msgAlerta" rendered="#{altaBean.habilitaCampos eq false}">
+                <i class="fa faMsgAlerta  fa-warning"></i>
+                <h:outputText value="Não existem Pacientes / Internações para cadastrar Alta." />
+            </h:panelGroup>
+
+            <!--inicio barra de ferramentas superior com botoes para salvar, cadastrar e pesquisar dados-->
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton icon="fa fa-save" value="Salvar" actionListener="#{altaBean.salvar()}"
+                                     process="tabview @this" update="@form" disabled="#{altaBean.habilitaCampos eq false}" />
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton icon="fa fa-plus" value="Novo" action="#{altaBean.novo()}"
+                                     process="@this" update="@form" disabled="#{altaBean.habilitaCampos eq false}" />
+                    <p:button icon="fa fa-search" value="Pesquisa" outcome="pesquisa-alta" />
+                </p:toolbarGroup>
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com botoes para salvar, cadastrar e pesquisar dados-->
+
+            <p:messages autoUpdate="false" closable="true" />
+
+            <!--inicio tabela com abas-->
+            <div class="ui-fluid">
+                <p:tabView id="tabview"> 
+
+                    <!--inicio campos para cadastrar ou alterar dados na primeira aba-->
+                    <p:tab title="Alta">
+                        <p:panelGrid columns="2" layout="grid" 
+                                     columnClasses="ui-grid-col-2, ui-grid-col-6, ui-grid-col-2, ui-grid-col-6"
+                                     styleClass="semborda">
+
+                            <h:outputLabel value="Paciente" for="paciente" />
+                            <p:inputText value="#{altaBean.alta.internacao.paciente.nomePessoa}" rendered="#{empty altaBean.internacoes}" disabled="true" />
+                            <p:selectOneMenu label="Paciente" id="paciente" value="#{altaBean.alta.internacao}" required="true" converter="converterInternacao" rendered="#{not empty altaBean.internacoes}" disabled="#{altaBean.habilitaCampos eq false}" >
+                                <f:selectItem itemLabel="Selecione" />
+                                <f:selectItems value="#{altaBean.internacoes}" var="internacao" 
+                                               itemValue="#{internacao}" itemLabel="#{internacao.paciente.nomePessoa}" />
+                                <p:ajax update="@form" />
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Internação" for="internacao" />
+                            <p:inputMask id="internacao" mask="99-99999" value="#{altaBean.alta.internacao.idInternacao}#{altaBean.alta.internacao.codigoInternacaoHospital}" disabled="true" />
+
+                            <p:outputLabel value="Leito" for="leito" />
+                            <p:inputText id="leito" value="#{altaBean.alta.internacao.leito.descricaoLeito}" disabled="true" />
+
+                            <p:outputLabel value="Médico" for="medico" />
+                            <p:inputText id="medico" value="#{altaBean.alta.internacao.medico.nomePessoa}" disabled="true" />
+
+                            <p:outputLabel value="Procedimento" for="procedimento" />
+                            <p:inputText id="procedimento" value="#{altaBean.alta.internacao.procedimento.NO_PROCEDIMENTO}" disabled="true" />
+
+                            <p:outputLabel value="CID" for="cid" />
+                            <p:inputText id="cid" value="#{altaBean.alta.internacao.cid.NO_CID}" disabled="true" />
+
+                            <p:outputLabel value="Entrada" for="entrada" />
+                            <p:inputText id="entrada" value="#{altaBean.alta.internacao.dataEntrada}" disabled="true">
+                                <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss" locale="pt_BR" />
+                            </p:inputText>
+
+                            <p:outputLabel value="Vencimento" for="vencimento" />
+                            <p:inputText id="vencimento" value="#{altaBean.alta.internacao.dataHoraLimiteVermelho}" disabled="true">
+                                <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss" locale="pt_BR" />
+                            </p:inputText>
+                            
+                            <p:outputLabel value="Previsão" for="previsao" rendered="#{not empty altaBean.alta.internacao.dataPrevisaoAlta}"/>                            
+                            <p:inputText id="previsao" value="#{altaBean.alta.internacao.dataPrevisaoAlta}" disabled="true" rendered="#{not empty altaBean.alta.internacao.dataPrevisaoAlta}">
+                                <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss" locale="pt_BR" />
+                            </p:inputText>
+
+                            <p:outputLabel for="dataalta" value="Data Alta" />
+                            <p:calendar id="dataalta" required="true" locale="pt" mask="99/99/9999 99:99" value="#{altaBean.alta.dataHoraRealizacao}" pattern="dd/MM/yyyy HH:mm" disabled="#{altaBean.habilitaCampos eq false}"/>
+                            
+                            <h:outputLabel value="Médico Alta" for="medicoalta" />
+                                <p:selectOneMenu label="Médico" id="medicoalta" value="#{altaBean.alta.medico}" required="true" disabled="#{altaBean.habilitaCampos eq false}"
+                                                 effect="fade" var="m" filter="true" filterMatchMode="startsWith" converter="converterMedico" >
+                                    <f:selectItem itemLabel="Selecione" />
+                                    <f:selectItems value="#{altaBean.medicos}" var="medico" 
+                                                   itemValue="#{medico}" itemLabel="#{medico.nomePessoa}" />
+                                    <p:column>
+                                        <h:outputText value="#{m.nomePessoa}" />
+                                    </p:column>
+                                </p:selectOneMenu>
+
+                        </p:panelGrid>
+                    </p:tab>
+                    <!--fim campos para cadastrar ou alterar dados na primeira aba-->
+
+                </p:tabView>
+            </div>
+            <!--fim tabela com abas-->
+
+        </h:form>
+    </ui:define>
+</ui:composition>

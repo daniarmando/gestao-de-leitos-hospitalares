@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:b="http://www.springframework.org/schema/beans"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/security
+                            http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+    <http auto-config="true" use-expressions="true">
+        
+        <intercept-url pattern="/index.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        
+        <intercept-url pattern="/cadastro-alta-qualificada.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/cadastro-alta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/cadastro-enfermeiro.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen')" />
+        <intercept-url pattern="/cadastro-fisioterapeuta.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-funcionario.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-gerente-enfermagem.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/cadastro-hospital.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-internacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/cadastro-leito.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-medico.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-nir.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-paciente.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/cadastro-quarto.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-setor.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/cadastro-terapeuta-ocupacional.xhtml" access="hasRole('ROLE_nir')" />
+        
+        <intercept-url pattern="/pesquisa-alta-qualificada.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-alta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-enfermeiros.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-fisioterapeutas.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-funcionarios.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-gerentes-enfermagem.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-hospital.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-internacoes.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-leitos.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-medicos.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-nir.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-pacientes.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-quartos.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-setores.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pesquisa-terapeutas-ocupacionais.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        
+        <intercept-url pattern="/grafico-alta-qualificada-alta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/grafico-saida-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/grafico-tempo-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/grafico-tempo-internacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/grafico-tempo-ociosidade.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/grafico-tempo-saida-paciente.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        
+        <intercept-url pattern="/relatorio-estatisticas.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        
+        <intercept-url pattern="/configuracao-kanban.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/dashboard.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/parametros.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/selecaoCid.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/selecaoPaciente.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/selecaoProcedimento.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/sigtap-upload.xhtml" access="hasRole('ROLE_nir')" />        
+        
+        <form-login login-page="/login.xhtml" authentication-failure-url="/login.xhtml?erro=true"/>
+    </http>
+    
+    
+    <authentication-manager>
+        <authentication-provider>
+            <jdbc-user-service data-source-ref="dataSource"
+                               users-by-username-query="SELECT login as username, senha as password, status as enable FROM usuario WHERE login=?"
+                               authorities-by-username-query="SELECT u.login as username, ua.autorizacoes_nome as authority FROM usuario u, usuario_autorizacao ua WHERE u.id = ua.usuario_id and u.login=?"
+            />
+        </authentication-provider>
+    </authentication-manager>
+
+    <b:bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+        <b:property name="url" value="jdbc:mysql://localhost:3306/bdghnir?zeroDateTimeBehavior=convertToNull" />
+        <b:property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <b:property name="username" value="root" />
+        <b:property name="password" value="123456" />
+    </b:bean>
+
+</b:beans>

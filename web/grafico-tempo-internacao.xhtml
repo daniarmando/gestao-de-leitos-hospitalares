@@ -1,0 +1,111 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+
+        <h1 class="nir-titulopagina">Gráfico Tempo de Internação em Leitos por Período</h1>
+
+        <h:form id="frm" rendered="#{usuarioBean.autorizacao le 3}">
+
+            <!--inicio barra de ferramentas superior com opções para filtrar o gráfico-->
+            <p:toolbar id="toolbar">
+
+                <p:toolbarGroup align="left">
+
+                    <p:selectOneMenu id="modeloGrafico" label="Modelo Gráfico" value="#{graficoTempoInternacaoBean.modeloGrafico}" required="true" style="top: 7px;">
+                        <f:selectItem itemLabel="Modelo" />
+                        <f:selectItem itemLabel="Linha" itemValue="1" />
+                        <f:selectItem itemLabel="Área" itemValue="2" />
+                        <f:selectItem itemLabel="Barra" itemValue="3" />
+                    </p:selectOneMenu>
+
+                    <p:selectOneMenu id="setor" label="Setor" value="#{graficoTempoInternacaoBean.setor}" required="true" converter="converterSetor" style="width: 150px; margin: 0 3px 0 3px; top: 7px;" >
+                        <f:selectItem itemLabel="Setor" />
+                        <f:selectItems value="#{graficoTempoInternacaoBean.setores}" var="setor" 
+                                       itemValue="#{setor}" itemLabel="#{setor.tipoSetor}" />
+                        <f:ajax render="quarto" event="change" listener="#{graficoTempoInternacaoBean.listaQuartos}" />
+                    </p:selectOneMenu>
+
+                    <p:selectOneMenu id="quarto" label="Quarto" value="#{graficoTempoInternacaoBean.quarto}" required="true" converter="converterQuarto" style="width: 150px; margin-right: 10px; top: 7px;" >
+                        <f:selectItem itemLabel="Quarto" />
+                        <f:selectItems value="#{graficoTempoInternacaoBean.quartos}" var="quarto" 
+                                       itemValue="#{quarto}" itemLabel="#{quarto.tipoQuarto}" />
+                    </p:selectOneMenu>
+
+                    <p:calendar id="datainicial" label="Data Inicial" placeholder="Data Inicial" locale="pt" mask="99/99/9999" value="#{graficoTempoInternacaoBean.dataInicial}" required="true" pattern="dd/MM/yyyy" />
+                    <h:outputLabel value="até" style="margin: 0 3px 0 3px;"/>
+                    <p:calendar id="datafinal" label="Data Final" placeholder="Data Final" locale="pt" mask="99/99/9999" value="#{graficoTempoInternacaoBean.dataFinal}" required="true" pattern="dd/MM/yyyy" />
+
+                    <p:commandButton icon="fa fa-bar-chart" value="Montar" actionListener="#{graficoTempoInternacaoBean.prepararGrafico()}" update="@form" style="margin-left: 10px;"/>
+
+                </p:toolbarGroup>
+
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com opções para filtrar o gráfico-->
+
+            <p:growl showDetail="true" id="growl" />
+
+            <br />
+            <br />
+
+            <center>
+                <h:outputText styleClass="ui-outputtext textogrande" id="instrrucao" value="Selecione as opções acima para montar o gráfico." rendered="#{empty graficoTempoInternacaoBean.modeloLinha and empty graficoTempoInternacaoBean.modeloBarra}"/>
+                <br />
+                <p:graphicImage id="grafico" library="nir" name="imagens/chart.png" rendered="#{empty graficoTempoInternacaoBean.modeloLinha and empty graficoTempoInternacaoBean.modeloBarra}" />
+            </center>
+            <h:outputText styleClass="ui-outputtext log" id="detalhesGrafico" value="*Clique nos pontos para visualizar detalhes" rendered="#{not empty graficoTempoInternacaoBean.modeloLinha}"/>
+
+            <p:chart type="line" model="#{graficoTempoInternacaoBean.modeloLinha}" rendered="#{not empty graficoTempoInternacaoBean.modeloLinha}" style="height: 300px;" responsive="true" >
+                <p:ajax event="itemSelect" listener="#{graficoTempoInternacaoBean.itemSelect}" update=":frm:dlgdetalhes" oncomplete="PF('dlgdetalhes').show()" />
+            </p:chart>
+
+            <p:chart type="bar" model="#{graficoTempoInternacaoBean.modeloBarra}" rendered="#{not empty graficoTempoInternacaoBean.modeloBarra}" style="height:300px" responsive="true" />
+
+            <p:dialog id="dlgdetalhes" width="480" header="Detalhes" widgetVar="dlgdetalhes" modal="true" resizable="false" responsive="true" closeOnEscape="true">
+
+                <p:outputPanel id="detalhes" style="text-align:center;">
+                    <p:panelGrid columns="2" rendered="#{not empty graficoTempoInternacaoBean.estatisticas}" columnClasses="label,value" style="margin: auto">
+
+                        <h:outputText value="Internação" />
+                        <h:outputText value="#{graficoTempoInternacaoBean.estatisticas.internacao.idInternacao}-#{graficoTempoInternacaoBean.estatisticas.internacao.codigoInternacaoHospital}" />
+                        
+                        <h:outputText value="Leito" />
+                        <h:outputText value="#{graficoTempoInternacaoBean.estatisticas.internacao.leito.descricaoLeito}" /> 
+                        
+                        <h:outputText value="Paciente" />
+                        <h:outputText value="#{graficoTempoInternacaoBean.estatisticas.internacao.paciente.nomePessoa}" /> 
+                        
+                        <h:outputText value="Médico" />
+                        <h:outputText value="#{graficoTempoInternacaoBean.estatisticas.internacao.medico.nomePessoa}" /> 
+
+                        <h:outputText value="Entrada" />
+                        <h:outputText value="#{graficoTempoInternacaoBean.estatisticas.internacao.dataEntrada}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                        </h:outputText>                              
+
+                        <h:outputText value="Saída" />
+                        <h:outputText value="#{graficoTempoInternacaoBean.estatisticas.internacao.dataSaidaLeito}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+                        </h:outputText>                              
+
+                        <h:outputText value="Duração" />
+                        <h:outputText value="#{graficoTempoInternacaoBean.detalhes}"/>                
+
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="1" rendered="#{empty graficoTempoInternacaoBean.estatisticas}" columnClasses="label,value" style="margin: auto">
+
+                        <h:outputText value="#{graficoTempoInternacaoBean.detalhes}"/>                
+
+                    </p:panelGrid>
+                </p:outputPanel>
+
+            </p:dialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

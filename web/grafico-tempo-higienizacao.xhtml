@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+
+        <h1 class="nir-titulopagina">Gráfico Tempo de Higienização em Leitos por Período</h1>
+
+        <h:form id="frm" rendered="#{usuarioBean.autorizacao le 3}">
+
+            <!--inicio barra de ferramentas superior com opções para filtrar o gráfico-->
+            <p:toolbar id="toolbar">
+
+                <p:toolbarGroup align="left">
+
+                    <p:selectOneMenu id="modeloGrafico" label="Modelo Gráfico" value="#{graficoTempoHigienizacaoBean.modeloGrafico}" required="true" style="top: 7px;">
+                        <f:selectItem itemLabel="Modelo" />
+                        <f:selectItem itemLabel="Linha" itemValue="1" />
+                        <f:selectItem itemLabel="Área" itemValue="2" />
+                        <f:selectItem itemLabel="Barra" itemValue="3" />
+                    </p:selectOneMenu>
+
+                    <p:selectOneMenu id="setor" label="Setor" value="#{graficoTempoHigienizacaoBean.setor}" required="true" converter="converterSetor" style="width: 150px; margin: 0 3px 0 3px; top: 7px;" >
+                        <f:selectItem itemLabel="Setor" />
+                        <f:selectItems value="#{graficoTempoHigienizacaoBean.setores}" var="setor" 
+                                       itemValue="#{setor}" itemLabel="#{setor.tipoSetor}" />
+                        <f:ajax render="quarto" event="change" listener="#{graficoTempoHigienizacaoBean.listaQuartos}" />
+                    </p:selectOneMenu>
+
+                    <p:selectOneMenu id="quarto" label="Quarto" value="#{graficoTempoHigienizacaoBean.quarto}" required="true" converter="converterQuarto" style="width: 150px; margin-right: 10px; top: 7px;" >
+                        <f:selectItem itemLabel="Quarto" />
+                        <f:selectItems value="#{graficoTempoHigienizacaoBean.quartos}" var="quarto" 
+                                       itemValue="#{quarto}" itemLabel="#{quarto.tipoQuarto}" />
+                    </p:selectOneMenu>
+
+                    <p:calendar id="datainicial" label="Data Inicial" placeholder="Data Inicial" locale="pt" mask="99/99/9999" value="#{graficoTempoHigienizacaoBean.dataInicial}" required="true" pattern="dd/MM/yyyy" />
+                    <h:outputLabel value="até" style="margin: 0 3px 0 3px;"/>
+                    <p:calendar id="datafinal" label="Data Final" placeholder="Data Final" locale="pt" mask="99/99/9999" value="#{graficoTempoHigienizacaoBean.dataFinal}" required="true" pattern="dd/MM/yyyy" />
+
+                    <p:commandButton icon="fa fa-bar-chart" value="Montar" actionListener="#{graficoTempoHigienizacaoBean.prepararGrafico()}" update="@form" style="margin-left: 10px;"/>
+
+                </p:toolbarGroup>
+
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com opções para filtrar o gráfico-->
+
+            <p:growl showDetail="true" id="growl" />
+
+            <br />
+            <br />
+
+            <center>
+                <h:outputText styleClass="ui-outputtext textogrande"  value="Selecione as opções acima para montar o gráfico." rendered="#{empty graficoTempoHigienizacaoBean.modeloLinha and empty graficoTempoHigienizacaoBean.modeloBarra}"/>
+                <br />
+                <p:graphicImage id="grafico" library="nir" name="imagens/chart.png" rendered="#{empty graficoTempoHigienizacaoBean.modeloLinha and empty graficoTempoHigienizacaoBean.modeloBarra}" />
+            </center>
+
+            <p:chart type="line" model="#{graficoTempoHigienizacaoBean.modeloLinha}" rendered="#{not empty graficoTempoHigienizacaoBean.modeloLinha}" style="height: 300px;" responsive="true" />
+
+            <p:chart type="bar" model="#{graficoTempoHigienizacaoBean.modeloBarra}" rendered="#{not empty graficoTempoHigienizacaoBean.modeloBarra}" style="height:300px" responsive="true" />
+
+        </h:form>
+    </ui:define>
+</ui:composition>

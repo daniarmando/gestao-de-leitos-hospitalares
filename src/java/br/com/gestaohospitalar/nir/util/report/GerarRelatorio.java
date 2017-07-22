@@ -37,12 +37,12 @@ import net.sf.jasperreports.engine.util.JRLoader;
  */
 public class GerarRelatorio {
 
-    private HttpServletResponse response;
-    private FacesContext context;
+    private final HttpServletResponse response;
+    private final FacesContext context;
     private ByteArrayOutputStream baos;
     private InputStream stream;
     private boolean relatorioGerado;
-    private ImageIcon logoNIR = new ImageIcon(getClass().getResource("/br/com/gestaohospitalar/nir/util/report/logo_nir.gif"));
+    private final ImageIcon logoNIR = new ImageIcon(getClass().getResource("/br/com/gestaohospitalar/nir/util/report/logo_nir.gif"));
 
     public GerarRelatorio() {
         this.context = FacesContext.getCurrentInstance();

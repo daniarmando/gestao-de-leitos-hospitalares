@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioEstatisticas" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f1c520fc-2c6f-4cf3-9127-5d8447895d80">
-	<property name="ireport.zoom" value="1.9487171000000227"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="164"/>
+	<property name="ireport.zoom" value="5.054470284993001"/>
+	<property name="ireport.x" value="148"/>
+	<property name="ireport.y" value="493"/>
 	<parameter name="data_inicial" class="java.util.Date">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
@@ -265,7 +265,7 @@ ORDER BY
 	<columnHeader>
 		<band height="29" splitType="Stretch">
 			<line>
-				<reportElement x="0" y="23" width="802" height="1" uuid="99cc7724-892a-44c0-915f-f02677a36c59"/>
+				<reportElement x="0" y="20" width="802" height="1" uuid="99cc7724-892a-44c0-915f-f02677a36c59"/>
 			</line>
 			<staticText>
 				<reportElement x="0" y="0" width="78" height="20" uuid="98337219-bf23-4302-914b-5b94ce10c224"/>

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioEstouroTempo" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f1c520fc-2c6f-4cf3-9127-5d8447895d80">
+	<property name="ireport.zoom" value="1.46410000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="42"/>
+	<parameter name="data_inicial" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="data_final" class="java.util.Date">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOGO" class="java.awt.Image"/>
+	<parameter name="usuario" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT TIMESTAMPDIFF(DAY, i.dataHoraLimiteVermelho, i.dataAlta) AS tempoEstouroDias,
+	TIMESTAMPDIFF(HOUR, i.dataHoraLimiteVermelho, i.dataAlta) AS tempoEstouroHoras,
+        	TIMESTAMPDIFF(MINUTE, i.dataHoraLimiteVermelho, i.dataAlta) AS tempoEstouroMinutos,
+		CONCAT(i.idInternacao, '-', i.codigoInternacaoHospital) AS codInternacao,
+		i.dataEntrada, i.dataHoraLimiteVermelho AS dataVencimento, i.dataAlta,
+        s.idSetor, s.tipoSetor,
+        q.idQuarto, q.tipoQuarto,
+        l.idLeito, l.codigoLeito, l.descricaoLeito,
+        p.nomePessoa AS nomePaciente,
+        m.nomePessoa AS nomeMedico,
+        tp.no_procedimento
+FROM internacao i
+INNER JOIN leito l ON l.idLeito = i.idLeito
+INNER JOIN quarto q ON q.idQuarto = l.idQuarto
+INNER JOIN setor s ON s.idSetor = q.idSetor
+INNER JOIN pessoa p ON p.idPessoa = i.idPaciente 
+INNER JOIN pessoa m ON m.idPessoa = i.idMedico
+INNER JOIN tb_procedimento tp ON tp.co_procedimento = i.co_procedimento AND tp.chaveMesAno = i.chaveMesAnoProcedimento
+INNER JOIN tb_cid tc ON tc.co_cid = i.co_cid AND tc.chaveMesAno = i.chaveMesAnoCid
+WHERE i.dataAlta > i.dataHoraLimiteVermelho 
+AND i.statusInternacao != 'C'
+AND i.dataEntrada BETWEEN $P{data_inicial} AND $P{data_final}
+ORDER BY s.idSetor, q.idQuarto, l.idLeito, i.DataEntrada;]]>
+	</queryString>
+	<field name="tempoEstouroDias" class="java.lang.Long"/>
+	<field name="tempoEstouroHoras" class="java.lang.Long"/>
+	<field name="tempoEstouroMinutos" class="java.lang.Long"/>
+	<field name="codInternacao" class="java.lang.String"/>
+	<field name="dataEntrada" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="dataVencimento" class="java.sql.Timestamp"/>
+	<field name="dataAlta" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="idSetor" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tipoSetor" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="idQuarto" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="tipoQuarto" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="idLeito" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="codigoLeito" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="descricaoLeito" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nomePaciente" class="java.lang.String"/>
+	<field name="nomeMedico" class="java.lang.String"/>
+	<field name="no_procedimento" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<group name="setor_quarto_leito">
+		<groupExpression><![CDATA[$F{idSetor}]]></groupExpression>
+		<groupHeader>
+			<band height="18">
+				<textField>
+					<reportElement x="0" y="1" width="801" height="13" uuid="2600dd32-21e3-4417-ac9b-d19fe6f74f83"/>
+					<textElement>
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Setor: " + $F{idSetor} + " - " + $F{tipoSetor} + "     /     " +
+"Quarto: " + $F{idQuarto} + " - " + $F{tipoQuarto} + "     /     " +
+"Leito: " + $F{idLeito} + " - " + $F{descricaoLeito}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="801" height="48" uuid="0068437f-2f09-4054-bbe4-838e90c0851d"/>
+				<textElement textAlignment="Center">
+					<font size="36" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório Estouro de Tempo Internações]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyy">
+				<reportElement x="735" y="71" width="41" height="13" uuid="cd1b7a2f-2fea-45ae-b227-53080415f296"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{data_final}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="643" y="58" width="133" height="13" uuid="5b39c2d9-ed3d-4dd6-b2a7-4750be760eb3"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Solicitado por: " + $P{usuario}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyy">
+				<reportElement x="685" y="71" width="41" height="13" uuid="407e5b26-43dc-4e48-8c45-8dcbcd452d33"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{data_inicial}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="642" y="71" width="41" height="13" uuid="6358f798-6a52-4a9d-ba58-aee87052b326"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Período:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="728" y="71" width="5" height="13" uuid="ecd7ed41-9921-49a8-8a98-182be1fb7ea8"/>
+				<textElement textAlignment="Right">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[a]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="29" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="20" width="802" height="1" uuid="99cc7724-892a-44c0-915f-f02677a36c59"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="78" height="20" uuid="98337219-bf23-4302-914b-5b94ce10c224"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data de Entrada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="0" width="85" height="20" uuid="49bf1eb4-0496-4f1a-806f-1395e4cd9e3a"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cód. Internação]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="0" width="78" height="20" uuid="a600a673-ef87-46fb-8b10-b453a972a7d3"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vencimento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="243" y="0" width="78" height="20" uuid="329d016f-4550-4ef9-b40c-46a9200fbfec"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Alta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="321" y="0" width="68" height="20" uuid="e526bc24-81f3-41bc-80cf-40f661dbc4f8"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Estouro]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="78" height="13" uuid="ceb36141-d49b-497f-b527-e118e41fd596"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dataEntrada}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="78" y="0" width="85" height="13" uuid="71da7786-d58a-4778-a0d7-e992a40ba14a"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codInternacao}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="165" y="0" width="78" height="13" uuid="042a917d-c1ae-47e9-ad3c-c321c29978d5"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{dataVencimento}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="243" y="1" width="78" height="13" uuid="97ffbf30-5c84-4b21-872f-8f90257a4575"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dataAlta}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="321" y="1" width="28" height="13" uuid="ea3091db-5920-4942-8c9c-e2e06b335977"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tempoEstouroDias} > 0 ? $F{tempoEstouroDias} + "d" : ""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="348" y="1" width="20" height="13" uuid="9ae7f5ad-6b99-44ee-b60e-2d9bece88a3d"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tempoEstouroHoras} > 0 ? $F{tempoEstouroHoras} + "h" : ""]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="367" y="1" width="22" height="13" uuid="238f7955-de47-414c-a8da-c3fecf0776df"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tempoEstouroMinutos} > 0 ? $F{tempoEstouroMinutos} + "m" : ""]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="43" splitType="Stretch">
+			<staticText>
+				<reportElement x="32" y="23" width="165" height="17" forecolor="#000000" backcolor="#FFFFFF" uuid="5994bdbd-8e13-49d8-bd66-84110f662ed0"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[N.I.R. Gestão de Leitos Hospitalares]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Opaque" x="520" y="10" width="241" height="13" backcolor="#FFFFFF" uuid="0db70710-fd9c-46f4-a0b0-9ec0a5dc7ad4"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement mode="Opaque" x="761" y="10" width="40" height="13" backcolor="#FFFFFF" uuid="6f0a6199-0715-4674-bacf-9bbacc4af1ff"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="10" width="274" height="13" uuid="930c5fa5-fb39-43a9-9198-bcf85c3aa46f"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="802" height="1" uuid="af0036e5-3493-430d-b8a6-076b4923f5bc"/>
+			</line>
+			<image>
+				<reportElement x="0" y="23" width="30" height="14" uuid="f2323610-cc96-4df5-bb73-ed03ae64adc9"/>
+				<imageExpression><![CDATA[$P{LOGO}]]></imageExpression>
+			</image>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement x="230" y="22" width="63" height="13" uuid="be166e27-d255-43b2-9ac8-0ae8217582ab"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Geral:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="9" width="63" height="13" uuid="913de8a5-e12f-47c3-90c1-8f2e8e90c03b"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Média Geral:]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

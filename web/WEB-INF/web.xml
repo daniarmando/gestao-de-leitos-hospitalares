@@ -42,8 +42,8 @@
         <servlet-name>Push Servlet</servlet-name>
         <url-pattern>/primepush/*</url-pattern>
     </servlet-mapping>
-    <session-config>
     <!-- Fim das configurações para o Primefaces Push (websocket) -->
+    <session-config>
         <session-timeout>
             30
         </session-timeout>

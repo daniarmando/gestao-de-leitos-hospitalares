@@ -19,7 +19,7 @@ import javax.persistence.Table;
  * @author Daniel
  */
 @Entity
-@Table(name = "configuracaoKanban")
+@Table(name = "configuracaokanban")
 public class ConfiguracaoKanban implements Serializable {
     
     private Integer idConfiguracaoKanban;

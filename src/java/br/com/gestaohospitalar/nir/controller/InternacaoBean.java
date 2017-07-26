@@ -42,6 +42,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.push.EventBus;
+import org.primefaces.push.EventBusFactory;
 
 /**
  *
@@ -52,7 +54,7 @@ import org.primefaces.event.SelectEvent;
 public class InternacaoBean implements Serializable {
 
     private Internacao internacao;
-    private InternacaoDAOImpl daoInterncao = new InternacaoDAOImpl();
+    private final InternacaoDAOImpl daoInterncao = new InternacaoDAOImpl();
 
     private List<Internacao> internacoes = new ArrayList<>();
     private List<Internacao> filtrarLista;
@@ -302,18 +304,20 @@ public class InternacaoBean implements Serializable {
         }
         
         //atualizando a lista de leitos
-        this.leitos = this.daoLeito.listarParaInternacao();;
+        this.leitos = this.daoLeito.listarParaInternacao();
         this.habilitaCampos = !this.leitos.isEmpty();
-
+        
+        //envia mensagem para usuários conectados e atualiza a página dashboard
+        notificar(TipoLog.REGISTRAR_INTERNACAO.get(), this.internacao.getLeito().getIdLeito());
+        
         this.internacao = new Internacao();
         this.medicos = new ArrayList<>();
         this.msgValidacaoPacienteLog = "";
         this.msgValidacaoProcedimentoLog = "";
         this.msgValidacaoCidLog = "";
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Internação salva com sucesso!"));
 
     }
-
+    
     /**
      * método que salva a alta qualificada
      *
@@ -339,9 +343,11 @@ public class InternacaoBean implements Serializable {
             this.log.setIdObjeto(this.altaQualificada.getInternacao().getIdInternacao());
             this.log.setDetalhe("alta qualiificada código " + this.altaQualificada.getIdAltaQualificada() + ".");
             salvarLog();
+            
+            //envia mensagem para usuários conectados e atualiza a página dashboard
+            notificar(TipoLog.REGISTRAR_ALTA_QUALIFICADA.get(), this.altaQualificada.getInternacao().getLeito().getIdLeito());
 
             this.altaQualificada = new AltaQualificada();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Alta Qualificada salva com sucesso!"));
         }
     }
 
@@ -378,11 +384,13 @@ public class InternacaoBean implements Serializable {
             this.log.setIdObjeto(this.alta.getInternacao().getIdInternacao());
             this.log.setDetalhe("alta código " + this.alta.getIdAlta() + ".");
             salvarLog();
+            
+            //envia mensagem para usuários conectados e atualiza a página dashboard
+            notificar(TipoLog.REGISTRAR_ALTA.get(), this.alta.getInternacao().getLeito().getIdLeito());
 
             this.alta = new Alta();
             this.altaQualificada = new AltaQualificada();
             this.medicos = new ArrayList<>();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Alta salva com sucesso!"));
         }
     }
 
@@ -400,9 +408,11 @@ public class InternacaoBean implements Serializable {
         this.log.setTipo(TipoLog.REGISTRAR_SAIDA.get());
         this.log.setIdObjeto(this.internacaoSelecionada.getIdInternacao());
         salvarLog();
+        
+        //envia mensagem para usuários conectados e atualiza a página dashboard
+        notificar(TipoLog.REGISTRAR_SAIDA.get(), this.internacaoSelecionada.getLeito().getIdLeito());
 
         this.internacaoSelecionada = new Internacao();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Saída do leito salva com sucesso!"));
 
     }
 
@@ -431,10 +441,12 @@ public class InternacaoBean implements Serializable {
             this.log.setIdObjeto(this.higienizacao.getInternacao().getIdInternacao());
             this.log.setDetalhe("higienização código " + this.higienizacao.getIdHigienizacao() + ".");
             salvarLog();
+            
+            //envia mensagem para usuários conectados e atualiza a página dashboard
+            notificar(TipoLog.REGISTRAR_HIGIENIZACAO.get(), this.higienizacao.getInternacao().getLeito().getIdLeito());
 
             this.higienizacao = new Higienizacao();
             this.funcionarios = new ArrayList<>();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Higienização do leito salva com sucesso!"));
         }
 
     }
@@ -460,11 +472,31 @@ public class InternacaoBean implements Serializable {
             this.log.setTipo(TipoLog.CANCELAR_INTERNACAO.get());
             this.log.setIdObjeto(internacao.getIdInternacao());
             salvarLog();
-
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Internação cancelada com sucesso."));
+            
+            //envia mensagem para usuários conectados e atualiza a página dashboard
+            notificar(TipoLog.CANCELAR_INTERNACAO.get(), internacao.getLeito().getIdLeito());
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Internação não pode mais ser cancelada."));
         }
+        
+        this.internacao = new Internacao();
+    }
+    
+     /**
+     * método para notificar usuários conectados
+     *
+     * @param info
+     * @param objeto
+     */
+    public void notificar(String info, int objeto) {
+        
+        info += " no Leito: " + objeto + ".";
+        String detalhe = "Feita por: " + usuarioBean.getUsuario().getLogin() + ".";
+        String CANAL = "/notificar";
+        
+        EventBus eventBus = EventBusFactory.getDefault().eventBus();
+        eventBus.publish(CANAL, new FacesMessage(info, detalhe));
+        
     }
 
     /**

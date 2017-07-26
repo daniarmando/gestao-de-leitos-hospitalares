@@ -5,6 +5,7 @@
  */
 package br.com.gestaohospitalar.nir.model;
 
+import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;

@@ -31,7 +31,19 @@
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
+    
+    <!-- Início das configurações para o Primefaces Push (websocket) -->
+    <servlet>
+        <servlet-name>Push Servlet</servlet-name>
+        <servlet-class>org.primefaces.push.PushServlet</servlet-class>
+        <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Push Servlet</servlet-name>
+        <url-pattern>/primepush/*</url-pattern>
+    </servlet-mapping>
     <session-config>
+    <!-- Fim das configurações para o Primefaces Push (websocket) -->
         <session-timeout>
             30
         </session-timeout>

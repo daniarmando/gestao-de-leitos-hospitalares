@@ -38,7 +38,7 @@
             </p:notificationBar>
 
             <p:growl id="growlmsg" life="8000" />
-            <p:poll id="poll" interval="300" update=":frm:leitoDataGrid" />
+            <p:growl id="grownotificacao" life="10000" widgetVar="notificacao" showDetail="true" />
 
             <!--inicio legenda cores-->
             <div class="nir-boxlegenda" id="legendacores" >                
@@ -108,35 +108,35 @@
 
                 <p:panel id="painel" header="S.#{leito.quarto.setor.idSetor} | Q.#{leito.quarto.idQuarto} | L.#{leito.codigoLeito}" style="text-align:center">
                     <h:panelGrid columns="1" style="width:100%">
-                        
+
                         <h:outputText id="descricaoLeito" value="#{leito.descricaoLeito}" />                        
-                        
+
                         <h:outputText id="nomePaciente" value="Paciente: #{leitoBean.nomeReduzidoPaciente(leito.internacao.paciente.nomePessoa)}" rendered="#{leito.statusLeito eq 'INT'}"/>
                         <p:tooltip id="toolTipFadeNomePaciente" for="nomePaciente" position="bottom" value="#{leito.internacao.paciente.nomePessoa}" rendered="#{leito.statusLeito eq 'INT'}"/>
-                        
+
                         <h:outputText id="descricao1" value="Disponível para nova internação" rendered="#{leito.statusLeito eq 'D'}" />
                         <h:outputText id="descricao2" value="Aguardando saída do paciente" rendered="#{leito.statusLeito eq 'ES'}" />
                         <h:outputText id="descricao3" value="Aguardando higienização" rendered="#{leito.statusLeito eq 'H'}" />
-                        
+
                         <h:outputText id="descricao4" value="#{leito.internacao.dataPrevisaoAlta}" rendered="#{leito.statusLeito eq 'INT' and not empty leito.internacao.dataPrevisaoAlta}" >
                             <f:convertDateTime pattern="'Previsão de Alta:' dd/MM/yyyy HH:mm" locale="pt_BR" />
                         </h:outputText>
                         <h:outputText id="descricao5" value="Previsão de Alta: Não Informado" rendered="#{leito.statusLeito eq 'INT' and empty leito.internacao.dataPrevisaoAlta}" />
-                        
+
                         <p:spacer rendered="#{leito.statusLeito ne 'INT'}"/>
 
                         <p:graphicImage id="corleito1" library="nir" name="imagens/leitoAzul.png" rendered="#{leito.statusLeito eq 'D'}" />
                         <p:graphicImage id="corleito2" library="nir" name="imagens/leitoCinzaEscuro.png" rendered="#{leito.statusLeito eq 'H'}" />
                         <p:graphicImage id="corleito3" library="nir" name="imagens/leitoCinzaClaro.png" rendered="#{leito.statusLeito eq 'ES'}" />
-                        
+
                         <!--Cores Kanban-->
                         <p:graphicImage id="corleito4" library="nir" name="imagens/leitoVerde.png" rendered="#{leito.statusLeito eq 'INT' and leito.internacao.dataHoraLimiteVerde.compareTo(leitoBean.dataAtual) ge 0 and leito.internacao.dataHoraLimiteAmarelo.compareTo(leitoBean.dataAtual) ge 0}" />
                         <p:graphicImage id="corleito5" library="nir" name="imagens/leitoAmarelo.png" rendered="#{leito.statusLeito eq 'INT' and leito.internacao.dataHoraLimiteVerde.compareTo(leitoBean.dataAtual) le 0 and leito.internacao.dataHoraLimiteAmarelo.compareTo(leitoBean.dataAtual) ge 0}" />
                         <p:graphicImage id="corleito6" library="nir" name="imagens/leitoVermelho.png" rendered="#{leito.statusLeito eq 'INT' and leito.internacao.dataHoraLimiteVerde.compareTo(leitoBean.dataAtual) le 0 and leito.internacao.dataHoraLimiteAmarelo.compareTo(leitoBean.dataAtual) le 0}" />
                         <!--Cores Kanban-->
-                        
+
                         <h:panelGroup>
-                            
+
                             <p:commandButton id="internacao" actionListener="#{internacaoBean.prepararInternacao()}" icon="fa  fa-bed" value="Internação" oncomplete="PF('dlginternacao').show();" update=":forminternacao" rendered="#{leito.statusLeito eq 'D'}">
                                 <f:setPropertyActionListener value="#{leito}" target="#{internacaoBean.leitoSelecionado}" />
                             </p:commandButton>
@@ -172,7 +172,7 @@
                                 <p:confirm header="Confirmação" message="Confirma o cancelamento da Internação #{leito.internacao.idInternacao}-#{leito.internacao.codigoInternacaoHospital}?" icon="ui-icon-alert" />
                             </p:commandButton>
                             <p:tooltip id="toolTipFadeCancelarInternacao" for="cancelarInternacao" position="bottom" value="Cancelar Internação"/>
-                            
+
                         </h:panelGroup>
                     </h:panelGrid>
                 </p:panel>
@@ -194,7 +194,7 @@
 
                                 <p:outputLabel value="Código Interno Hospital" for="codigo" />
                                 <p:inputText id="codigo" maxlength="9" required="true" value="#{internacaoBean.internacao.codigoInternacaoHospital}" />
-                                
+
                                 <p:outputLabel value="Leito" for="leito" />
                                 <p:inputText id="leito" value="#{internacaoBean.internacao.leito.descricaoLeito}" disabled="true" />
 
@@ -321,10 +321,10 @@
 
                                 <p:outputLabel value="Leito" for="leito" />
                                 <p:inputText id="leito" value="#{internacaoBean.alta.internacao.leito.descricaoLeito}" disabled="true" />
-                                
+
                                 <p:outputLabel value="Médico" for="medico" />
                                 <p:inputText id="medico" value="#{internacaoBean.alta.internacao.medico.nomePessoa}" disabled="true" />
-                                
+
                                 <p:outputLabel value="Data Alta" for="dataalta" />
                                 <p:calendar id="dataalta" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.alta.dataHoraRealizacao}" pattern="dd/MM/yyyy HH:mm" />
 
@@ -458,7 +458,7 @@
                 <p:column headerText="Internação">
                     <h:outputText value="#{historico.idInternacao}-#{historico.codigoInternacaoHospital}" />
                 </p:column>
-                
+
                 <p:column headerText="Paciente">
                     <h:outputText value="#{historico.paciente.nomePessoa}" />
                 </p:column>
@@ -466,15 +466,15 @@
                 <p:column headerText="Médico">
                     <h:outputText value="#{historico.medico.nomePessoa}" />
                 </p:column>
-            
+
                 <p:column headerText="Entrada">
                     <h:outputText value="#{historico.dataEntrada}" >
                         <f:convertDateTime pattern="dd/MM/yy 'as' HH:mm" locale="pt_BR" />
                     </h:outputText>
                 </p:column>
-                
-                 <p:column headerText="Vencimento">
-                     <h:outputText value="#{historico.dataHoraLimiteVermelho}" >
+
+                <p:column headerText="Vencimento">
+                    <h:outputText value="#{historico.dataHoraLimiteVermelho}" >
                         <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
                     </h:outputText>
                 </p:column>
@@ -511,6 +511,18 @@
             </p:confirmDialog>
             <!--fim janela modal que pede confirmação de cancelamento -->
         </h:form>
+
+        <p:socket onMessage="handleMessage" channel="/notificar" >
+            <p:ajax event="message" update=":frm:leitoDataGrid" />
+        </p:socket>
+
+        <script type="text/javascript">
+            function handleMessage(facesmessage) {
+                facesmessage.severity = 'info';
+
+                PF('notificacao').show([facesmessage]);
+            }
+        </script>
 
     </ui:define>
 </ui:composition>

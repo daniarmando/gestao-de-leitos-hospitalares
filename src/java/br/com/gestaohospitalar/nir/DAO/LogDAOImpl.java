@@ -6,12 +6,10 @@
 package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.Log;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -21,70 +19,32 @@ import org.hibernate.criterion.Restrictions;
  */
 public class LogDAOImpl {
 
-    public void salvar(Log log) {
-        Session session = null;
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
+    public void salvar(Log log) {
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
-            session.beginTransaction();
-            session.save(log);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar Log. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            this.session.save(log);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar log. Erro: " + e.getMessage());
         }
     }
 
     public Log ultimoLogPorObjeto(String objeto) {
-        Log ultimoLog = new Log();
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-
-        try {
-            Criteria crit = session.createCriteria(Log.class)
-                    .add(Restrictions.eq("objeto", objeto))
-                    .addOrder(Order.desc("dataHora"))
-                    .setMaxResults(1);
-
-            ultimoLog = (Log) crit.uniqueResult();
-
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao buscar último Log por objeto. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-
-        return ultimoLog;
+        return (Log) this.session.createCriteria(Log.class)
+                .add(Restrictions.eq("objeto", objeto))
+                .addOrder(Order.desc("dataHora"))
+                .setMaxResults(1)
+                .uniqueResult();
     }
-    
+
     public List<Log> listarPorIdObjeto(String objeto, Integer idObjeto) {
-        List<Log> listarLog = null;
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-
-        try {
-            listarLog = session.createCriteria(Log.class)
-                    .add(Restrictions.eq("objeto", objeto))
-                    .add(Restrictions.eq("idObjeto", idObjeto))
-                    .addOrder(Order.asc("idObjeto"))
-                    .addOrder(Order.desc("dataHora"))
-                    .list();
-
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao listar logs por objeto e idObjeto. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-
-        return listarLog;
+        return (List<Log>) this.session.createCriteria(Log.class)
+                .add(Restrictions.eq("objeto", objeto))
+                .add(Restrictions.eq("idObjeto", idObjeto))
+                .addOrder(Order.asc("idObjeto"))
+                .addOrder(Order.desc("dataHora"))
+                .list();
     }
-
 }

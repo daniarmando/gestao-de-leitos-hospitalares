@@ -33,10 +33,6 @@ public class SelecaoPacienteBean implements Serializable {
     private String paramPesquisa;
     private List<Paciente> pacientes = new ArrayList<>();
 
-    private final PacienteDAOImpl daoPaciente = new PacienteDAOImpl();
-
-    private final ParametrosDAOImpl daoParametros = new ParametrosDAOImpl();
-
     private Paciente pacienteSelecionado;
     private Leito leitoSelecionado = new Leito();
 
@@ -156,7 +152,7 @@ public class SelecaoPacienteBean implements Serializable {
         } else {
             //se não passou na validação
             //checando o parâmetro
-            Parametros parametros = this.daoParametros.parametrosPorIdHospital(1); //passando o id do hospital manualmente
+            Parametros parametros = new ParametrosDAOImpl().parametrosPorIdHospital(1); //passando o id do hospital manualmente
             this.permiteLiberar = parametros.getLeitoIncompativelPaciente();
             this.msgValidacao = this.permiteLiberar == true ? (msg + " Deseja continuar?") : this.permiteLiberar == false ? msg : "";
             return false;
@@ -177,7 +173,7 @@ public class SelecaoPacienteBean implements Serializable {
      * @return this.pacientes
      */
     public List<Paciente> pesquisarPaciente() {
-        this.pacientes = this.daoPaciente.listarPacientePorNomeOuCodigoSusOuCPF(this.paramPesquisa);
+        this.pacientes = new PacienteDAOImpl().listarPorNomeOuCodigoSusOuCPF(this.paramPesquisa);
         return this.pacientes;
     }
 

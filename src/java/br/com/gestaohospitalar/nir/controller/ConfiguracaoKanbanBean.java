@@ -11,6 +11,8 @@ import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.ConfiguracaoKanban;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.io.Serializable;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -18,7 +20,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -29,13 +30,13 @@ import javax.faces.context.FacesContext;
 public class ConfiguracaoKanbanBean implements Serializable {
 
     private ConfiguracaoKanban configuracaoKanban;
-    private ConfiguracaoKanbanDAOImpl daoConfiguracaoKanban = new ConfiguracaoKanbanDAOImpl();
+    private ConfiguracaoKanbanDAOImpl daoConfiguracaoKanban;
 
     //Injetando o usuário
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log = new Log();
 
     private ConfiguracaoKanban cloneConfiguracaoKanban = new ConfiguracaoKanban();
@@ -49,6 +50,7 @@ public class ConfiguracaoKanbanBean implements Serializable {
 
     @PostConstruct
     public void init() {
+        this.daoConfiguracaoKanban = new ConfiguracaoKanbanDAOImpl();
         this.configuracaoKanban = this.daoConfiguracaoKanban.configuracaoKanbanPorId(1);
         this.cloneConfiguracaoKanban = this.configuracaoKanban.clone();
     }
@@ -59,35 +61,41 @@ public class ConfiguracaoKanbanBean implements Serializable {
      *
      */
     public void salvar() {
+        this.daoConfiguracaoKanban = new ConfiguracaoKanbanDAOImpl();
 
-        if (this.configuracaoKanban.equals(this.cloneConfiguracaoKanban) == false) {
+        try {
 
-            //somando os valores
-            int soma = this.configuracaoKanban.getValorVerdeKanban()
-                    + this.configuracaoKanban.getValorAmareloKanban()
-                    + this.configuracaoKanban.getValorVermelhoKanban();
+            if (this.configuracaoKanban.equals(this.cloneConfiguracaoKanban) == false) {
 
-            //verificando se os três campos foram preenchidos
-            if (this.configuracaoKanban.getValorVerdeKanban() == 0
-                    || this.configuracaoKanban.getValorVermelhoKanban() == 0
-                    || this.configuracaoKanban.getValorVermelhoKanban() == 0) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Favor preencher os três campos", null));
+                //somando os valores
+                int soma = this.configuracaoKanban.getValorVerdeKanban()
+                        + this.configuracaoKanban.getValorAmareloKanban()
+                        + this.configuracaoKanban.getValorVermelhoKanban();
 
-                //verificando se a soma dos valores corresponde a 100
-            } else if (soma != 100) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A soma dos valores nos 3 campos deve ser igual a 100, a soma atual está com " + soma, null));
+                //verificando se os três campos foram preenchidos
+                if (this.configuracaoKanban.getValorVerdeKanban() == 0
+                        || this.configuracaoKanban.getValorVermelhoKanban() == 0
+                        || this.configuracaoKanban.getValorVermelhoKanban() == 0) {
+                    FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Favor preencher os três campos.");
 
-                //gravando a configuração kanban
-            } else {
-                daoConfiguracaoKanban.salvar(configuracaoKanban);
+                    //verificando se a soma dos valores corresponde a 100
+                } else if (soma != 100) {
+                    FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A soma dos valores nos 3 campos deve ser igual a 100, a soma atual está com " + soma + ".");
 
-                //salvando o log
-                salvarLog();
-                
-                this.cloneConfiguracaoKanban = this.configuracaoKanban.clone();
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Configuração do Kanban salva com sucesso!", null));
+                    //gravando a configuração kanban
+                } else {
+                    daoConfiguracaoKanban.salvar(configuracaoKanban);
+
+                    //salvando o log
+                    salvarLog();
+
+                    this.cloneConfiguracaoKanban = this.configuracaoKanban.clone();
+                    FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Configuração do Kanban salva com sucesso!");
+                }
+
             }
-
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -96,6 +104,7 @@ public class ConfiguracaoKanbanBean implements Serializable {
      *
      */
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = "";
 
         if (!this.configuracaoKanban.getValorVerdeKanban().equals(this.cloneConfiguracaoKanban.getValorVerdeKanban())) {
@@ -134,14 +143,14 @@ public class ConfiguracaoKanbanBean implements Serializable {
         //salvando o log
         this.daoLog.salvar(this.log);
     }
-    
+
     /**
      * método que exibe o último log na página
      *
      * @return
      */
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("configuracaoKanban");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("configuracaoKanban");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 

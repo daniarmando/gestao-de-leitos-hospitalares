@@ -11,6 +11,8 @@ import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.Parametros;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.io.Serializable;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -18,7 +20,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -28,25 +29,26 @@ import javax.faces.context.FacesContext;
 @RequestScoped
 public class ParametrosBean implements Serializable {
 
-    private ParametrosDAOImpl daoParametros = new ParametrosDAOImpl();
+    private ParametrosDAOImpl daoParametros;
     private Parametros parametros;
 
     //Injetando o usuário
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
 
     /**
      * Creates a new instance of ParamProcedimentoBean
      */
     public ParametrosBean() {
-        parametros = new Parametros();
+        this.parametros = new Parametros();
     }
 
     @PostConstruct
     public void init() {
+        this.daoParametros = new ParametrosDAOImpl();
         this.parametros = this.daoParametros.parametrosPorId(1); //passando o id manualmente
     }
 
@@ -57,83 +59,90 @@ public class ParametrosBean implements Serializable {
      * @param tipoParametro
      */
     public void salvar(String tipoParametro) {
+        this.daoParametros = new ParametrosDAOImpl();
         String msg = "";
 
-        //salvando o parâmetro
-        this.daoParametros.salvar(this.getParametros());
+        try {
 
-        this.log = new Log();
+            //salvando o parâmetro
+            this.daoParametros.salvar(this.getParametros());
 
-        switch (tipoParametro) {
-            case "leitoPaciente":
+            this.log = new Log();
 
-                this.log.setDetalhe("parâmetro: liberar internação em leito incompatível com idade e/ou sexo do paciente.");
+            switch (tipoParametro) {
+                case "leitoPaciente":
 
-                if (this.parametros.getLeitoIncompativelPaciente()) {
-                    msg = "Parâmetro: liberar internação em leito incompatível com idade e/ou sexo do paciente ativado.";
-                    this.log.setTipo(TipoLog.ATIVACAO.get());
-                } else {
-                    msg = "Parâmetro: liberar internação em leito incompatível com idade e/ou sexo do paciente desativado.";
-                    this.log.setTipo(TipoLog.INATIVACAO.get());
-                }
-                break;
+                    this.log.setDetalhe("parâmetro: liberar internação em leito incompatível com idade e/ou sexo do paciente.");
 
-            case "procedimentoLeito":
+                    if (this.parametros.getLeitoIncompativelPaciente()) {
+                        msg = "Parâmetro: liberar internação em leito incompatível com idade e/ou sexo do paciente ativado.";
+                        this.log.setTipo(TipoLog.ATIVACAO.get());
+                    } else {
+                        msg = "Parâmetro: liberar internação em leito incompatível com idade e/ou sexo do paciente desativado.";
+                        this.log.setTipo(TipoLog.INATIVACAO.get());
+                    }
+                    break;
 
-                this.log.setDetalhe("parâmetro: liberar internação com procedimento incompatível com leito.");
+                case "procedimentoLeito":
 
-                if (this.parametros.getProcedimentoIncompativelLeito()) {
-                    msg = "Parâmetro: liberar internação com procedimento incompatível com leito ativado.";
-                    this.log.setTipo(TipoLog.ATIVACAO.get());
-                } else {
-                    msg = "Parâmetro: liberar internação com procedimento incompatível com leito desativado.";
-                    this.log.setTipo(TipoLog.INATIVACAO.get());
-                }
-                break;
+                    this.log.setDetalhe("parâmetro: liberar internação com procedimento incompatível com leito.");
 
-            case "procedimentoPaciente":
+                    if (this.parametros.getProcedimentoIncompativelLeito()) {
+                        msg = "Parâmetro: liberar internação com procedimento incompatível com leito ativado.";
+                        this.log.setTipo(TipoLog.ATIVACAO.get());
+                    } else {
+                        msg = "Parâmetro: liberar internação com procedimento incompatível com leito desativado.";
+                        this.log.setTipo(TipoLog.INATIVACAO.get());
+                    }
+                    break;
 
-                this.log.setDetalhe("parâmetro: liberar internação com procedimento incompatível com idade e/ou sexo do paciente.");
+                case "procedimentoPaciente":
 
-                if (this.parametros.getProcedimentoIncompativelPaciente()) {
-                    msg = "Parâmetro: liberar internação com procedimento incompatível com idade e/ou sexo do paciente ativado.";
-                    this.log.setTipo(TipoLog.ATIVACAO.get());
-                } else {
-                    msg = "Parâmetro: liberar internação com procedimento incompatível com idade e/ou sexo do paciente desativado.";
-                    this.log.setTipo(TipoLog.INATIVACAO.get());
-                }
-                break;
+                    this.log.setDetalhe("parâmetro: liberar internação com procedimento incompatível com idade e/ou sexo do paciente.");
 
-            case "cidLeito":
+                    if (this.parametros.getProcedimentoIncompativelPaciente()) {
+                        msg = "Parâmetro: liberar internação com procedimento incompatível com idade e/ou sexo do paciente ativado.";
+                        this.log.setTipo(TipoLog.ATIVACAO.get());
+                    } else {
+                        msg = "Parâmetro: liberar internação com procedimento incompatível com idade e/ou sexo do paciente desativado.";
+                        this.log.setTipo(TipoLog.INATIVACAO.get());
+                    }
+                    break;
 
-                this.log.setDetalhe("parâmetro: liberar internação com cid incompatível com tipo sexo do leito.");
+                case "cidLeito":
 
-                if (this.parametros.getProcedimentoIncompativelPaciente()) {
-                    msg = "Parâmetro: liberar internação com cid incompatível com tipo sexo do leito ativado.";
-                    this.log.setTipo(TipoLog.ATIVACAO.get());
-                } else {
-                    msg = "Parâmetro: liberar internação com cid incompatível com tipo sexo do leito desativado.";
-                    this.log.setTipo(TipoLog.INATIVACAO.get());
-                }
-                break;
-                
+                    this.log.setDetalhe("parâmetro: liberar internação com cid incompatível com tipo sexo do leito.");
+
+                    if (this.parametros.getProcedimentoIncompativelPaciente()) {
+                        msg = "Parâmetro: liberar internação com cid incompatível com tipo sexo do leito ativado.";
+                        this.log.setTipo(TipoLog.ATIVACAO.get());
+                    } else {
+                        msg = "Parâmetro: liberar internação com cid incompatível com tipo sexo do leito desativado.";
+                        this.log.setTipo(TipoLog.INATIVACAO.get());
+                    }
+                    break;
+
                 case "cidPaciente":
 
-                this.log.setDetalhe("parâmetro: liberar internação com cid incompatível com sexo do paciente.");
+                    this.log.setDetalhe("parâmetro: liberar internação com cid incompatível com sexo do paciente.");
 
-                if (this.parametros.getProcedimentoIncompativelPaciente()) {
-                    msg = "Parâmetro: liberar internação com cid incompatível com sexo do paciente ativado.";
-                    this.log.setTipo(TipoLog.ATIVACAO.get());
-                } else {
-                    msg = "Parâmetro: liberar internação com cid incompatível com sexo do paciente desativado.";
-                    this.log.setTipo(TipoLog.INATIVACAO.get());
-                }
-                break;
+                    if (this.parametros.getProcedimentoIncompativelPaciente()) {
+                        msg = "Parâmetro: liberar internação com cid incompatível com sexo do paciente ativado.";
+                        this.log.setTipo(TipoLog.ATIVACAO.get());
+                    } else {
+                        msg = "Parâmetro: liberar internação com cid incompatível com sexo do paciente desativado.";
+                        this.log.setTipo(TipoLog.INATIVACAO.get());
+                    }
+                    break;
+            }
+
+            salvarLog();
+
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, msg);
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
-
-        salvarLog();
-
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
     }
 
     /**
@@ -141,6 +150,8 @@ public class ParametrosBean implements Serializable {
      *
      */
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
+
         //passando as demais informações 
         this.log.setDataHora(new Date());
         this.log.setObjeto("parametros");
@@ -156,7 +167,7 @@ public class ParametrosBean implements Serializable {
      * @return
      */
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("parametros");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("parametros");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 

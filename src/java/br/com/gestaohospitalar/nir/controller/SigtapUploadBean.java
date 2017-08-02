@@ -5,6 +5,8 @@
  */
 package br.com.gestaohospitalar.nir.controller;
 
+import br.com.gestaohospitalar.nir.DAO.InternacaoDAOImpl;
+import br.com.gestaohospitalar.nir.DAO.LeitoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SigtapUploadDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SigtapUploadLogDAOImpl;
@@ -20,6 +22,8 @@ import br.com.gestaohospitalar.nir.model.sigtap.TB_MODALIDADE;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_PROCEDIMENTO;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_RUBRICA;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_TIPO_LEITO;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,7 +65,7 @@ public class SigtapUploadBean implements Serializable {
 
     //progresso importação
     private Integer progresso = 0;
-    private Integer qtdTabelas = 8; //são importados 8 tabelas
+    private final Integer qtdTabelas = 8; //são importados 8 tabelas
     private String mensagem = "Preparando...";
     private String nomeArquivo = "";
 
@@ -74,27 +78,26 @@ public class SigtapUploadBean implements Serializable {
     List<RL_PROCEDIMENTO_LEITO> rl_procedimentos_leitos = new ArrayList<>();
     List<RL_PROCEDIMENTO_CID> rl_procedimentos_cids = new ArrayList<>();
 
-    private SigtapUploadDAOImpl daoSigtapUpload = new SigtapUploadDAOImpl();
+    private SigtapUploadDAOImpl daoSigtapUpload;
 
-    private SigtapUploadLogDAOImpl daoSigtapUploadLog = new SigtapUploadLogDAOImpl();
-    private SigtapUploadLog sigtapUploadLog = new SigtapUploadLog();
+    private SigtapUploadLogDAOImpl daoSigtapUploadLog;
+    private final SigtapUploadLog sigtapUploadLog = new SigtapUploadLog();
 
     //injetando o usuário logado
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
-    private List<Log> logs = new ArrayList<>();
 
     //transforma String em data de acordo com o formato que vem no arquivo txt
-    SimpleDateFormat fmtData = new SimpleDateFormat("ddyyMM");
+    private final SimpleDateFormat fmtData = new SimpleDateFormat("ddyyMM");
 
     //monta a chave MesAno
-    String chaveMesAno = ConverterDataHora.gerarChaveMesAno();
+    private final String chaveMesAno = ConverterDataHora.gerarChaveMesAno();
 
     //cria uma data atual
-    Date data = new Date();
+    private final Date data = new Date();
 
     /**
      * Creates a new instance of SigtapUploadBean
@@ -118,9 +121,11 @@ public class SigtapUploadBean implements Serializable {
      *
      * @return true or false
      */
-    public Boolean verificarTabela() {
+    public boolean isTabelaImportada() {
+        this.daoSigtapUpload = new SigtapUploadDAOImpl();
+
         //retorna true se tabela para o mês atual já estiver importada
-        return this.daoSigtapUpload.verificarTabela(chaveMesAno);
+        return this.daoSigtapUpload.isTabelaImportada(chaveMesAno);
     }
 
     /**
@@ -134,9 +139,9 @@ public class SigtapUploadBean implements Serializable {
     public String exibirDialogo() {
         String exibirDialogo;
         //se a tabela já estiver sido importada anteriormente
-        if (verificarTabela()) {
+        if (isTabelaImportada()) {
             //se existirem registros que dependem da tabela, chama o dialog que apresenta uma mensagem informando que a tabela não pode ser substituída
-            if (this.daoSigtapUpload.verificarSePossuiInternacao(chaveMesAno) || this.daoSigtapUpload.verificarSePossuiLeito(chaveMesAno)) {
+            if (new InternacaoDAOImpl().temTB_TIPO_LEITO(chaveMesAno) || new LeitoDAOImpl().temTB_TIPO_LEITO(chaveMesAno)) {
                 exibirDialogo = "PF('dlgnaoimportar').show()";
                 //senão existirem registros que dependem da tabela, chama o dialog para substituir a tabela
             } else {
@@ -279,22 +284,24 @@ public class SigtapUploadBean implements Serializable {
      *
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
+     * @throws br.com.gestaohospitalar.nir.service.DAOException
      */
-    public void importarSigtap() throws FileNotFoundException, IOException {
+    public void importarSigtap() throws FileNotFoundException, IOException, DAOException {
+        this.daoSigtapUpload = new SigtapUploadDAOImpl();
 
         try {
-            
+
             this.log = new Log();
 
             //descompacta arquivo
             unzip();
 
             //se caso a tabela já estiver sido importada anteriormente 
-            if (verificarTabela()) {
+            if (isTabelaImportada()) {
                 this.log.setTipo(TipoLog.REIMPORTACAO_SIGTAP.get());
                 atualizarProgresso(1, 0, "D");
-                this.daoSigtapUpload.excluir(); //Excluindo tabela sigtap
-                this.daoSigtapUploadLog.excluir(); //Excluindo log  
+                this.daoSigtapUpload.excluir(); //excluindo tabela sigtap
+                this.daoSigtapUploadLog.excluir(); //excluindo log  
             } else {
                 this.log.setTipo(TipoLog.IMPORTACAO_SIGTAP.get());
             }
@@ -326,19 +333,19 @@ public class SigtapUploadBean implements Serializable {
             atualizarProgresso(8, 8, "F");
             //deletando a pasta onde o arquivo foi descompactado
             deletarPasta(new File(diretorio));
+
             //salvando log específico do sigtap upload
             this.sigtapUploadLog.setDataImportacao(data);
             this.sigtapUploadLog.setChaveMesAno(chaveMesAno);
-            daoSigtapUploadLog.salvar(this.sigtapUploadLog);
-            
+            new SigtapUploadLogDAOImpl().salvar(this.sigtapUploadLog);
+
             //salvando log na tabela de logs
             salvarLog();
 
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Tabela Sigtap de " + mostrarMes() + " importada com sucesso!"));
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Tabela Sigtap de " + mostrarMes() + " importada com sucesso!");
 
-        } catch (FileNotFoundException ex) {
-            System.out.println("Problemas ao importar tabela Sigtap. Erro:" + ex.getMessage());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Problemas ao importar Tabela Sigtap de " + mostrarMes() + ".", null));
+        } catch (FileNotFoundException | DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -385,8 +392,9 @@ public class SigtapUploadBean implements Serializable {
      *
      */
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         SimpleDateFormat fmt = new SimpleDateFormat("MM/yyyy");
-        String detalhe = "referente ao mês: " + fmt.format(this.data) 
+        String detalhe = "referente ao mês: " + fmt.format(this.data)
                 + ", nome do arquivo: " + this.nomeArquivo + ".";
 
         //passando as demais informações 
@@ -404,14 +412,12 @@ public class SigtapUploadBean implements Serializable {
      * @return
      */
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("sigtapUpload");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("sigtapUpload");
         return this.log != null ? "Última importação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
-    
     //abaixo estão os métodos que fazem a leitura linha a linha dos txts e os 
     //enviam para serem salvos no BD, contém um método para cada tabela.
-    
     /**
      * método que passa os dados do arquivo txt para uma lista do objeto a ser
      * montado

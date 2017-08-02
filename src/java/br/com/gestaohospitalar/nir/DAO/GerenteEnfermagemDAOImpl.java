@@ -8,12 +8,11 @@ package br.com.gestaohospitalar.nir.DAO;
 import br.com.gestaohospitalar.nir.model.Enfermeiro;
 import br.com.gestaohospitalar.nir.model.GerenteEnfermagem;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -22,85 +21,44 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class GerenteEnfermagemDAOImpl {
-    
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
     public GerenteEnfermagem gerenteEnfermagemPorId(Integer id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-
-        return (GerenteEnfermagem) session.get(GerenteEnfermagem.class, id);
-
+        return (GerenteEnfermagem) this.session.get(GerenteEnfermagem.class, id);
     }
-    
-    public void salvar(GerenteEnfermagem gerenteEnfermagem) {
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(gerenteEnfermagem);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar Gerente Enfermagem. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+
+    public void salvar(GerenteEnfermagem gerenteEnfermagem) throws DAOException {
+
+        try {
+            this.session.saveOrUpdate(gerenteEnfermagem);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar Gerente de Enfermagem. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Gerente de Enfermagem.");
         }
     }
 
     public List<GerenteEnfermagem> listar() {
-        List <GerenteEnfermagem> listarGerenteEnfermagem = null;
-        
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        
-        try {
-            listarGerenteEnfermagem = session.createCriteria(GerenteEnfermagem.class)
-                    .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
-                    .list();
-            transaction.commit();
-            session.close();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao listar Gerente Enfermagem. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        
-        return listarGerenteEnfermagem;
+
+        return (List<GerenteEnfermagem>) this.session.createCriteria(GerenteEnfermagem.class)
+                .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .list();
     }
-    
-    public GerenteEnfermagem listarPorId(Integer id) {
-         
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        
-        try {
-            return (GerenteEnfermagem) session.createCriteria(GerenteEnfermagem.class)
-                    .add(Restrictions.idEq(id))
-                    .uniqueResult();
-            
-        }finally {
-            session.close();
-        }        
-    }
-    
-    public Boolean verificarSePossuiEnfermeiro(GerenteEnfermagem gerenteEnfermagem) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+
+    public boolean temEnfermeiro(GerenteEnfermagem gerenteEnfermagem) throws DAOException {
         Long resultado = null;
 
         try {
-            Criteria crit = session.createCriteria(Enfermeiro.class)
+            Criteria crit = this.session.createCriteria(Enfermeiro.class)
                     .setProjection(Projections.count("idPessoa"))
                     .add(Restrictions.eq("gerenteEnfermagem", gerenteEnfermagem))
                     .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()));
 
-            transaction.commit();
-
             resultado = (Long) crit.uniqueResult();
 
-            session.close();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             System.out.println("Problemas ao verificar se o Gerente possuí Enfermeiro(s). Erro: " + e.getMessage());
-            transaction.rollback();
+            throw new DAOException("Problemas ao validar informações no banco de dados.");
         }
         return resultado > 0;
     }

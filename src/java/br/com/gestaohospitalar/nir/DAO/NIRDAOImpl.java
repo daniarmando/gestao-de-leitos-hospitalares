@@ -6,11 +6,10 @@
 package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.NIR;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -18,54 +17,27 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class NIRDAOImpl {
-    
-    public void salvar(NIR nir) {
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(nir);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar NIR. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
+    public void salvar(NIR nir) throws DAOException {
+
+        try {
+            this.session.saveOrUpdate(nir);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar NIR. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar NIR.");
         }
     }
 
     public List<NIR> listar() {
-        List <NIR> listarNIR = null;
-        
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        
-        try {
-            listarNIR = session.createCriteria(NIR.class).list();
-            transaction.commit();
-            session.close();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao listar NIR. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        
-        return listarNIR;
+        return (List<NIR>) this.session.createCriteria(NIR.class).list();
     }
-    
-    public NIR listarPorId(Integer id) {
-         
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        
-        try {
-            return (NIR) session.createCriteria(NIR.class)
-                    .add(Restrictions.idEq(id))
-                    .uniqueResult();
-            
-        }finally {
-            session.close();
-        }        
+
+    public NIR nirPorId(Integer id) {
+
+        return (NIR) this.session.createCriteria(NIR.class)
+                .add(Restrictions.idEq(id))
+                .uniqueResult();
     }
 }

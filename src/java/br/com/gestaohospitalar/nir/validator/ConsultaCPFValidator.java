@@ -7,8 +7,8 @@ package br.com.gestaohospitalar.nir.validator;
 
 import br.com.gestaohospitalar.nir.DAO.PessoaDAOImpl;
 import br.com.gestaohospitalar.nir.model.Pessoa;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 
 /**
  * Validação que irá apenas realizar uma consulta no BD para verificar se o CPF
@@ -17,32 +17,32 @@ import javax.faces.context.FacesContext;
  *
  * @author Daniel
  */
-public class ConsultaCPFValidator  {
-    
+public class ConsultaCPFValidator {
+
     public static Boolean verificar(Pessoa pessoa, Pessoa clonePessoa) {
         PessoaDAOImpl daoPessoa = new PessoaDAOImpl();
 
         //Se for cadastro novo
-        if (pessoa.getIdPessoa() == null || pessoa.getIdPessoa() == 0) { 
-            if (daoPessoa.verificarPessoaPorCPF(pessoa.getCpfPessoa())) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "CPF já cadastrado no sistema.", null));
+        if (pessoa.getIdPessoa() == null || pessoa.getIdPessoa() == 0) {
+            if (daoPessoa.isCPFCadastrado(pessoa.getCpfPessoa())) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "CPF já cadastrado no sistema.");
                 return false;
             } else {
                 return true;
             }
-            
-          //se for alteração
-        } else { 
+
+            //se for alteração
+        } else {
             if (!pessoa.getCpfPessoa().equals(clonePessoa.getCpfPessoa())) {
-                if (daoPessoa.verificarPessoaPorCPF(pessoa.getCpfPessoa())) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "CPF já cadastrado no sistema.", null));
+                if (daoPessoa.isCPFCadastrado(pessoa.getCpfPessoa())) {
+                    FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "CPF já cadastrado no sistema.");
                     return false;
                 } else {
                     return true;
                 }
             }
         }
-        
+
         return true;
     }
 }

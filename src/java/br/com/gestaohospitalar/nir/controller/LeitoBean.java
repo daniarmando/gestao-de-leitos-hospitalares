@@ -20,6 +20,8 @@ import br.com.gestaohospitalar.nir.model.Medico;
 import br.com.gestaohospitalar.nir.model.Quarto;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +31,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -39,21 +40,17 @@ import javax.faces.context.FacesContext;
 @SessionScoped
 public class LeitoBean implements InterfaceBean, Serializable {
 
-    private final LeitoDAOImpl daoLeito = new LeitoDAOImpl();
+    private LeitoDAOImpl daoLeito;
     private Leito leito;
     private List<Leito> filtrarLista;
     private List<Leito> leitos = new ArrayList<>();
 
-    private final QuartoDAOImpl daoQuarto = new QuartoDAOImpl();
     private List<Quarto> quartos = new ArrayList<>();
 
-    private final SigtapUploadDAOImpl daoTb_tipo_leito = new SigtapUploadDAOImpl();
     private List<TB_TIPO_LEITO> tipo_leitos = new ArrayList<>();
 
-    private final InternacaoDAOImpl daoInternacao = new InternacaoDAOImpl();
     private List<Internacao> historicoInternacoesPorLeito = new ArrayList();
 
-    private final MedicoDAOImpl daoMedico = new MedicoDAOImpl();
     private List<Medico> medicos = new ArrayList<>();
 
     //injetando o usuário logado
@@ -62,7 +59,7 @@ public class LeitoBean implements InterfaceBean, Serializable {
 
     private Leito cloneLeito;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -74,25 +71,22 @@ public class LeitoBean implements InterfaceBean, Serializable {
 
     private Leito leitoSelecionado;
 
-    private Date dataAtual = new Date();
+    private final Date dataAtual = new Date();
 
     /**
      * Creates a new instance of LeitoBean
      */
     public LeitoBean() {
-        leito = new Leito();
+        this.leito = new Leito();
     }
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.leitos = this.daoLeito.listar();
+        this.leitos = new LeitoDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-
-        this.log = new Log();
 
         if (isEditar()) {
             this.cloneLeito = this.leito.clone();
@@ -101,8 +95,8 @@ public class LeitoBean implements InterfaceBean, Serializable {
             this.log.setTipo(TipoLog.INCLUSAO.get());
         }
 
-        this.quartos = this.daoQuarto.listar();
-        this.tipo_leitos = this.daoTb_tipo_leito.listar();
+        this.quartos = new QuartoDAOImpl().listar();
+        this.tipo_leitos = new SigtapUploadDAOImpl().listar();
 
     }
 
@@ -114,20 +108,27 @@ public class LeitoBean implements InterfaceBean, Serializable {
 
     @Override
     public void salvar() {
+        this.daoLeito = new LeitoDAOImpl();
 
-        //Passando a chaveMesAno se for incluir um novo registro
-        if (this.leito.getIdLeito() == null || this.leito.getIdLeito() == 0) {
-            this.leito.setChaveMesAnoTipoLeito(ConverterDataHora.ultimaChaveMesAno());
+        try {
+
+            //passando a chaveMesAno se for incluir um novo registro
+            if (this.leito.getIdLeito() == null || this.leito.getIdLeito() == 0) {
+                this.leito.setChaveMesAnoTipoLeito(ConverterDataHora.ultimaChaveMesAno());
+            }
+
+            this.daoLeito.salvar(this.leito);
+
+            //gravando o log
+            salvarLog();
+
+            this.leito = new Leito();
+
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Leito salvo com sucesso!");
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
-
-        this.daoLeito.salvar(this.leito);
-
-        //gravando o log
-        salvarLog();
-
-        this.setLeito(new Leito());
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Leito salvo com sucesso!"));
-
     }
 
     @Override
@@ -137,27 +138,36 @@ public class LeitoBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        if (daoLeito.verificarSePossuiInternacaoAberta(this.leito) == false) {
-            this.leito.setStatusLeito(Status.INDISPONIVEL.get());
+        this.daoLeito = new LeitoDAOImpl();
 
-            this.daoLeito.salvar(this.leito);
+        try {
 
-            //Atualizando lista de leitos
-            this.leitos.remove(this.leito);
+            if (daoLeito.temInternacaoAberta(this.leito) == false) {
+                this.leito.setStatusLeito(Status.INDISPONIVEL.get());
 
-            //gravando o log
-            this.log.setTipo(TipoLog.INATIVACAO.get());
-            salvarLog();
+                this.daoLeito.salvar(this.leito);
 
-            this.leito = new Leito();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Leito Inativado com sucesso!"));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Leito não pode ser Inativado, pois possuí Internação em aberto!", null));
+                //atualizando lista de leitos
+                this.leitos.remove(this.leito);
+
+                //gravando o log
+                this.log.setTipo(TipoLog.INATIVACAO.get());
+                salvarLog();
+
+                this.leito = new Leito();
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Leito inativado com sucesso!");
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Leito não pode ser inativado, pois possuí Internação em aberto!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
+
         String detalhe = null;
 
         //se for alteração
@@ -222,13 +232,13 @@ public class LeitoBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("leito");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("leito");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("leito", this.leito.getIdLeito());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("leito", this.leito.getIdLeito());
     }
 
     @Override
@@ -257,7 +267,7 @@ public class LeitoBean implements InterfaceBean, Serializable {
             this.exibePesqSetor = false;
             this.exibePesqMedico = true;
             //carregando os médicos na combo
-            this.medicos = daoMedico.listar();
+            this.medicos = new MedicoDAOImpl().listar();
         }
     }
 
@@ -271,9 +281,9 @@ public class LeitoBean implements InterfaceBean, Serializable {
 
         if (this.pesqSetor != null || this.pesqMedico.getIdPessoa() != null) {
             if (this.exibePesqSetor) {
-                listaLeitos = this.daoLeito.listarPorIdSetor(this.pesqSetor);
+                listaLeitos = new LeitoDAOImpl().listarPorIdSetor(this.pesqSetor);
             } else if (this.exibePesqMedico) {
-                listaLeitos = this.daoLeito.listarPorIdMedico(this.pesqMedico.getIdPessoa());
+                listaLeitos = new LeitoDAOImpl().listarPorIdMedico(this.pesqMedico.getIdPessoa());
             }
         } else {
             return null;
@@ -289,7 +299,7 @@ public class LeitoBean implements InterfaceBean, Serializable {
      * @return getHistoricoInternacoesPorLeito
      */
     public List<Internacao> listarHistoricoInternacoes(Integer idLeito) {
-        this.historicoInternacoesPorLeito = daoInternacao.listarHistoricoInternacoesPorLeito(idLeito);
+        this.historicoInternacoesPorLeito = new InternacaoDAOImpl().listarHistoricoInternacoesPorLeito(idLeito);
         return this.getHistoricoInternacoesPorLeito();
     }
 

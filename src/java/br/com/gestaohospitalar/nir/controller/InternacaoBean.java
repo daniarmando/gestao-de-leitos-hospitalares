@@ -29,6 +29,8 @@ import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_CID;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_PROCEDIMENTO;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -40,7 +42,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.push.EventBus;
 import org.primefaces.push.EventBusFactory;
@@ -54,34 +55,28 @@ import org.primefaces.push.EventBusFactory;
 public class InternacaoBean implements Serializable {
 
     private Internacao internacao;
-    private final InternacaoDAOImpl daoInterncao = new InternacaoDAOImpl();
+    private InternacaoDAOImpl daoInternacao;
 
     private List<Internacao> internacoes = new ArrayList<>();
     private List<Internacao> filtrarLista;
 
-    private final MedicoDAOImpl daoMedico = new MedicoDAOImpl();
     private List<Medico> medicos = new ArrayList<>();
 
-    private final LeitoDAOImpl daoLeito = new LeitoDAOImpl();
     private List<Leito> leitos = new ArrayList<>();
 
-    private final AltaDAOImpl daoAlta = new AltaDAOImpl();
+    private AltaQualificada altaQualificada = new AltaQualificada();
+
     private Alta alta = new Alta();
 
-    private final HigienizacaoDAOImpl daoHigienizacao = new HigienizacaoDAOImpl();
     private Higienizacao higienizacao = new Higienizacao();
 
-    private final FuncionarioDAOImpl daoFuncionario = new FuncionarioDAOImpl();
     private List<Funcionario> funcionarios = new ArrayList<>();
-
-    private final AltaQualificadaDAOImpl daoAltaQualificada = new AltaQualificadaDAOImpl();
-    private AltaQualificada altaQualificada = new AltaQualificada();
 
     //injetando o usuário logado
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -95,7 +90,7 @@ public class InternacaoBean implements Serializable {
     //variável que define qual o tipo de cadastro vai ser feito 
     //(internação, alta qualificada, alta, higienização)
     private String tipoCadastro = "";
-    
+
     String msgValidacaoPacienteLog = "", msgValidacaoProcedimentoLog = "", msgValidacaoCidLog = "";
 
     /**
@@ -106,16 +101,13 @@ public class InternacaoBean implements Serializable {
     }
 
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.internacoes = this.daoInterncao.listar();
+        this.internacoes = new InternacaoDAOImpl().listar();
     }
 
     public void inicializarPaginaCadastro() {
 
-        this.log = new Log();
-
-        this.medicos = this.daoMedico.listar();
-        this.leitos = this.daoLeito.listarParaInternacao();
+        this.medicos = new MedicoDAOImpl().listar();
+        this.leitos = new LeitoDAOImpl().listarParaInternacao();
         this.habilitaCampos = !this.leitos.isEmpty();
 
         //passando a data e hora atual para já vir preenchido no formulário
@@ -139,7 +131,7 @@ public class InternacaoBean implements Serializable {
         this.tipoCadastro = "RI"; //registrar internação
 
         //listando os médicos
-        this.medicos = this.daoMedico.listar();
+        this.medicos = new MedicoDAOImpl().listar();
 
         //passando a data e hora atual para já vir preenchido no formulário
         this.internacao.setDataEntrada(new Date());
@@ -167,7 +159,7 @@ public class InternacaoBean implements Serializable {
         this.tipoCadastro = "RA"; //registar alta
 
         //listando os médicos
-        this.medicos = this.daoMedico.listar();
+        this.medicos = new MedicoDAOImpl().listar();
 
     }
 
@@ -181,7 +173,7 @@ public class InternacaoBean implements Serializable {
         this.tipoCadastro = "RH"; //registrar higienização
 
         //listando os funcionários 
-        this.funcionarios = this.daoFuncionario.listar();
+        this.funcionarios = new FuncionarioDAOImpl().listar();
 
     }
 
@@ -236,118 +228,131 @@ public class InternacaoBean implements Serializable {
      *
      */
     public void registrarInternacao() {
+        this.daoInternacao = new InternacaoDAOImpl();
 
-        //passando o status inicial da internação
-        this.internacao.setStatusInternacao(Status.ABERTA.get());
+        try {
 
-        //passando a chaveMesAno SigTap
-        String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
-        this.internacao.setChaveMesAnoProcedimento(chaveMesAno);
-        this.internacao.setChaveMesAnoCID(chaveMesAno);
+            //passando o status inicial da internação
+            this.internacao.setStatusInternacao(Status.ABERTA.get());
 
-        //pega os valores da configuração kanban para fazer o cálculo
-        ConfiguracaoKanban configuracaoKanban = new ConfiguracaoKanbanDAOImpl().configuracaoKanbanPorId(1);
+            //passando a chaveMesAno SigTap
+            String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+            this.internacao.setChaveMesAnoProcedimento(chaveMesAno);
+            this.internacao.setChaveMesAnoCID(chaveMesAno);
 
-        //converte a data de entrada para o tipo LocalDateTime para fazer o cálculo
-        LocalDateTime dataEntrada = ConverterDataHora.paraLocalDateTime(this.internacao.getDataEntrada());
+            //pega os valores da configuração kanban para fazer o cálculo
+            ConfiguracaoKanban configuracaoKanban = new ConfiguracaoKanbanDAOImpl().configuracaoKanbanPorId(1);
 
-        //calculando e setando limite de tempo para cor verde
-        Long verde = Math.round(((this.internacao.getProcedimento().getQT_DIAS_PERMANENCIA() * 24)
-                * configuracaoKanban.getValorVerdeKanban()) / 100.0);
-        LocalDateTime tempoLimiteVerde = dataEntrada.plusHours(verde);
-        this.internacao.setDataHoraLimiteVerde(ConverterDataHora.paraDate(tempoLimiteVerde));
+            //converte a data de entrada para o tipo LocalDateTime para fazer o cálculo
+            LocalDateTime dataEntrada = ConverterDataHora.paraLocalDateTime(this.internacao.getDataEntrada());
 
-        //calculando e setando limite de tempo para cor amarelo
-        Long amarelo = verde + Math.round(((this.internacao.getProcedimento().getQT_DIAS_PERMANENCIA() * 24)
-                * configuracaoKanban.getValorAmareloKanban()) / 100.0);
-        LocalDateTime tempoLimiteAmarelo = dataEntrada.plusHours(amarelo);
-        this.internacao.setDataHoraLimiteAmarelo(ConverterDataHora.paraDate(tempoLimiteAmarelo));
+            //calculando e setando limite de tempo para cor verde
+            Long verde = Math.round(((this.internacao.getProcedimento().getQT_DIAS_PERMANENCIA() * 24)
+                    * configuracaoKanban.getValorVerdeKanban()) / 100.0);
+            LocalDateTime tempoLimiteVerde = dataEntrada.plusHours(verde);
+            this.internacao.setDataHoraLimiteVerde(ConverterDataHora.paraDate(tempoLimiteVerde));
 
-        //calculando e setando limite de tempo para cor vermelho
-        Long vermelho = Long.valueOf(this.internacao.getProcedimento().getQT_DIAS_PERMANENCIA() * 24);
-        LocalDateTime tempoLimiteVermelho = dataEntrada.plusHours(vermelho);
-        this.internacao.setDataHoraLimiteVermelho(ConverterDataHora.paraDate(tempoLimiteVermelho));
+            //calculando e setando limite de tempo para cor amarelo
+            Long amarelo = verde + Math.round(((this.internacao.getProcedimento().getQT_DIAS_PERMANENCIA() * 24)
+                    * configuracaoKanban.getValorAmareloKanban()) / 100.0);
+            LocalDateTime tempoLimiteAmarelo = dataEntrada.plusHours(amarelo);
+            this.internacao.setDataHoraLimiteAmarelo(ConverterDataHora.paraDate(tempoLimiteAmarelo));
 
-        //salvando a internação
-        this.daoInterncao.salvar(this.internacao);
+            //calculando e setando limite de tempo para cor vermelho
+            Long vermelho = Long.valueOf(this.internacao.getProcedimento().getQT_DIAS_PERMANENCIA() * 24);
+            LocalDateTime tempoLimiteVermelho = dataEntrada.plusHours(vermelho);
+            this.internacao.setDataHoraLimiteVermelho(ConverterDataHora.paraDate(tempoLimiteVermelho));
 
-        //salvando o log
-        this.log.setTipo(TipoLog.REGISTRAR_INTERNACAO.get());
-        this.log.setIdObjeto(this.internacao.getIdInternacao());
-        salvarLog();
-        
-        //se gerou mensagem de validação ao selecionar o paciente salva um log
-        if (this.msgValidacaoPacienteLog.length() > 0) {
-            this.log = new Log();
-            this.log.setTipo(TipoLog.ERRO_VALIDACAO_PACIENTE.get());
+            //salvando a internação
+            this.daoInternacao.salvar(this.internacao);
+
+            //salvando o log
+            this.log.setTipo(TipoLog.REGISTRAR_INTERNACAO.get());
             this.log.setIdObjeto(this.internacao.getIdInternacao());
-            this.log.setDetalhe(this.msgValidacaoPacienteLog);
             salvarLog();
+
+            //se gerou mensagem de validação ao selecionar o paciente salva um log
+            if (this.msgValidacaoPacienteLog.length() > 0) {
+                this.log = new Log();
+                this.log.setTipo(TipoLog.ERRO_VALIDACAO_PACIENTE.get());
+                this.log.setIdObjeto(this.internacao.getIdInternacao());
+                this.log.setDetalhe(this.msgValidacaoPacienteLog);
+                salvarLog();
+            }
+
+            //se gerou mensagem de validação ao selecionar o procedimento salva um log
+            if (this.msgValidacaoProcedimentoLog.length() > 0) {
+                this.log = new Log();
+                this.log.setTipo(TipoLog.ERRO_VALIDACAO_PROCEDIMENTO.get());
+                this.log.setIdObjeto(this.internacao.getIdInternacao());
+                this.log.setDetalhe(this.msgValidacaoProcedimentoLog);
+                salvarLog();
+            }
+
+            //se gerou mensagem de validação ao selecionar o cid salva um log
+            if (this.msgValidacaoCidLog.length() > 0) {
+                this.log = new Log();
+                this.log.setTipo(TipoLog.ERRO_VALIDACAO_CID.get());
+                this.log.setIdObjeto(this.internacao.getIdInternacao());
+                this.log.setDetalhe(this.msgValidacaoCidLog);
+                salvarLog();
+            }
+
+            //atualizando a lista de leitos
+            this.leitos = new LeitoDAOImpl().listarParaInternacao();
+            this.habilitaCampos = !this.leitos.isEmpty();
+
+            //envia mensagem para usuários conectados e atualiza a página dashboard
+            notificar(TipoLog.REGISTRAR_INTERNACAO.get(), this.internacao.getLeito().getIdLeito());
+
+            this.internacao = new Internacao();
+            this.medicos = new ArrayList<>();
+            this.msgValidacaoPacienteLog = "";
+            this.msgValidacaoProcedimentoLog = "";
+            this.msgValidacaoCidLog = "";
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
-        
-        //se gerou mensagem de validação ao selecionar o procedimento salva um log
-        if (this.msgValidacaoProcedimentoLog.length() > 0) {
-            this.log = new Log();
-            this.log.setTipo(TipoLog.ERRO_VALIDACAO_PROCEDIMENTO.get());
-            this.log.setIdObjeto(this.internacao.getIdInternacao());
-            this.log.setDetalhe(this.msgValidacaoProcedimentoLog);
-            salvarLog();
-        }
-        
-        //se gerou mensagem de validação ao selecionar o cid salva um log
-        if (this.msgValidacaoCidLog.length() > 0) {
-            this.log = new Log();
-            this.log.setTipo(TipoLog.ERRO_VALIDACAO_CID.get());
-            this.log.setIdObjeto(this.internacao.getIdInternacao());
-            this.log.setDetalhe(this.msgValidacaoCidLog);
-            salvarLog();
-        }
-        
-        //atualizando a lista de leitos
-        this.leitos = this.daoLeito.listarParaInternacao();
-        this.habilitaCampos = !this.leitos.isEmpty();
-        
-        //envia mensagem para usuários conectados e atualiza a página dashboard
-        notificar(TipoLog.REGISTRAR_INTERNACAO.get(), this.internacao.getLeito().getIdLeito());
-        
-        this.internacao = new Internacao();
-        this.medicos = new ArrayList<>();
-        this.msgValidacaoPacienteLog = "";
-        this.msgValidacaoProcedimentoLog = "";
-        this.msgValidacaoCidLog = "";
 
     }
-    
+
     /**
      * método que salva a alta qualificada
      *
      */
     public void registrarAltaQualificada() {
+        AltaQualificadaDAOImpl daoAltaQualificada = new AltaQualificadaDAOImpl();
 
-        //se a data da previsão de alta informada for igual a data de entrada da internação
-        if (this.altaQualificada.getDataHoraPrevisao().compareTo(this.altaQualificada.getInternacao().getDataEntrada()) == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data da previsão de alta não pode ser igual que a data de entrada da internação!", null));
-            //se a data da previsão de alta informada for menor que a data de entrada da internação
-        } else if (this.altaQualificada.getDataHoraPrevisao().before(this.altaQualificada.getInternacao().getDataEntrada())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data da previsão de alta não pode ser menor que a data de entrada da internação!", null));
-        } else {
+        try {
 
-            //passando a data e hora atual
-            this.altaQualificada.setDataHoraInformacao(new Date());
+            //se a data da previsão de alta informada for igual a data de entrada da internação
+            if (this.altaQualificada.getDataHoraPrevisao().compareTo(this.altaQualificada.getInternacao().getDataEntrada()) == 0) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data da previsão de alta não pode ser igual que a data de entrada da internação!");
+                //se a data da previsão de alta informada for menor que a data de entrada da internação
+            } else if (this.altaQualificada.getDataHoraPrevisao().before(this.altaQualificada.getInternacao().getDataEntrada())) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data da previsão de alta não pode ser menor que a data de entrada da internação!");
+            } else {
 
-            //salvando a alta qualificada
-            this.daoAltaQualificada.salvar(this.altaQualificada);
+                //passando a data e hora atual
+                this.altaQualificada.setDataHoraInformacao(new Date());
 
-            //salvando o log
-            this.log.setTipo(TipoLog.REGISTRAR_ALTA_QUALIFICADA.get());
-            this.log.setIdObjeto(this.altaQualificada.getInternacao().getIdInternacao());
-            this.log.setDetalhe("alta qualiificada código " + this.altaQualificada.getIdAltaQualificada() + ".");
-            salvarLog();
-            
-            //envia mensagem para usuários conectados e atualiza a página dashboard
-            notificar(TipoLog.REGISTRAR_ALTA_QUALIFICADA.get(), this.altaQualificada.getInternacao().getLeito().getIdLeito());
+                //salvando a alta qualificada
+                daoAltaQualificada.salvar(this.altaQualificada);
 
-            this.altaQualificada = new AltaQualificada();
+                //salvando o log
+                this.log.setTipo(TipoLog.REGISTRAR_ALTA_QUALIFICADA.get());
+                this.log.setIdObjeto(this.altaQualificada.getInternacao().getIdInternacao());
+                this.log.setDetalhe("alta qualiificada código " + this.altaQualificada.getIdAltaQualificada() + ".");
+                salvarLog();
+
+                //envia mensagem para usuários conectados e atualiza a página dashboard
+                notificar(TipoLog.REGISTRAR_ALTA_QUALIFICADA.get(), this.altaQualificada.getInternacao().getLeito().getIdLeito());
+
+                this.altaQualificada = new AltaQualificada();
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -356,42 +361,49 @@ public class InternacaoBean implements Serializable {
      *
      */
     public void registrarAlta() {
+        AltaDAOImpl daoAlta = new AltaDAOImpl();
 
-        //se a data da realização da alta informada for igual a data de entrada da internação
-        if (this.alta.getDataHoraRealizacao().compareTo(this.alta.getInternacao().getDataEntrada()) == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data da alta não pode ser igual que a data de entrada da internação!", null));
-            //se a data da previsão de alta informada for menor que a data de entrada da internação
-        } else if (this.alta.getDataHoraRealizacao().before(this.alta.getInternacao().getDataEntrada())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data da alta não pode ser menor que a data de entrada da internação!", null));
-        } else {
+        try {
 
-            //buscando alta qualificada para a internação
-            this.altaQualificada = this.daoAltaQualificada.altaQualificadaPorIdInternacao(this.alta.getInternacao().getIdInternacao());
+            //se a data da realização da alta informada for igual a data de entrada da internação
+            if (this.alta.getDataHoraRealizacao().compareTo(this.alta.getInternacao().getDataEntrada()) == 0) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data da alta não pode ser igual que a data de entrada da internação!");
+                //se a data da previsão de alta informada for menor que a data de entrada da internação
+            } else if (this.alta.getDataHoraRealizacao().before(this.alta.getInternacao().getDataEntrada())) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data da alta não pode ser menor que a data de entrada da internação!");
+            } else {
 
-            //se tiver alta qualificada para a internação, passa o idAltaQualificada para a alta
-            if (this.altaQualificada != null) {
-                this.alta.setAltaQualificada(this.altaQualificada);
+                //buscando alta qualificada para a internação
+                this.altaQualificada = new AltaQualificadaDAOImpl().altaQualificadaPorIdInternacao(this.alta.getInternacao().getIdInternacao());
+
+                //se tiver alta qualificada para a internação, passa o idAltaQualificada para a alta
+                if (this.altaQualificada != null) {
+                    this.alta.setAltaQualificada(this.altaQualificada);
+                }
+
+                //passando a data e hora atual
+                this.alta.setDataHoraInformacao(new Date());
+
+                //salvando a alta
+                daoAlta.salvar(this.alta);
+
+                //salvando o log
+                this.log.setTipo(TipoLog.REGISTRAR_ALTA.get());
+                this.log.setIdObjeto(this.alta.getInternacao().getIdInternacao());
+                this.log.setDetalhe("alta código " + this.alta.getIdAlta() + ".");
+                salvarLog();
+
+                //envia mensagem para usuários conectados e atualiza a página dashboard
+                notificar(TipoLog.REGISTRAR_ALTA.get(), this.alta.getInternacao().getLeito().getIdLeito());
+
+                this.alta = new Alta();
+                this.altaQualificada = new AltaQualificada();
+                this.medicos = new ArrayList<>();
             }
-
-            //passando a data e hora atual
-            this.alta.setDataHoraInformacao(new Date());
-
-            //salvando a alta
-            this.daoAlta.salvar(this.alta);
-
-            //salvando o log
-            this.log.setTipo(TipoLog.REGISTRAR_ALTA.get());
-            this.log.setIdObjeto(this.alta.getInternacao().getIdInternacao());
-            this.log.setDetalhe("alta código " + this.alta.getIdAlta() + ".");
-            salvarLog();
-            
-            //envia mensagem para usuários conectados e atualiza a página dashboard
-            notificar(TipoLog.REGISTRAR_ALTA.get(), this.alta.getInternacao().getLeito().getIdLeito());
-
-            this.alta = new Alta();
-            this.altaQualificada = new AltaQualificada();
-            this.medicos = new ArrayList<>();
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
+
     }
 
     /**
@@ -399,20 +411,27 @@ public class InternacaoBean implements Serializable {
      *
      */
     public void registrarSaida() {
+        this.daoInternacao = new InternacaoDAOImpl();
 
-        //atualizando a internação com a data e hora da saída e alterando o status para higienização
-        this.internacaoSelecionada.setStatusInternacao(Status.HIGIENIZACAO.get());
-        this.daoInterncao.salvar(this.internacaoSelecionada);
+        try {
 
-        //salvando o log
-        this.log.setTipo(TipoLog.REGISTRAR_SAIDA.get());
-        this.log.setIdObjeto(this.internacaoSelecionada.getIdInternacao());
-        salvarLog();
-        
-        //envia mensagem para usuários conectados e atualiza a página dashboard
-        notificar(TipoLog.REGISTRAR_SAIDA.get(), this.internacaoSelecionada.getLeito().getIdLeito());
+            //atualizando a internação com a data e hora da saída e alterando o status para higienização
+            this.internacaoSelecionada.setStatusInternacao(Status.HIGIENIZACAO.get());
+            this.daoInternacao.salvar(this.internacaoSelecionada);
 
-        this.internacaoSelecionada = new Internacao();
+            //salvando o log
+            this.log.setTipo(TipoLog.REGISTRAR_SAIDA.get());
+            this.log.setIdObjeto(this.internacaoSelecionada.getIdInternacao());
+            salvarLog();
+
+            //envia mensagem para usuários conectados e atualiza a página dashboard
+            notificar(TipoLog.REGISTRAR_SAIDA.get(), this.internacaoSelecionada.getLeito().getIdLeito());
+
+            this.internacaoSelecionada = new Internacao();
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
 
     }
 
@@ -421,32 +440,38 @@ public class InternacaoBean implements Serializable {
      *
      */
     public void registrarHigienizacao() {
+        HigienizacaoDAOImpl daoHigienizacao = new HigienizacaoDAOImpl();
 
-        //se a data inicial for menor que a data de saída do paciente do leito
-        if (higienizacao.getDataHoraInicio().before(higienizacao.getInternacao().getDataSaidaLeito())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data e hora da higienização não pode ser menor que a data da saída do paciente!", null));
-            //se a data inicial for igual a final
-        } else if (higienizacao.getDataHoraInicio().compareTo(higienizacao.getDataHoraFim()) == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser igual a data e hora final!", null));
-            //se a data inicial for maior que a data final
-        } else if (higienizacao.getDataHoraInicio().after(higienizacao.getDataHoraFim())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser maior que a data e hora final!", null));
-        } else {
-            //salvando a higienização
-            this.higienizacao.setTempoHigienizacaoMinutos(ConverterDataHora.diferencaEmMinutos(this.higienizacao.getDataHoraInicio(), this.higienizacao.getDataHoraFim()));
-            this.daoHigienizacao.salvar(this.higienizacao);
+        try {
 
-            //salvando o log
-            this.log.setTipo(TipoLog.REGISTRAR_HIGIENIZACAO.get());
-            this.log.setIdObjeto(this.higienizacao.getInternacao().getIdInternacao());
-            this.log.setDetalhe("higienização código " + this.higienizacao.getIdHigienizacao() + ".");
-            salvarLog();
-            
-            //envia mensagem para usuários conectados e atualiza a página dashboard
-            notificar(TipoLog.REGISTRAR_HIGIENIZACAO.get(), this.higienizacao.getInternacao().getLeito().getIdLeito());
+            //se a data inicial for menor que a data de saída do paciente do leito
+            if (higienizacao.getDataHoraInicio().before(higienizacao.getInternacao().getDataSaidaLeito())) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data e hora da higienização não pode ser menor que a data da saída do paciente!");
+                //se a data inicial for igual a final
+            } else if (higienizacao.getDataHoraInicio().compareTo(higienizacao.getDataHoraFim()) == 0) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser igual a data e hora final!");
+                //se a data inicial for maior que a data final
+            } else if (higienizacao.getDataHoraInicio().after(higienizacao.getDataHoraFim())) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser maior que a data e hora final!");
+            } else {
+                //salvando a higienização
+                this.higienizacao.setTempoHigienizacaoMinutos(ConverterDataHora.diferencaEmMinutos(this.higienizacao.getDataHoraInicio(), this.higienizacao.getDataHoraFim()));
+                daoHigienizacao.salvar(this.higienizacao);
 
-            this.higienizacao = new Higienizacao();
-            this.funcionarios = new ArrayList<>();
+                //salvando o log
+                this.log.setTipo(TipoLog.REGISTRAR_HIGIENIZACAO.get());
+                this.log.setIdObjeto(this.higienizacao.getInternacao().getIdInternacao());
+                this.log.setDetalhe("higienização código " + this.higienizacao.getIdHigienizacao() + ".");
+                salvarLog();
+
+                //envia mensagem para usuários conectados e atualiza a página dashboard
+                notificar(TipoLog.REGISTRAR_HIGIENIZACAO.get(), this.higienizacao.getInternacao().getLeito().getIdLeito());
+
+                this.higienizacao = new Higienizacao();
+                this.funcionarios = new ArrayList<>();
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
 
     }
@@ -457,46 +482,53 @@ public class InternacaoBean implements Serializable {
      * @param internacao
      */
     public void cancelarInternacao(Internacao internacao) {
+        this.daoInternacao = new InternacaoDAOImpl();
 
-        //se a internação não tiver alta
-        if (internacao.getDataAlta() == null) {
+        try {
 
-            //passando o status cancelada para a internação
-            internacao.setStatusInternacao(Status.CANCELADA.get());
+            //se a internação não tiver alta
+            if (internacao.getDataAlta() == null) {
 
-            //salvando a internação
-            this.daoInterncao.salvar(internacao);
+                //passando o status cancelada para a internação
+                internacao.setStatusInternacao(Status.CANCELADA.get());
 
-            //salvando o log
-            this.log = new Log();
-            this.log.setTipo(TipoLog.CANCELAR_INTERNACAO.get());
-            this.log.setIdObjeto(internacao.getIdInternacao());
-            salvarLog();
-            
-            //envia mensagem para usuários conectados e atualiza a página dashboard
-            notificar(TipoLog.CANCELAR_INTERNACAO.get(), internacao.getLeito().getIdLeito());
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Internação não pode mais ser cancelada."));
+                //salvando a internação
+                this.daoInternacao.salvar(internacao);
+
+                //salvando o log
+                this.log = new Log();
+                this.log.setTipo(TipoLog.CANCELAR_INTERNACAO.get());
+                this.log.setIdObjeto(internacao.getIdInternacao());
+                salvarLog();
+
+                //envia mensagem para usuários conectados e atualiza a página dashboard
+                notificar(TipoLog.CANCELAR_INTERNACAO.get(), internacao.getLeito().getIdLeito());
+
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Internação não pode mais ser cancelada.");
+            }
+
+            this.internacao = new Internacao();
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
-        
-        this.internacao = new Internacao();
     }
-    
-     /**
+
+    /**
      * método para notificar usuários conectados
      *
      * @param info
      * @param objeto
      */
     public void notificar(String info, int objeto) {
-        
+
         info += " no Leito: " + objeto + ".";
-        String detalhe = "Feita por: " + usuarioBean.getUsuario().getLogin() + ".";
+        String detalhe = "Feita por: " + this.usuarioBean.getUsuario().getLogin() + ".";
         String CANAL = "/notificar";
-        
+
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
         eventBus.publish(CANAL, new FacesMessage(info, detalhe));
-        
+
     }
 
     /**
@@ -504,6 +536,8 @@ public class InternacaoBean implements Serializable {
      *
      */
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
+
         //passando as demais informações 
         this.log.setDataHora(new Date());
         this.log.setObjeto("internacao");
@@ -518,7 +552,7 @@ public class InternacaoBean implements Serializable {
      * @return
      */
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("internacao");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("internacao");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
@@ -526,7 +560,7 @@ public class InternacaoBean implements Serializable {
      * método que traz os logs para do objeto selecionado
      */
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("internacao", this.internacao.getIdInternacao());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("internacao", this.internacao.getIdInternacao());
     }
 
     /**
@@ -547,19 +581,21 @@ public class InternacaoBean implements Serializable {
      * @param idInternacao
      */
     public void internacaoPorId(Integer idInternacao) {
+        this.daoInternacao = new InternacaoDAOImpl();
+
         //buscando a internação para mostrar um resumo dela por meio do notificationBar
-        this.resumoInternacao = daoInterncao.internacaoPorId(idInternacao);
+        this.resumoInternacao = this.daoInternacao.internacaoPorId(idInternacao);
     }
 
     /**
-     * método que pega o paciente selecionado pelo evento dialogReturn 
+     * método que pega o paciente selecionado pelo evento dialogReturn
      *
      * @param event
      */
     public void pacienteSelecionado(SelectEvent event) {
         //pegando o paciente selecionado
         Map<String, Paciente> pacienteSelecionado = (Map<String, Paciente>) event.getObject();
-        
+
         Paciente paciente = new Paciente();
 
         //percorrendo o map para pegar o paciente e a mensagem de validação para o log
@@ -567,19 +603,19 @@ public class InternacaoBean implements Serializable {
             this.msgValidacaoPacienteLog = p.getKey();
             paciente = p.getValue();
         }
-        
+
         this.internacao.setPaciente(paciente);
     }
 
     /**
-     * método que pega o procedimento selecionado pelo evento dialogReturn 
+     * método que pega o procedimento selecionado pelo evento dialogReturn
      *
      * @param event
      */
     public void procedimentoSelecionado(SelectEvent event) {
         //pegando o procedimento selecionado
         Map<String, TB_PROCEDIMENTO> procedimentoSelecionado = (Map<String, TB_PROCEDIMENTO>) event.getObject();
-        
+
         TB_PROCEDIMENTO procedimento = new TB_PROCEDIMENTO();
 
         //percorrendo o map para pegar o procedimento e a mensagem de validação para o log
@@ -587,19 +623,19 @@ public class InternacaoBean implements Serializable {
             this.msgValidacaoProcedimentoLog = p.getKey();
             procedimento = p.getValue();
         }
-        
+
         this.internacao.setProcedimento(procedimento);
     }
-    
-      /**
-     * método que pega o CID selecionado pelo evento dialogReturn 
+
+    /**
+     * método que pega o CID selecionado pelo evento dialogReturn
      *
      * @param event
      */
     public void cidSelecionado(SelectEvent event) {
-         //pegando o cid selecionado
+        //pegando o cid selecionado
         Map<String, TB_CID> cidSelecionado = (Map<String, TB_CID>) event.getObject();
-        
+
         TB_CID cid = new TB_CID();
 
         //percorrendo o map para pegar o cid e a mensagem de validação para o log
@@ -607,9 +643,9 @@ public class InternacaoBean implements Serializable {
             this.msgValidacaoCidLog = c.getKey();
             cid = c.getValue();
         }
-        
+
         this.internacao.setCid(cid);
-        
+
     }
 
     /**

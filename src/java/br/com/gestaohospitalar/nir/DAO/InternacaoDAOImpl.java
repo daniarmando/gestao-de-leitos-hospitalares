@@ -8,12 +8,11 @@ package br.com.gestaohospitalar.nir.DAO;
 import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.Internacao;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -24,65 +23,37 @@ import org.hibernate.sql.JoinType;
  */
 public class InternacaoDAOImpl {
 
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
     //Busca a última chaveMesAno
-    private String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+    private final String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
     private Boolean isAltaQualificada = false;
     private Boolean isAlta = false;
 
     public Internacao internacaoPorId(Integer id) {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        return (Internacao) this.session.createCriteria(Internacao.class)
+                .add(Restrictions.idEq(id))
+                .uniqueResult();
 
-        try {
-            return (Internacao) session.createCriteria(Internacao.class)
-                    .add(Restrictions.idEq(id))
-                    .uniqueResult();
-
-        } finally {
-            session.close();
-        }
     }
 
-    public void salvar(Internacao internacao) {
-
-        Session session = null;
+    public void salvar(Internacao internacao) throws DAOException {
 
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
-            session.beginTransaction();
-            session.saveOrUpdate(internacao);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar Internação. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            this.session.saveOrUpdate(internacao);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar Internação. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Internação.");
         }
     }
 
     public List<Internacao> listar() {
-        List<Internacao> listarInternacao = null;
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-
-        try {
-            //Consulta as internações distinguindo pelo id da internação
-            Criteria crit = session.createCriteria(Internacao.class)
-                    .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-
-            listarInternacao = crit.list();
-
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao listar Internações. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-
-        return listarInternacao;
+        //Consulta as internações distinguindo pelo id da internação
+        return (List<Internacao>) this.session.createCriteria(Internacao.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
     }
 
     public List<Internacao> listarParaHigienizacao() {
@@ -103,95 +74,79 @@ public class InternacaoDAOImpl {
     }
 
     public List<Internacao> listarPorStatus(String statusInternacao, String statusLeito) {
-        List<Internacao> listarInternacao = null;
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+        Criteria crit = this.session.createCriteria(Internacao.class)
+                //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
+                .createAlias("procedimento", "p", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("p.chaveMesAno", chaveMesAno))
+                .createAlias("procedimento.tb_financiamento", "ptf", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ptf.chaveMesAno", chaveMesAno))
+                .createAlias("procedimento.tb_rubrica", "ptr", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ptr.chaveMesAno", chaveMesAno))
+                .createAlias("cid", "c", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("c.chaveMesAno", chaveMesAno))
+                .createAlias("leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("tl.chaveMesAno", chaveMesAno))
+                //Passando regras do status
+                .createAlias("leito", "l", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("l.statusLeito", statusLeito))
+                .add(Restrictions.eq("statusInternacao", statusInternacao));
 
-        try {
-            Criteria crit = session.createCriteria(Internacao.class)
-                    //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
-                    .createAlias("procedimento", "p", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("p.chaveMesAno", chaveMesAno))
-                    .createAlias("procedimento.tb_financiamento", "ptf", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ptf.chaveMesAno", chaveMesAno))
-                    .createAlias("procedimento.tb_rubrica", "ptr", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ptr.chaveMesAno", chaveMesAno))
-                    .createAlias("cid", "c", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("c.chaveMesAno", chaveMesAno))
-                    .createAlias("leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("tl.chaveMesAno", chaveMesAno))
-                    //Passando regras do status
-                    .createAlias("leito", "l", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("l.statusLeito", statusLeito))
-                    .add(Restrictions.eq("statusInternacao", statusInternacao));
-            
-            //se estiver listando para cadastrar alta qualificada
-            if (isAltaQualificada) {
-                crit.add(Restrictions.isNull("dataPrevisaoAlta"));
-                crit.add(Restrictions.isNull("dataAlta"));
-                isAltaQualificada = false;
-            }
-            
-            //se estiver listando para cadastrar alta
-            if (isAlta) {
-                crit.add(Restrictions.isNull("dataAlta"));
-                isAlta = false;
-            }
-          
-            listarInternacao = crit.list();
-            
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao listar Internação por status. Erro: " + e.getMessage());
-            transaction.rollback();
+        //se estiver listando para cadastrar alta qualificada
+        if (isAltaQualificada) {
+            crit.add(Restrictions.isNull("dataPrevisaoAlta"));
+            crit.add(Restrictions.isNull("dataAlta"));
+            isAltaQualificada = false;
         }
-        return listarInternacao;
+
+        //se estiver listando para cadastrar alta
+        if (isAlta) {
+            crit.add(Restrictions.isNull("dataAlta"));
+            isAlta = false;
+        }
+
+        return (List<Internacao>) crit.list();
+
     }
 
     public List<Internacao> listarHistoricoInternacoesPorLeito(Integer idLeito) {
-        List<Internacao> listarInternacao = null;
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+        return (List<Internacao>) this.session.createCriteria(Internacao.class)
+                //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
+                .createAlias("procedimento", "p", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("p.chaveMesAno", chaveMesAno))
+                .createAlias("procedimento.tb_financiamento", "ptf", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ptf.chaveMesAno", chaveMesAno))
+                .createAlias("procedimento.tb_rubrica", "ptr", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ptr.chaveMesAno", chaveMesAno))
+                .createAlias("cid", "c", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("c.chaveMesAno", chaveMesAno))
+                .createAlias("leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("tl.chaveMesAno", chaveMesAno))
+                //Passando regras para consulta 
+                .add(Restrictions.eq("leito.idLeito", idLeito))
+                .add(Restrictions.ne("statusInternacao", Status.CANCELADA.get()))
+                .list();
 
-        try {
-            listarInternacao = session.createCriteria(Internacao.class)
-                    //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
-                    .createAlias("procedimento", "p", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("p.chaveMesAno", chaveMesAno))
-                    .createAlias("procedimento.tb_financiamento", "ptf", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ptf.chaveMesAno", chaveMesAno))
-                    .createAlias("procedimento.tb_rubrica", "ptr", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("ptr.chaveMesAno", chaveMesAno))
-                    .createAlias("cid", "c", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("c.chaveMesAno", chaveMesAno))
-                    .createAlias("leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("tl.chaveMesAno", chaveMesAno))
-                    //Passando regras para consulta 
-                    .add(Restrictions.eq("leito.idLeito", idLeito))
-                    .add(Restrictions.ne("statusInternacao", Status.CANCELADA.get()))
-                    .list();
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao listar Intenações por leito. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        return listarInternacao;
     }
-    
-    public Boolean verificarSeHouveSaida(Integer idInternacao) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+
+    public boolean houveSaida(Integer idInternacao) throws DAOException {
         Long resultado = null;
 
         try {
-            Criteria crit = session.createCriteria(Internacao.class)
+            Criteria crit = this.session.createCriteria(Internacao.class)
                     .setProjection(Projections.count("idInternacao"))
                     .add(Restrictions.eq("idInternacao", idInternacao))
                     .add(Restrictions.isNotNull("dataSaidaLeito"));
 
-            transaction.commit();
-
             resultado = (Long) crit.uniqueResult();
 
-            session.close();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             System.out.println("Problemas ao verificar foi registrado saída do paciente do leito. Erro: " + e.getMessage());
-            transaction.rollback();
+            throw new DAOException("Problemas ao validar informações no banco de dados.");
         }
         return resultado > 0;
+    }
+
+    public boolean temTB_TIPO_LEITO(String chaveMesAnoGerada) {
+
+        Long resultado = (Long) this.session.createCriteria(Internacao.class)
+                .setProjection(Projections.count("idInternacao"))
+                .add(Restrictions.eq("chaveMesAnoProcedimento", chaveMesAnoGerada))
+                .add(Restrictions.eq("chaveMesAnoCID", chaveMesAnoGerada)).
+                uniqueResult();
+
+        return resultado > 0;
+
     }
 
 }

@@ -6,11 +6,8 @@
 package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.Pessoa;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -19,28 +16,17 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class PessoaDAOImpl {
-    
-    public Boolean verificarPessoaPorCPF (String cpf){
-        
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        Long resultado = null;
-        
-        try {
-            Criteria crit = session.createCriteria(Pessoa.class)
-                    .setProjection(Projections.count("cpfPessoa"))
-                    .add(Restrictions.eq("cpfPessoa", cpf));
-            
-           transaction.commit();
-           
-           resultado = (Long) crit.uniqueResult();
-           
-           session.close();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao verificar se CPF Pessoa já existe, Erro: " + e.getMessage());
-            transaction.rollback();
-        }
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
+    public boolean isCPFCadastrado(String cpf) {
+
+        Long resultado = (Long) this.session.createCriteria(Pessoa.class)
+                .setProjection(Projections.count("cpfPessoa"))
+                .add(Restrictions.eq("cpfPessoa", cpf))
+                .uniqueResult();
+
         return resultado > 0;
+
     }
-    
 }

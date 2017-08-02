@@ -6,8 +6,8 @@
 package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.Parametros;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
-import org.hibernate.HibernateException;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -16,49 +16,28 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class ParametrosDAOImpl {
-    
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
     public Parametros parametrosPorId(Integer id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        
-        try {
-            return (Parametros) session.createCriteria(Parametros.class)
-                    .add(Restrictions.idEq(id))
-                    .uniqueResult();
-            
-        }finally {
-            session.close();
-        }        
+        return (Parametros) this.session.createCriteria(Parametros.class)
+                .add(Restrictions.idEq(id))
+                .uniqueResult();
     }
-    
+
     public Parametros parametrosPorIdHospital(Integer idHospital) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        
-        try {
-            return (Parametros) session.createCriteria(Parametros.class)
-                    .add(Restrictions.eq("hospital.idHospital", idHospital))
-                    .uniqueResult();
-            
-        }finally {
-            session.close();
-        }        
+        return (Parametros) this.session.createCriteria(Parametros.class)
+                .add(Restrictions.eq("hospital.idHospital", idHospital))
+                .uniqueResult();
     }
-    
-    public void salvar(Parametros parametros) {
-        
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(parametros);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar Parâmetro. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+
+    public void salvar(Parametros parametros) throws DAOException {
+
+        try {
+            this.session.saveOrUpdate(parametros);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar Parâmetro. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Parâmetro.");
         }
     }
 }

@@ -14,6 +14,7 @@ import br.com.gestaohospitalar.nir.model.Estatisticas;
 import br.com.gestaohospitalar.nir.model.Leito;
 import br.com.gestaohospitalar.nir.model.Quarto;
 import br.com.gestaohospitalar.nir.model.Setor;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.validator.PeriodoValidator;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -30,7 +31,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
@@ -48,20 +48,16 @@ import org.primefaces.model.chart.LineChartSeries;
 @ViewScoped
 public class GraficoTempoHigienizacaoBean implements Serializable {
 
-    private final EstatisticasDAOImpl daoEstatisticas = new EstatisticasDAOImpl();
+    private EstatisticasDAOImpl daoEstatisticas;
     private Estatisticas estatisticas;
 
     private List<Estatisticas> listaEstatisticas = new ArrayList<>();
 
-    private final SetorDAOImpl daoSetor = new SetorDAOImpl();
     private List<Setor> setores = new ArrayList<>();
     private Setor setor;
 
-    private final QuartoDAOImpl daoQuarto = new QuartoDAOImpl();
     private List<Quarto> quartos = new ArrayList<>();
-    private Quarto quarto;
-
-    private final LeitoDAOImpl daoLeito = new LeitoDAOImpl();
+    private Quarto quarto;    
     private List<Leito> leitos = new ArrayList<>();
 
     private int modeloGrafico; //1 = gráfico de linha // 2 = gráfico de área // 3 = gráfico de barra
@@ -72,7 +68,7 @@ public class GraficoTempoHigienizacaoBean implements Serializable {
     private Date dataInicial;
     private Date dataFinal;
 
-    private static DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM");
 
     /**
      * Creates a new instance of GraficoTempoHigienizacaoBean
@@ -86,7 +82,7 @@ public class GraficoTempoHigienizacaoBean implements Serializable {
     @PostConstruct
     public void init() {
         //listando os setores
-        this.setores = this.daoSetor.listar();
+        this.setores = new SetorDAOImpl().listar();
     }
 
     /**
@@ -96,7 +92,7 @@ public class GraficoTempoHigienizacaoBean implements Serializable {
      * @param event
      */
     public void listaQuartos(AjaxBehaviorEvent event) {
-        this.quartos = this.daoQuarto.listarPorIdSetor(this.setor.getIdSetor());
+        this.quartos = new QuartoDAOImpl().listarPorIdSetor(this.setor.getIdSetor());
     }
 
     /**
@@ -107,21 +103,21 @@ public class GraficoTempoHigienizacaoBean implements Serializable {
 
         //verificando se data inicial está menor que a data final
         if (PeriodoValidator.comparaDatas(this.dataInicial, this.dataFinal) == false) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data inicial não pode ser maior que a data final.", null));
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data inicial não pode ser maior que a data final.");            
             //verificando se a quantidade de dias do período está dentro do limite de 31 dias
         } else if (PeriodoValidator.qtdDias(this.dataInicial, this.dataFinal, 31) == false) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Período informado deve ser no máximo 31 dias.", null));
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Período informado deve ser no máximo 31 dias.");            
         } else {
 
             //buscando os leitos do quarto selecionado
-            this.leitos = this.daoLeito.listarPorIdQuarto(this.quarto.getIdQuarto());
+            this.leitos = new LeitoDAOImpl().listarPorIdQuarto(this.quarto.getIdQuarto());
 
             //se não foram encontrados leitos para o quarto selecionado
             //limpa os modelos de gráficos e aborta o processo de montar o gráfico
             if (this.leitos.isEmpty()) {
                 this.modeloLinha = new LineChartModel();
                 this.modeloBarra = new BarChartModel();
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Não foram encontrados leitos para o quarto selecionado.", null));
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Não foram encontrados leitos para o quarto selecionado.");            
             } else {
                 //se tudo estiver ok, da continuidade no processo de montar o gráfico
                 graficoTempoHigienizacao();
@@ -280,6 +276,7 @@ public class GraficoTempoHigienizacaoBean implements Serializable {
      * @return resultado
      */
     public Map<Date, Double> tempoHigienizacao(Integer idLeito, Date dataInicial, Date dataFinal) {
+        this.daoEstatisticas = new EstatisticasDAOImpl();
 
         //convertendo a data inicial para Calendar
         Calendar cDataInicial = ConverterDataHora.paraCalendar(dataInicial);
@@ -296,7 +293,7 @@ public class GraficoTempoHigienizacaoBean implements Serializable {
         Map<Date, Double> resultado = criarMapaVazio(cDataInicial, qtdDiasPeriodo);
 
         //buscando as estatísticas de acordo com o leito e período informado
-        this.listaEstatisticas = daoEstatisticas.listarPorPeriodoIdLeito(idLeito, dataInicial, dataFinal);
+        this.listaEstatisticas = this.daoEstatisticas.listarPorPeriodoIdLeito(idLeito, dataInicial, dataFinal);
 
         //para cada estatistica encontrada adiciona os valores 
         //de dataHoraInicio da higienização (eixo x)

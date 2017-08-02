@@ -13,7 +13,7 @@
 
         <h1 class="nir-titulopagina">Cadastro de Leito</h1>
 
-        <h:panelGroup id="msgAlertaUrgente" layout="block" class="msgAlertaUrgente" rendered="#{sigtapUploadBean.verificarTabela() eq false}">
+        <h:panelGroup id="msgAlertaUrgente" layout="block" class="msgAlertaUrgente" rendered="#{sigtapUploadBean.isTabelaImportada() eq false}">
             <i class="fa faMsgAlerta  fa-warning"></i>
             <h:outputText value="Atenção! A tabela Sigtap não foi importada para o Sistema. Favor importá-la para liberar o cadastro de Leitos" />
         </h:panelGroup>
@@ -24,12 +24,12 @@
             <p:toolbar>
                 <p:toolbarGroup>
                     <p:commandButton icon="fa fa-save" value="Salvar" actionListener="#{leitoBean.salvar()}"
-                                     process="tabview @this" update="@form" disabled="#{sigtapUploadBean.verificarTabela() eq false}" />
+                                     process="tabview @this" update="@form" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}" />
                 </p:toolbarGroup>
 
                 <p:toolbarGroup align="right">
                     <p:commandButton icon="fa fa-plus" value="Novo" action="#{leitoBean.novo()}"
-                                     process="@this" update="@form" disabled="#{sigtapUploadBean.verificarTabela() eq false}" />
+                                     process="@this" update="@form" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}" />
                     <p:button icon="fa fa-search" value="Pesquisa" outcome="pesquisa-leitos" />
                 </p:toolbarGroup>
             </p:toolbar>
@@ -48,42 +48,42 @@
                                      styleClass="semborda">
 
                             <h:outputLabel value="Tipo de Leito" for="tipoleito" />
-                            <p:selectOneMenu autoWidth="true" label="Tipo de Leito" id="tipoleito" value="#{leitoBean.leito.tipo_leito}" required="true" converter="converterTb_tipo_leito" disabled="#{sigtapUploadBean.verificarTabela() eq false}">
+                            <p:selectOneMenu autoWidth="true" label="Tipo de Leito" id="tipoleito" value="#{leitoBean.leito.tipo_leito}" required="true" converter="converterTb_tipo_leito" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}">
                                 <f:selectItem itemLabel="Selecione" />
                                 <f:selectItems value="#{leitoBean.tipo_leitos}" var="tipo_leito" 
                                                itemValue="#{tipo_leito}" itemLabel="#{tipo_leito.NO_TIPO_LEITO}" />
                             </p:selectOneMenu>
 
                             <h:outputLabel value="Quarto" for="quarto" />
-                            <p:selectOneMenu label="Quarto" id="quarto" value="#{leitoBean.leito.quarto}" required="true" converter="converterQuarto" disabled="#{sigtapUploadBean.verificarTabela() eq false}">
+                            <p:selectOneMenu label="Quarto" id="quarto" value="#{leitoBean.leito.quarto}" required="true" converter="converterQuarto" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}">
                                 <f:selectItem itemLabel="Selecione" />
                                 <f:selectItems value="#{leitoBean.quartos}" var="quarto" 
                                                itemValue="#{quarto}" itemLabel="#{quarto.tipoQuarto}" />
                             </p:selectOneMenu>
 
                             <p:outputLabel value="Código" for="codigo" />
-                            <p:inputText id="codigo" maxlength="5" required="true" value="#{leitoBean.leito.codigoLeito}" disabled="#{sigtapUploadBean.verificarTabela() eq false}" />
+                            <p:inputText id="codigo" maxlength="5" required="true" value="#{leitoBean.leito.codigoLeito}" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}" />
 
                             <p:outputLabel value="Descrição" for="descricao" />
-                            <p:inputText id="descricao" maxlength="45" required="true" value="#{leitoBean.leito.descricaoLeito}" disabled="#{sigtapUploadBean.verificarTabela() eq false}">
+                            <p:inputText id="descricao" maxlength="45" required="true" value="#{leitoBean.leito.descricaoLeito}" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}">
                                 <f:validateLength minimum="3" maximum="45" />
                             </p:inputText>
 
                             <h:outputLabel value="Idade Mínima" for="idademinima" />
-                            <p:spinner id="idademinima" label="Idade Mínima" value="#{leitoBean.leito.idadeMinima}" min="0" max="100" required="true" disabled="#{sigtapUploadBean.verificarTabela() eq false}" />
+                            <p:spinner id="idademinima" label="Idade Mínima" value="#{leitoBean.leito.idadeMinima}" min="0" max="100" required="true" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}" />
 
                             <h:outputLabel value="Idade Máxima" for="idademaxima" />
-                            <p:spinner id="idademaxima" label="Idade Máxima" value="#{leitoBean.leito.idadeMaxima}" min="0" max="150" required="true" disabled="#{sigtapUploadBean.verificarTabela() eq false}" />
+                            <p:spinner id="idademaxima" label="Idade Máxima" value="#{leitoBean.leito.idadeMaxima}" min="0" max="150" required="true" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}" />
                             
                             <p:outputLabel value="Tipo Sexo" for="tiposexo" />
-                            <p:selectOneRadio id="tiposexo" value="#{leitoBean.leito.tipoSexo}" required="true" disabled="#{sigtapUploadBean.verificarTabela() eq false}">
+                            <p:selectOneRadio id="tiposexo" value="#{leitoBean.leito.tipoSexo}" required="true" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}">
                                 <f:selectItem itemLabel="Masculino" itemValue="M" />
                                 <f:selectItem itemLabel="Feminino" itemValue="F" />
                                 <f:selectItem itemLabel="Indiferente/Ambos" itemValue="I" />
                             </p:selectOneRadio>
 
                             <h:outputLabel value="Status" for="status" />
-                            <p:selectOneMenu label="Status" id="status" value="#{leitoBean.leito.statusLeito}" required="true" disabled="#{sigtapUploadBean.verificarTabela() eq false}">
+                            <p:selectOneMenu label="Status" id="status" value="#{leitoBean.leito.statusLeito}" required="true" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}">
                                 <f:selectItem itemLabel="Disponível" itemValue="D" />
                                 <f:selectItem itemLabel="Manutenção" itemValue="M" />
                             </p:selectOneMenu>

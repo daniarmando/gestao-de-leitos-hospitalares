@@ -10,6 +10,7 @@ import br.com.gestaohospitalar.nir.DAO.SetorDAOImpl;
 import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.Estatisticas;
 import br.com.gestaohospitalar.nir.model.Setor;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.validator.PeriodoValidator;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -26,7 +27,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
@@ -43,10 +43,9 @@ import org.primefaces.model.chart.LineChartSeries;
 @ViewScoped
 public class GraficoTempoOciosidadeBean implements Serializable {
 
-    private final EstatisticasDAOImpl daoEstatisticas = new EstatisticasDAOImpl();
+    private EstatisticasDAOImpl daoEstatisticas;
     private Estatisticas estatisticas;
 
-    private final SetorDAOImpl daoSetor = new SetorDAOImpl();
     private List<Setor> setores = new ArrayList<>();
     
     private List<Estatisticas> listaEstatisticas = new ArrayList<>();
@@ -60,7 +59,7 @@ public class GraficoTempoOciosidadeBean implements Serializable {
     private Date dataInicial;
     private Date dataFinal;
 
-    private static DateFormat DATE_FORMAT = new SimpleDateFormat("MM/yyyy");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("MM/yyyy");
 
     /**
      * Creates a new instance of GraficoTempoOciosidadeBean
@@ -72,7 +71,7 @@ public class GraficoTempoOciosidadeBean implements Serializable {
     @PostConstruct
     public void init() {
         //listando os setores
-        this.setores = this.daoSetor.listar();
+        this.setores = new SetorDAOImpl().listar();
     }
 
     /**
@@ -83,10 +82,10 @@ public class GraficoTempoOciosidadeBean implements Serializable {
 
         //verificando se data inicial está menor que a data final
         if (PeriodoValidator.comparaDatas(this.dataInicial, this.dataFinal) == false) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "O Mês/Ano Inicial não pode ser maior que o Mês/Ano Final.", null));
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "O Mês/Ano Inicial não pode ser maior que o Mês/Ano Final.");
             //verificando se a quantidade de meses do período está dentro do limite de 12 meses
         } else if (PeriodoValidator.qtdMeses(this.dataInicial, this.dataFinal, 12) == false) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Período informado deve ser no máximo 12 meses.", null));
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Período informado deve ser no máximo 12 meses.");
         } else {
 
             //se tudo estiver ok, da continuidade no processo de montar o gráfico
@@ -249,6 +248,7 @@ public class GraficoTempoOciosidadeBean implements Serializable {
      * @return resultado
      */
     public Map<Date, Double> tempoOciosidade(Integer idSetor, Date dataInicial, Date dataFinal, boolean isTodosSetores) {
+        this.daoEstatisticas = new EstatisticasDAOImpl();
 
         //convertendo a data inicial para Calendar
         Calendar cDataInicial = ConverterDataHora.paraCalendar(dataInicial);
@@ -265,7 +265,7 @@ public class GraficoTempoOciosidadeBean implements Serializable {
         Map<Date, Double> resultado = criarMapaVazio(cDataInicial, qtdMesesPeriodo);
 
         //buscando as estatísticas de acordo com o leito e período informado
-        this.listaEstatisticas = isTodosSetores ? daoEstatisticas.listarPorPeriodoTodosSetores(dataInicial, dataFinal, this.tipoCalculo) : daoEstatisticas.listarPorPeriodoIdSetor(idSetor, dataInicial, dataFinal, this.tipoCalculo);
+        this.listaEstatisticas = isTodosSetores ? this.daoEstatisticas.listarPorPeriodoTodosSetores(dataInicial, dataFinal, this.tipoCalculo) : this.daoEstatisticas.listarPorPeriodoIdSetor(idSetor, dataInicial, dataFinal, this.tipoCalculo);
 
         //para cada estatistica encontrada adiciona os valores 
         //de dataHoraFimHigienizacao da higienização (eixo x)

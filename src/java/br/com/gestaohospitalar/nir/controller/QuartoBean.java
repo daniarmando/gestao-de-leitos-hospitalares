@@ -8,7 +8,6 @@ package br.com.gestaohospitalar.nir.controller;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.QuartoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SetorDAOImpl;
-import br.com.gestaohospitalar.nir.DAO.UsuarioDAOImpl;
 import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
@@ -16,6 +15,8 @@ import br.com.gestaohospitalar.nir.model.Quarto;
 import br.com.gestaohospitalar.nir.model.Setor;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,7 +26,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -35,15 +35,13 @@ import javax.faces.context.FacesContext;
 @SessionScoped
 public class QuartoBean implements InterfaceBean, Serializable {
 
-    private final QuartoDAOImpl daoQuarto = new QuartoDAOImpl();
+    private QuartoDAOImpl daoQuarto;
     private Quarto quarto;
     private List<Quarto> quartos = new ArrayList<>();
     private List<Quarto> filtrarLista;
 
-    private final SetorDAOImpl daoSetor = new SetorDAOImpl();
     private List<Setor> setores = new ArrayList<>();
 
-    private final UsuarioDAOImpl daoUsuario = new UsuarioDAOImpl();
     private Usuario usuario;
 
     //injetando o usuário logado
@@ -52,7 +50,7 @@ public class QuartoBean implements InterfaceBean, Serializable {
 
     private Quarto cloneQuarto;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -60,19 +58,16 @@ public class QuartoBean implements InterfaceBean, Serializable {
      * Creates a new instance of QuartoBean
      */
     public QuartoBean() {
-        quarto = new Quarto();
+        this.quarto = new Quarto();
     }
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.quartos = this.daoQuarto.listar();
+        this.quartos = new QuartoDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
 
         if (isEditar()) {
             this.cloneQuarto = this.quarto.clone();
@@ -81,27 +76,34 @@ public class QuartoBean implements InterfaceBean, Serializable {
             this.log.setTipo(TipoLog.INCLUSAO.get());
         }
 
-        this.setores = this.daoSetor.listar();
+        this.setores = new SetorDAOImpl().listar();
     }
 
     @Override
     public String novo() {
-        setQuarto(new Quarto());
+        this.quarto = new Quarto();
         return "cadastro-quarto?faces-redirect=true";
     }
 
     @Override
     public void salvar() {
+        this.daoQuarto = new QuartoDAOImpl();
 
-        this.quarto.setStatusQuarto(Status.ATIVO.get());
-        this.daoQuarto.salvar(this.quarto);
+        try {
 
-        //gravando o log
-        salvarLog();
+            this.quarto.setStatusQuarto(Status.ATIVO.get());
+            this.daoQuarto.salvar(this.quarto);
 
-        this.quarto = new Quarto();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Quarto salvo com sucesso!"));
+            //gravando o log
+            salvarLog();
 
+            this.quarto = new Quarto();
+
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Quarto salvo com sucesso!");
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
     }
 
     @Override
@@ -111,27 +113,39 @@ public class QuartoBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        if (daoQuarto.verificarSePossuiLeito(this.quarto) == false) {
-            this.quarto.setStatusQuarto(Status.INATIVO.get());
+        this.daoQuarto = new QuartoDAOImpl();
 
-            this.daoQuarto.salvar(this.quarto);
+        try {
 
-            //Atualizando quartos
-            this.quartos.remove(this.quarto);
+            if (this.daoQuarto.temLeito(this.quarto) == false) {
 
-            //gravando o log
-            this.log.setTipo(TipoLog.INATIVACAO.get());
-            salvarLog();
+                this.quarto.setStatusQuarto(Status.INATIVO.get());
 
-            this.quarto = new Quarto();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Quarto Inativado com sucesso!"));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Quarto não pode ser Inativado, pois possuí Leito(s) cadastrado(s)!", null));
+                this.daoQuarto.salvar(this.quarto);
+
+                //atualizando lista de quartos
+                this.quartos.remove(this.quarto);
+
+                //gravando o log
+                this.log.setTipo(TipoLog.INATIVACAO.get());
+                salvarLog();
+
+                this.quarto = new Quarto();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Quarto inativado com sucesso!");
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Quarto não pode ser inativado, pois possuí Leito(s) cadastrado(s)!");
+            }
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
+
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = null;
 
         //se for alteração
@@ -152,12 +166,12 @@ public class QuartoBean implements InterfaceBean, Serializable {
             }
 
             if (!this.quarto.getSetor().getTipoSetor().equals(this.cloneQuarto.getSetor().getTipoSetor())) {
-                detalhe += " setor de " + this.cloneQuarto.getSetor().getTipoSetor()+ " para " + this.quarto.getSetor().getTipoSetor()+ ",";
+                detalhe += " setor de " + this.cloneQuarto.getSetor().getTipoSetor() + " para " + this.quarto.getSetor().getTipoSetor() + ",";
             }
 
             //removendo última vírgula e adicionando ponto final
             detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
-            
+
         }
 
         //passando as demais informações 
@@ -172,13 +186,13 @@ public class QuartoBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("quarto");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("quarto");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("quarto", this.quarto.getIdQuarto());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("quarto", this.quarto.getIdQuarto());
     }
 
     @Override

@@ -15,11 +15,12 @@ import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.Paciente;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.ConsultaCPFValidator;
@@ -36,12 +37,12 @@ import javax.faces.bean.ManagedProperty;
 @SessionScoped
 public class PacienteBean implements InterfaceBean, Serializable {
 
-    private final PacienteDAOImpl daoPaciente = new PacienteDAOImpl();
+    private PacienteDAOImpl daoPaciente;
     private Paciente paciente;
     private List<Paciente> pacientes = new ArrayList<>();
     private List<Paciente> filtrarLista;
 
-    private final EstadoCidadeDAOImpl daoEstadoCidade = new EstadoCidadeDAOImpl();
+    private EstadoCidadeDAOImpl daoEstadoCidade;
     private List<Estado> estados;
     private List<Cidade> cidades;
     private Estado estado;
@@ -51,7 +52,7 @@ public class PacienteBean implements InterfaceBean, Serializable {
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -61,19 +62,17 @@ public class PacienteBean implements InterfaceBean, Serializable {
      * Creates a new instance of PacienteBean
      */
     public PacienteBean() {
-        paciente = new Paciente();
+        this.paciente = new Paciente();
     }
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.pacientes = this.daoPaciente.listar();
+        this.pacientes = new PacienteDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
+        this.daoEstadoCidade = new EstadoCidadeDAOImpl();
 
         if (isEditar()) {
             this.cidades = this.daoEstadoCidade.listarCidades(this.paciente.getEstado());
@@ -84,28 +83,35 @@ public class PacienteBean implements InterfaceBean, Serializable {
         }
 
         this.estados = this.daoEstadoCidade.listarEstados();
-
     }
 
     @Override
     public String novo() {
-        paciente = new Paciente();
+        this.paciente = new Paciente();
         return "cadastro-paciente?faces-redirect=true";
     }
 
     @Override
     public void salvar() {
-        //Verificando CPF
-        if (ConsultaCPFValidator.verificar(this.paciente, this.clonePaciente)) {
-            this.paciente.setStatusPaciente(Status.ATIVO.get());
-            this.paciente.setStatusPessoa(Status.ATIVO.get());
-            this.daoPaciente.salvar(this.paciente);
+        this.daoPaciente = new PacienteDAOImpl();
 
-            //gravando o log
-            salvarLog();
+        try {
 
-            this.paciente = new Paciente();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Paciente salvo com sucesso!"));
+            //verificando CPF
+            if (ConsultaCPFValidator.verificar(this.paciente, this.clonePaciente)) {
+                this.paciente.setStatusPaciente(Status.ATIVO.get());
+                this.paciente.setStatusPessoa(Status.ATIVO.get());
+                this.daoPaciente.salvar(this.paciente);
+
+                //gravando o log
+                salvarLog();
+
+                this.paciente = new Paciente();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Paciente salvo com sucesso!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -116,28 +122,38 @@ public class PacienteBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        if (daoPaciente.verificarSePossuiInternacaoAberta(this.paciente) == false) {
-            this.paciente.setStatusPessoa(Status.INATIVO.get());
-            this.paciente.setStatusPaciente(Status.INATIVO.get());
+        this.daoPaciente = new PacienteDAOImpl();
 
-            this.daoPaciente.salvar(this.paciente);
+        try {
 
-            //Atualizando a lista de pacientes
-            this.pacientes.remove(this.paciente);
+            if (this.daoPaciente.estaEmInternacaoAberta(this.paciente) == false) {
+                this.paciente.setStatusPessoa(Status.INATIVO.get());
+                this.paciente.setStatusPaciente(Status.INATIVO.get());
 
-            //gravando o log
-            this.log.setTipo(TipoLog.INATIVACAO.get());
-            salvarLog();
+                this.daoPaciente.salvar(this.paciente);
 
-            this.paciente = new Paciente();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Paciente Inativado com sucesso!"));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Paciente não pode ser Inativado, pois está Internado!", null));
+                //atualizando a lista de pacientes
+                this.pacientes.remove(this.paciente);
+
+                //gravando o log
+                this.log.setTipo(TipoLog.INATIVACAO.get());
+                salvarLog();
+
+                this.paciente = new Paciente();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Paciente inativado com sucesso!");
+
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Paciente não pode ser inativado, pois está Internado!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = null;
 
         //se for alteração
@@ -152,7 +168,7 @@ public class PacienteBean implements InterfaceBean, Serializable {
             if (!this.paciente.getCodigoSusPaciente().equals(this.clonePaciente.getCodigoSusPaciente())) {
                 detalhe += " código SUS de " + this.clonePaciente.getCodigoSusPaciente() + " para " + this.paciente.getCodigoSusPaciente() + ",";
             }
-            
+
             if (!this.paciente.getObservacoesPaciente().equals(this.clonePaciente.getObservacoesPaciente())) {
                 detalhe += " campo observações alterado,";
             }
@@ -166,10 +182,10 @@ public class PacienteBean implements InterfaceBean, Serializable {
             }
 
             if (!this.paciente.getSexoPessoa().equals(this.clonePaciente.getSexoPessoa())) {
-                detalhe += " sexo de " 
-                        + (this.clonePaciente.getSexoPessoa().equals("M") ? " masculino " : " feminino ") 
-                        + " para " 
-                        + (this.paciente.getSexoPessoa().equals("M") ? " masculino " : " feminino ") 
+                detalhe += " sexo de "
+                        + (this.clonePaciente.getSexoPessoa().equals("M") ? " masculino " : " feminino ")
+                        + " para "
+                        + (this.paciente.getSexoPessoa().equals("M") ? " masculino " : " feminino ")
                         + ",";
             }
 
@@ -212,10 +228,10 @@ public class PacienteBean implements InterfaceBean, Serializable {
             }
 
             if (!this.paciente.getStatusPaciente().equals(this.clonePaciente.getStatusPaciente())) {
-                detalhe += " status de " 
-                        + (this.clonePaciente.getStatusPaciente().equals(Status.ATIVO.get()) ? " ativo " : " inativo ") 
-                        + " para " 
-                        + (this.paciente.getStatusPaciente().equals(Status.ATIVO.get()) ? " ativo " : " inativo ") 
+                detalhe += " status de "
+                        + (this.clonePaciente.getStatusPaciente().equals(Status.ATIVO.get()) ? " ativo " : " inativo ")
+                        + " para "
+                        + (this.paciente.getStatusPaciente().equals(Status.ATIVO.get()) ? " ativo " : " inativo ")
                         + ",";
             }
 
@@ -229,7 +245,7 @@ public class PacienteBean implements InterfaceBean, Serializable {
 
             //removendo última vírgula e adicionando ponto final
             detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
-            
+
         }
 
         //passando as demais informações 
@@ -244,13 +260,13 @@ public class PacienteBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("paciente");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("paciente");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("paciente", this.paciente.getIdPessoa());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("paciente", this.paciente.getIdPessoa());
     }
 
     @Override
@@ -263,13 +279,13 @@ public class PacienteBean implements InterfaceBean, Serializable {
     }
 
     /**
-     * Método que aciona o método que lista cidades passando o id do estado para
+     * método que aciona o método que lista cidades passando o id do estado para
      * exibir na página
      *
      * @param event
      */
     public void listaCidades(AjaxBehaviorEvent event) {
-        this.cidades = daoEstadoCidade.listarCidades(paciente.getEstado());
+        this.cidades = new EstadoCidadeDAOImpl().listarCidades(paciente.getEstado());
     }
 
     /**

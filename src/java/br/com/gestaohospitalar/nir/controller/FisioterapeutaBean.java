@@ -15,6 +15,8 @@ import br.com.gestaohospitalar.nir.model.Fisioterapeuta;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.ConsultaCPFValidator;
 import java.io.Serializable;
@@ -26,7 +28,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 /**
@@ -37,12 +38,12 @@ import javax.faces.event.AjaxBehaviorEvent;
 @SessionScoped
 public class FisioterapeutaBean implements InterfaceBean, Serializable {
 
-    private FisioterapeutaDAOImpl daoFisioterapeuta = new FisioterapeutaDAOImpl();
+    private FisioterapeutaDAOImpl daoFisioterapeuta;
     private Fisioterapeuta fisioterapeuta;
     private List<Fisioterapeuta> fisioterapeutas = new ArrayList<>();
     private List<Fisioterapeuta> filtrarLista;
 
-    private final EstadoCidadeDAOImpl daoEstadoCidade = new EstadoCidadeDAOImpl();
+    private EstadoCidadeDAOImpl daoEstadoCidade;
     private List<Estado> estados;
     private List<Cidade> cidades;
     private Estado estado;
@@ -52,7 +53,7 @@ public class FisioterapeutaBean implements InterfaceBean, Serializable {
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -67,14 +68,12 @@ public class FisioterapeutaBean implements InterfaceBean, Serializable {
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.fisioterapeutas = daoFisioterapeuta.listar();
+        this.fisioterapeutas = new FisioterapeutaDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
+        this.daoEstadoCidade = new EstadoCidadeDAOImpl();
 
         if (isEditar()) {
             this.cidades = this.daoEstadoCidade.listarCidades(this.fisioterapeuta.getEstado());
@@ -89,25 +88,33 @@ public class FisioterapeutaBean implements InterfaceBean, Serializable {
 
     @Override
     public String novo() {
-        fisioterapeuta = new Fisioterapeuta();
-        //fisioterapeuta.setStatusCadastroFisioterapeuta(Boolean.TRUE);
+        this.fisioterapeuta = new Fisioterapeuta();
         return "cadastro-fisioterapeuta?faces-redirect=true";
     }
 
     @Override
     public void salvar() {
-        //Verificando CPF
-        if (ConsultaCPFValidator.verificar(this.fisioterapeuta, this.cloneFisioterapeuta)) {
-            this.fisioterapeuta.setStatusFisioterapeuta(Status.ATIVO.get());
-            this.fisioterapeuta.setStatusPessoa(Status.ATIVO.get());
+        this.daoFisioterapeuta = new FisioterapeutaDAOImpl();
 
-            this.daoFisioterapeuta.salvar(this.fisioterapeuta);
+        try {
 
-            //gravando o log
-            salvarLog();
+            //verificando CPF
+            if (ConsultaCPFValidator.verificar(this.fisioterapeuta, this.cloneFisioterapeuta)) {
+                this.fisioterapeuta.setStatusFisioterapeuta(Status.ATIVO.get());
+                this.fisioterapeuta.setStatusPessoa(Status.ATIVO.get());
 
-            this.fisioterapeuta = new Fisioterapeuta();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Fisioterapeuta salvo com sucesso!"));
+                this.daoFisioterapeuta.salvar(this.fisioterapeuta);
+
+                //gravando o log
+                salvarLog();
+
+                this.fisioterapeuta = new Fisioterapeuta();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Fisioterapeuta salvo com sucesso!");
+            }
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -118,24 +125,34 @@ public class FisioterapeutaBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        this.fisioterapeuta.setStatusPessoa(Status.INATIVO.get());
-        this.fisioterapeuta.setStatusFisioterapeuta(Status.INATIVO.get());
+        this.daoFisioterapeuta = new FisioterapeutaDAOImpl();
 
-        this.daoFisioterapeuta.salvar(this.fisioterapeuta);
+        try {
 
-        //Atualizando a lista de Fisioterapeutas
-        this.fisioterapeutas.remove(this.fisioterapeuta);
+            this.fisioterapeuta.setStatusPessoa(Status.INATIVO.get());
+            this.fisioterapeuta.setStatusFisioterapeuta(Status.INATIVO.get());
 
-        //gravando o log
-        this.log.setTipo(TipoLog.INATIVACAO.get());
-        salvarLog();
+            this.daoFisioterapeuta.salvar(this.fisioterapeuta);
 
-        this.fisioterapeuta = new Fisioterapeuta();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Fisioterapeuta Inativado com sucesso!"));
+            //atualizando a lista de Fisioterapeutas
+            this.fisioterapeutas.remove(this.fisioterapeuta);
+
+            //gravando o log
+            this.log.setTipo(TipoLog.INATIVACAO.get());
+            salvarLog();
+
+            this.fisioterapeuta = new Fisioterapeuta();
+
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Fisioterapeuta inativado com sucesso!");
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = null;
 
         //se for alteração
@@ -146,7 +163,7 @@ public class FisioterapeutaBean implements InterfaceBean, Serializable {
             if (!this.fisioterapeuta.getNomePessoa().equals(this.cloneFisioterapeuta.getNomePessoa())) {
                 detalhe += " nome de " + this.cloneFisioterapeuta.getNomePessoa() + " para " + this.fisioterapeuta.getNomePessoa() + ",";
             }
-            
+
             if (!this.fisioterapeuta.getCrefitoFisioterapeuta().equals(this.cloneFisioterapeuta.getCrefitoFisioterapeuta())) {
                 detalhe += " crefito de " + this.cloneFisioterapeuta.getCrefitoFisioterapeuta() + " para " + this.fisioterapeuta.getCrefitoFisioterapeuta() + ",";
             }
@@ -223,7 +240,7 @@ public class FisioterapeutaBean implements InterfaceBean, Serializable {
 
             //removendo última vírgula e adicionando ponto final
             detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
-            
+
         }
 
         //passando as demais informações 
@@ -238,13 +255,13 @@ public class FisioterapeutaBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("fisioterapeuta");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("fisioterapeuta");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("fisioterapeuta", this.fisioterapeuta.getIdPessoa());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("fisioterapeuta", this.fisioterapeuta.getIdPessoa());
     }
 
     @Override
@@ -277,7 +294,7 @@ public class FisioterapeutaBean implements InterfaceBean, Serializable {
      * @param event
      */
     public void listaCidades(AjaxBehaviorEvent event) {
-        setCidades(daoEstadoCidade.listarCidades(fisioterapeuta.getEstado()));
+        this.cidades = new EstadoCidadeDAOImpl().listarCidades(this.fisioterapeuta.getEstado());
     }
 
     /**

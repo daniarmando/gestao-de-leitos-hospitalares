@@ -18,6 +18,8 @@ import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.ConsultaCPFValidator;
 import br.com.gestaohospitalar.nir.validator.ConsultaLoginValidator;
@@ -30,7 +32,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 /**
@@ -41,12 +42,12 @@ import javax.faces.event.AjaxBehaviorEvent;
 @SessionScoped
 public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
 
-    private GerenteEnfermagemDAOImpl daoGerenteEnfermagem = new GerenteEnfermagemDAOImpl();
+    private GerenteEnfermagemDAOImpl daoGerenteEnfermagem;
     private GerenteEnfermagem gerenteEnfermagem;
     private List<GerenteEnfermagem> gerentesEnfermagem = new ArrayList<>();
     private List<GerenteEnfermagem> filtrarLista;
 
-    private final EstadoCidadeDAOImpl daoEstadoCidade = new EstadoCidadeDAOImpl();
+    private EstadoCidadeDAOImpl daoEstadoCidade;
     private List<Estado> estados;
     private List<Cidade> cidades;
     private Estado estado;
@@ -55,14 +56,14 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
     private GerenteEnfermagem cloneGerenteEnfermagem;
     private Usuario cloneUsuario;
 
-    private final UsuarioDAOImpl daoUsuario = new UsuarioDAOImpl();
+    private UsuarioDAOImpl daoUsuario;
     private Usuario usuario;
 
     //injetando o usuário logado
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -70,24 +71,22 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
      * Creates a new instance of GerenteEnfermagemBean
      */
     public GerenteEnfermagemBean() {
-        gerenteEnfermagem = new GerenteEnfermagem();
-        usuario = new Usuario();
+        this.gerenteEnfermagem = new GerenteEnfermagem();
+        this.usuario = new Usuario();
     }
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.gerentesEnfermagem = daoGerenteEnfermagem.listar();
+        this.gerentesEnfermagem = new GerenteEnfermagemDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
+        this.daoEstadoCidade = new EstadoCidadeDAOImpl();
 
         if (isEditar()) {
             this.cidades = this.daoEstadoCidade.listarCidades(this.gerenteEnfermagem.getEstado());
-            this.usuario = this.daoUsuario.usuarioPorIdPessoa(this.gerenteEnfermagem.getIdPessoa());
+            this.usuario = new UsuarioDAOImpl().usuarioPorIdPessoa(this.gerenteEnfermagem.getIdPessoa());
             this.cloneGerenteEnfermagem = this.gerenteEnfermagem.clone();
             this.cloneUsuario = this.usuario.clone();
             this.log.setTipo(TipoLog.ALTERACAO.get());
@@ -107,38 +106,46 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
 
     @Override
     public void salvar() {
-        //verificando CPF e login
-        if (ConsultaCPFValidator.verificar(this.gerenteEnfermagem, this.cloneGerenteEnfermagem) && ConsultaLoginValidator.verificar(this.getUsuario(), this.cloneUsuario)) {
-            //ve a data de nascimento informada for maior que a data mínima de 18 anos
-            if (this.gerenteEnfermagem.getDataNascimentoPessoa().after(getMaxDate())) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Data de Nascimento deve ser menor que " + getMaxDate() + ", pois só pode ser cadastrado se for maior de 18 anos.", null));
-            } else {
+        this.daoGerenteEnfermagem = new GerenteEnfermagemDAOImpl();
+        this.daoUsuario = new UsuarioDAOImpl();
 
-                this.gerenteEnfermagem.setStatusGerenteEnfermagem(Status.ATIVO.get());
-                this.gerenteEnfermagem.setStatusPessoa(Status.ATIVO.get());
+        try {
+            //verificando CPF e login
+            if (ConsultaCPFValidator.verificar(this.gerenteEnfermagem, this.cloneGerenteEnfermagem) && ConsultaLoginValidator.verificar(this.getUsuario(), this.cloneUsuario)) {
+                //se a data de nascimento informada for maior que a data mínima de 18 anos
+                if (this.gerenteEnfermagem.getDataNascimentoPessoa().after(getMaxDate())) {
+                    FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Data de Nascimento deve ser menor que " + getMaxDate() + ", pois só pode ser cadastrado se for maior de 18 anos.");
+                } else {
 
-                //Salvando Gerente de Enfermagem
-                this.daoGerenteEnfermagem.salvar(this.gerenteEnfermagem);
+                    this.gerenteEnfermagem.setStatusGerenteEnfermagem(Status.ATIVO.get());
+                    this.gerenteEnfermagem.setStatusPessoa(Status.ATIVO.get());
 
-                List<Autorizacao> autorizacoes = new ArrayList<>();
-                Autorizacao autorizacao = new Autorizacao();
-                autorizacao.setNome("ROLE_gen");
-                autorizacoes.add(autorizacao);
+                    //salvando Gerente de Enfermagem
+                    this.daoGerenteEnfermagem.salvar(this.gerenteEnfermagem);
 
-                this.getUsuario().setAutorizacoes(autorizacoes);
-                this.getUsuario().setStatus(true);
-                this.getUsuario().setPessoa(this.gerenteEnfermagem);
+                    List<Autorizacao> autorizacoes = new ArrayList<>();
+                    Autorizacao autorizacao = new Autorizacao();
+                    autorizacao.setNome("ROLE_gen");
+                    autorizacoes.add(autorizacao);
 
-                //salvando Usuário
-                this.daoUsuario.salvar(this.usuario);
+                    this.usuario.setAutorizacoes(autorizacoes);
+                    this.usuario.setStatus(true);
+                    this.usuario.setPessoa(this.gerenteEnfermagem);
 
-                //gravando o log
-                salvarLog();
+                    //salvando Usuário
+                    this.daoUsuario.salvar(this.usuario);
 
-                this.gerenteEnfermagem = new GerenteEnfermagem();
-                this.usuario = new Usuario();
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Gerente de Enfermagem salvo com sucesso!", null));
+                    //gravando o log
+                    salvarLog();
+
+                    this.gerenteEnfermagem = new GerenteEnfermagem();
+                    this.usuario = new Usuario();
+
+                    FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Gerente de Enfermagem  salvo com sucesso!");
+                }
             }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -149,35 +156,46 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        if (daoGerenteEnfermagem.verificarSePossuiEnfermeiro(this.gerenteEnfermagem) == false) {
-            this.gerenteEnfermagem.setStatusPessoa(Status.INATIVO.get());
-            this.gerenteEnfermagem.setStatusGerenteEnfermagem(Status.INATIVO.get());
+        this.daoGerenteEnfermagem = new GerenteEnfermagemDAOImpl();
+        this.daoUsuario = new UsuarioDAOImpl();
 
-            this.daoGerenteEnfermagem.salvar(this.gerenteEnfermagem);
+        try {
 
-            //inativando o usuário
-            this.usuario = daoUsuario.usuarioPorIdPessoa(this.gerenteEnfermagem.getIdPessoa());
-            this.usuario.setPessoa(gerenteEnfermagem);
-            this.usuario.setStatus(false);
-            this.daoUsuario.salvar(this.usuario);
+            if (this.daoGerenteEnfermagem.temEnfermeiro(this.gerenteEnfermagem) == false) {
+                this.gerenteEnfermagem.setStatusPessoa(Status.INATIVO.get());
+                this.gerenteEnfermagem.setStatusGerenteEnfermagem(Status.INATIVO.get());
 
-            //atualizando a lista de Gerentes de Enfermagem
-            this.gerentesEnfermagem.remove(this.gerenteEnfermagem);
+                this.daoGerenteEnfermagem.salvar(this.gerenteEnfermagem);
 
-            //gravando o log
-            this.log.setTipo(TipoLog.INATIVACAO.get());
-            salvarLog();
+                //inativando o usuário
+                this.usuario = daoUsuario.usuarioPorIdPessoa(this.gerenteEnfermagem.getIdPessoa());
+                this.usuario.setPessoa(gerenteEnfermagem);
+                this.usuario.setStatus(false);
+                this.daoUsuario.salvar(this.usuario);
 
-            this.gerenteEnfermagem = new GerenteEnfermagem();
-            this.usuario = new Usuario();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Gerente de Enfermagem Inativado com sucesso!"));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Gerente de Enfermagem não pode ser Inativado, pois possuí Enfermeiro(s) vinculado(s)!", null));
+                //atualizando a lista de Gerentes de Enfermagem
+                this.gerentesEnfermagem.remove(this.gerenteEnfermagem);
+
+                //gravando o log
+                this.log.setTipo(TipoLog.INATIVACAO.get());
+                salvarLog();
+
+                this.gerenteEnfermagem = new GerenteEnfermagem();
+                this.usuario = new Usuario();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Gerente de Enfermagem inativado com sucesso!");
+
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Gerente de Enfermagem não pode ser inativado, pois possuí Enfermeiro(s) vinculado(s)!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = null;
 
         //se for alteração
@@ -265,7 +283,7 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
 
             //removendo última vírgula e adicionando ponto final
             detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
-            
+
         }
 
         //passando as demais informações 
@@ -280,13 +298,13 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("gerenteEnfermagem");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("gerenteEnfermagem");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("gerenteEnfermagem", this.gerenteEnfermagem.getIdPessoa());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("gerenteEnfermagem", this.gerenteEnfermagem.getIdPessoa());
     }
 
     @Override
@@ -305,7 +323,7 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
      * @param event
      */
     public void listaCidades(AjaxBehaviorEvent event) {
-        this.cidades = this.daoEstadoCidade.listarCidades(this.gerenteEnfermagem.getEstado());
+        this.cidades = new EstadoCidadeDAOImpl().listarCidades(this.gerenteEnfermagem.getEstado());
     }
 
     /**

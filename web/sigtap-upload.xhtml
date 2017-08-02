@@ -9,12 +9,12 @@
         <h1 class="nir-titulopagina">Importar Tabela SigTap</h1>
 
         <h:panelGroup id="msg" >
-            <h:panelGroup id="msgAlerta" layout="block" class="nir-msgAlerta" rendered="#{sigtapUploadBean.verificarTabela() eq true}">
+            <h:panelGroup id="msgAlerta" layout="block" class="nir-msgAlerta" rendered="#{sigtapUploadBean.isTabelaImportada() eq true}">
                 <i class="fa faMsgAlerta  fa-warning"></i>
                 <h:outputText value="Atenção! Tabela do mês de #{sigtapUploadBean.mostrarMes()} já foi importada para o Sistema." />
             </h:panelGroup>
 
-            <h:panelGroup id="msgAlertaUrgente" layout="block" class="nir-msgAlertaUrgente" rendered="#{sigtapUploadBean.verificarTabela() eq false}">
+            <h:panelGroup id="msgAlertaUrgente" layout="block" class="nir-msgAlertaUrgente" rendered="#{sigtapUploadBean.isTabelaImportada() eq false}">
                 <i class="fa faMsgAlerta  fa-warning"></i>
                 <h:outputText value="Atenção! Tabela do mês de #{sigtapUploadBean.mostrarMes()} ainda não foi importada para o Sistema." />
             </h:panelGroup>

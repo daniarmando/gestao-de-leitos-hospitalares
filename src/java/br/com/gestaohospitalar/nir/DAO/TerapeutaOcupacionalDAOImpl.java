@@ -2,11 +2,10 @@ package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.TerapeutaOcupacional;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 /*
@@ -14,49 +13,29 @@ import org.hibernate.criterion.Restrictions;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Daniel
  */
 public class TerapeutaOcupacionalDAOImpl {
-    
-    public void salvar(TerapeutaOcupacional terapeutaOcupacional) {
-        
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(terapeutaOcupacional);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
+    public void salvar(TerapeutaOcupacional terapeutaOcupacional) throws DAOException {
+
+        try {
+            this.session.saveOrUpdate(terapeutaOcupacional);
+        } catch (Exception e) {
             System.out.println("Problemas ao cadastrar Terapeuta Ocupacional. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+            throw new DAOException("Problemas ao salvar Terapeuta Ocupacional.");
         }
     }
 
     public List<TerapeutaOcupacional> listar() {
-        List <TerapeutaOcupacional> listarTerapeutasOcupacionais = null;
-        
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        
-        try {
-            listarTerapeutasOcupacionais = session.createCriteria(TerapeutaOcupacional.class)
-                    .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
-                    .list();
-            transaction.commit();
-            session.close();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao listar Terapeutas Ocupacionais. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        
-        return listarTerapeutasOcupacionais;
+
+        return (List<TerapeutaOcupacional>) this.session.createCriteria(TerapeutaOcupacional.class)
+                .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .list();
     }
+
 }

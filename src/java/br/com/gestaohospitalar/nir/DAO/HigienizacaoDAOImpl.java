@@ -7,15 +7,11 @@ package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.Higienizacao;
-import br.com.gestaohospitalar.nir.model.Internacao;
-import br.com.gestaohospitalar.nir.model.Leito;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
@@ -25,73 +21,42 @@ import org.hibernate.sql.JoinType;
  */
 public class HigienizacaoDAOImpl {
 
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
     //Busca a última chaveMesAno
     String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
 
-    public void salvar(Higienizacao higienizacao) {
-
-        Session session = null;
+    public void salvar(Higienizacao higienizacao) throws DAOException {
 
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
-            session.beginTransaction();
-            session.saveOrUpdate(higienizacao);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar Higienização. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            this.session.saveOrUpdate(higienizacao);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar Higienização. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Higienização.");
         }
     }
 
     public List<Higienizacao> listar() {
-        List<Higienizacao> listarHigienizacoes = null;
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-
-        try {
-            Criteria crit = session.createCriteria(Higienizacao.class)
-                    .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                    //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
-                    .createAlias("internacao.procedimento", "p", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("p.chaveMesAno", chaveMesAno))
-                    .createAlias("internacao.cid", "c", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("c.chaveMesAno", chaveMesAno))
-                    .createAlias("internacao.leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("tl.chaveMesAno", chaveMesAno));
-
-            listarHigienizacoes = crit.list();
-
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao listar Higienizações. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-
-        return listarHigienizacoes;
+        return (List<Higienizacao>) this.session.createCriteria(Higienizacao.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
+                .createAlias("internacao.procedimento", "p", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("p.chaveMesAno", chaveMesAno))
+                .createAlias("internacao.cid", "c", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("c.chaveMesAno", chaveMesAno))
+                .createAlias("internacao.leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("tl.chaveMesAno", chaveMesAno))
+                .list();
     }
 
-    public void excluir(Higienizacao higienizacao) {
-
-        Session session = null;
+    public void excluir(Higienizacao higienizacao) throws DAOException {
 
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
-            session.beginTransaction();
-            session.delete(higienizacao);
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao Excluir Higienização. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+            this.session.delete(higienizacao);
+        } catch (Exception e) {
+            System.out.println("Problemas ao excluir Higienização. Erro: " + e.getMessage());
+            throw new DAOException(("Problemas ao excluir Higienização."));
         }
     }
-    
+
 //    public void excluirFuncionarios(Integer idHigienizacao) {
 //        Session session = null;
 //
@@ -105,33 +70,10 @@ public class HigienizacaoDAOImpl {
 //
 //            session.getTransaction().commit();
 //
-//        } catch (HibernateException e) {
+//        } catch (Exception e) {
 //            System.out.println("Problemas ao Excluir Funcionários da Higienização. Erro: " + e.getMessage());
 //            session.getTransaction().rollback();
 //
 //        }
 //    }
-
-    public Boolean verificarSeLeitoPossuiNovaInternacao(Internacao internacao) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        Long resultado = null;
-
-        try {
-            Criteria crit = session.createCriteria(Leito.class)
-                    .setProjection(Projections.count("idLeito"))
-                    .add(Restrictions.eq("idLeito", internacao.getLeito().getIdLeito()))
-                    .add(Restrictions.ne("internacao.idInternacao", internacao.getIdInternacao()));
-
-            transaction.commit();
-
-            resultado = (Long) crit.uniqueResult();
-
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao verificar foi registrado saída do paciente do leito. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        return resultado > 0;
-    }
 }

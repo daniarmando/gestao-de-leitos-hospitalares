@@ -13,7 +13,7 @@
 
         <h1 class="nir-titulopagina">Pesquisa de Leitos</h1>
 
-        <h:panelGroup id="msgAlertaUrgente" layout="block" class="nir-msgAlertaUrgente" rendered="#{sigtapUploadBean.verificarTabela() eq false and usuarioBean.autorizacao eq 1}">
+        <h:panelGroup id="msgAlertaUrgente" layout="block" class="nir-msgAlertaUrgente" rendered="#{sigtapUploadBean.isTabelaImportada() eq false and usuarioBean.autorizacao eq 1}">
             <i class="fa faMsgAlerta  fa-warning"></i>
             <h:outputText value="Atenção! A tabela Sigtap não foi importada para o Sistema. Favor importá-la para liberar o cadastro de Leitos" />
         </h:panelGroup>
@@ -26,7 +26,7 @@
                     <p:commandButton icon="fa fa-file-text" value="Relatório" action="#{leitoBean.gerarRelatorio()}"
                                      ajax="false" onclick="this.form.target = '_blank'" disabled="#{empty leitoBean.leitos}" />
                     <p:commandButton icon="fa fa-plus" value="Novo Leito" action="#{leitoBean.novo()}"
-                                     process="@this" disabled="#{sigtapUploadBean.verificarTabela() eq false}"/>
+                                     process="@this" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}"/>
                 </p:toolbarGroup>
             </p:toolbar>
             <!--fim barra de ferramentas superior com botao para cadastrar novos dados-->
@@ -97,12 +97,12 @@
                 <f:facet name="footer">
                     <p:commandButton icon="ui-icon-pencil" value="Editar" 
                                      action="cadastro-leito?faces-redirect=true" 
-                                     disabled="#{sigtapUploadBean.verificarTabela() eq false}"
+                                     disabled="#{sigtapUploadBean.isTabelaImportada() eq false}"
                                      rendered="#{usuarioBean.autorizacao eq 1}" />
                     <p:commandButton value="Excluir" 
                                      rendered="#{usuarioBean.autorizacao eq 1}"
                                      actionListener="#{leitoBean.excluir()}"
-                                     disabled="#{sigtapUploadBean.verificarTabela() eq false}"
+                                     disabled="#{sigtapUploadBean.isTabelaImportada() eq false}"
                                      icon="fa fa-trash"
                                      update=":frm:tabelaDeDados :frm:ultimolog">
                         <p:confirm header="Confirmação" message="Confirma inativação do registro selecionado?" icon="ui-icon-alert" />

@@ -15,6 +15,8 @@ import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.Medico;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.ConsultaCPFValidator;
 import java.io.Serializable;
@@ -26,7 +28,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 /**
@@ -37,12 +38,12 @@ import javax.faces.event.AjaxBehaviorEvent;
 @SessionScoped
 public class MedicoBean implements InterfaceBean, Serializable {
 
-    private MedicoDAOImpl daoMedico = new MedicoDAOImpl();
+    private MedicoDAOImpl daoMedico;
     private Medico medico;
     private List<Medico> medicos = new ArrayList<>();
     private List<Medico> filtrarLista;
 
-    private final EstadoCidadeDAOImpl daoEstadoCidade = new EstadoCidadeDAOImpl();
+    private EstadoCidadeDAOImpl daoEstadoCidade;
     private List<Estado> estados;
     private List<Cidade> cidades;
     private Estado estado;
@@ -52,7 +53,7 @@ public class MedicoBean implements InterfaceBean, Serializable {
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -62,19 +63,17 @@ public class MedicoBean implements InterfaceBean, Serializable {
      * Creates a new instance of MedicoBean
      */
     public MedicoBean() {
-        medico = new Medico();
+        this.medico = new Medico();
     }
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.medicos = this.daoMedico.listar();
+        this.medicos = new MedicoDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
+        this.daoEstadoCidade = new EstadoCidadeDAOImpl();
 
         if (isEditar()) {
             this.cidades = this.daoEstadoCidade.listarCidades(this.medico.getEstado());
@@ -90,23 +89,31 @@ public class MedicoBean implements InterfaceBean, Serializable {
 
     @Override
     public String novo() {
-        medico = new Medico();
+        this.medico = new Medico();
         return "cadastro-medico?faces-redirect=true";
     }
 
     @Override
     public void salvar() {
-        //Verificando CPF
-        if (ConsultaCPFValidator.verificar(this.medico, this.cloneMedico)) {
-            this.medico.setStatusMedico(Status.ATIVO.get());
-            this.medico.setStatusPessoa(Status.ATIVO.get());
-            this.daoMedico.salvar(this.medico);
+        this.daoMedico = new MedicoDAOImpl();
 
-            //gravando o log
-            salvarLog();
+        try {
 
-            this.medico = new Medico();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Médico salvo com sucesso!"));
+            //verificando CPF
+            if (ConsultaCPFValidator.verificar(this.medico, this.cloneMedico)) {
+                this.medico.setStatusMedico(Status.ATIVO.get());
+                this.medico.setStatusPessoa(Status.ATIVO.get());
+                this.daoMedico.salvar(this.medico);
+
+                //gravando o log
+                salvarLog();
+
+                this.medico = new Medico();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Médico salvo com sucesso!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -117,28 +124,37 @@ public class MedicoBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        if (daoMedico.verificarSePossuiInternacaoAberta(this.medico) == false) {
-            this.medico.setStatusPessoa(Status.INATIVO.get());
-            this.medico.setStatusMedico(Status.INATIVO.get());
+        this.daoMedico = new MedicoDAOImpl();
 
-            this.daoMedico.salvar(this.medico);
+        try {
 
-            //atualizando a lista de médicos
-            this.medicos.remove(this.medico);
+            if (this.daoMedico.estaEmInternacaoAberta(this.medico) == false) {
+                this.medico.setStatusPessoa(Status.INATIVO.get());
+                this.medico.setStatusMedico(Status.INATIVO.get());
 
-            //gravando o log
-            this.log.setTipo(TipoLog.INATIVACAO.get());
-            salvarLog();
+                this.daoMedico.salvar(this.medico);
 
-            this.medico = new Medico();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Médico Inativado com sucesso!"));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Médico não pode ser Inativado, pois está em Internação aberta!", null));
+                //atualizando a lista de médicos
+                this.medicos.remove(this.medico);
+
+                //gravando o log
+                this.log.setTipo(TipoLog.INATIVACAO.get());
+                salvarLog();
+
+                this.medico = new Medico();
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Médico inativado com sucesso!");
+
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Médico não pode ser Inativado, pois está em Internação aberta!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = null;
 
         //se for alteração
@@ -151,7 +167,7 @@ public class MedicoBean implements InterfaceBean, Serializable {
             }
 
             if (!this.medico.getCrmMedico().equals(this.cloneMedico.getCrmMedico())) {
-                detalhe += " crm de " + this.cloneMedico.getCrmMedico() + " para " + this.medico.getCrmMedico()+ ",";
+                detalhe += " crm de " + this.cloneMedico.getCrmMedico() + " para " + this.medico.getCrmMedico() + ",";
             }
 
             if (!this.medico.getCpfPessoa().equals(this.cloneMedico.getCpfPessoa())) {
@@ -225,8 +241,8 @@ public class MedicoBean implements InterfaceBean, Serializable {
             }
 
             //removendo última vírgula e adicionando ponto final
-            detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";            
-            
+            detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
+
         }
 
         //passando as demais informações 
@@ -241,13 +257,13 @@ public class MedicoBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("medico");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("medico");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("medico", this.medico.getIdPessoa());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("medico", this.medico.getIdPessoa());
     }
 
     @Override
@@ -274,13 +290,13 @@ public class MedicoBean implements InterfaceBean, Serializable {
     }
 
     /**
-     * Método que aciona o método que lista cidades passando o id do estado para
+     * método que aciona o método que lista cidades passando o id do estado para
      * exibir na página
      *
      * @param event
      */
     public void listaCidades(AjaxBehaviorEvent event) {
-        this.cidades = daoEstadoCidade.listarCidades(medico.getEstado());
+        this.cidades = new EstadoCidadeDAOImpl().listarCidades(this.medico.getEstado());
     }
 
     /**

@@ -6,8 +6,8 @@
 package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.ConfiguracaoKanban;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
-import org.hibernate.HibernateException;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -16,38 +16,23 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class ConfiguracaoKanbanDAOImpl {
-    
-    public void salvar(ConfiguracaoKanban configuracaoKanban) {
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(configuracaoKanban);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar a Configuração do Kanban. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
-    
-    public ConfiguracaoKanban configuracaoKanbanPorId(Integer id) {
-         
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
+    public void salvar(ConfiguracaoKanban configuracaoKanban) throws DAOException {
+
         try {
-            return (ConfiguracaoKanban) session.createCriteria(ConfiguracaoKanban.class)
-                    .add(Restrictions.idEq(id))
-                    .uniqueResult();
-            
-        }finally {
-            session.close();
-        }        
+            this.session.saveOrUpdate(configuracaoKanban);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salva a Configuração Kanban. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Configuração Kanban.");
+        }
+        
     }
 
-    
+    public ConfiguracaoKanban configuracaoKanbanPorId(Integer id) {
+        return (ConfiguracaoKanban) this.session.createCriteria(ConfiguracaoKanban.class)
+                .add(Restrictions.idEq(id))
+                .uniqueResult();
+    }
 }

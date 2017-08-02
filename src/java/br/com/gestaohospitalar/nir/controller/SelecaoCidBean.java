@@ -33,14 +33,10 @@ public class SelecaoCidBean implements Serializable {
     private String paramPesquisa;
     private List<TB_CID> cids = new ArrayList<>();
 
-    private final SigtapUploadDAOImpl daoSU = new SigtapUploadDAOImpl();
-
     private TB_CID cidSelecionado;
     private TB_PROCEDIMENTO procedimentoSelecionado = new TB_PROCEDIMENTO();
     private Leito leitoSelecionado = new Leito();
     private Paciente pacienteSelecionado = new Paciente();
-    
-    private ParametrosDAOImpl daoParametros = new ParametrosDAOImpl();
 
     private String msgValidacao = "";
     private Boolean permiteLiberar = false;
@@ -68,7 +64,7 @@ public class SelecaoCidBean implements Serializable {
         RequestContext.getCurrentInstance().openDialog("selecaoCid", opcoes, null);
     }
 
-     /**
+    /**
      * método que recebe o objeto selecionado e verifica com relação a validação
      * do objeto
      *
@@ -87,23 +83,23 @@ public class SelecaoCidBean implements Serializable {
             RequestContext.getCurrentInstance().execute("PF('dlgmsgValidacao').show()");
         }
     }
-    
+
     /**
      * método que fecha a página aberta em janela modal e devolve o objeto
      * selecionado
      *
      */
     public void liberar() {
-        
+
         //cria um map com o cid selecionado e com a mensagem da validação para o log
         Map<String, TB_CID> cid = new TreeMap<>();
-        
-        if (this.msgValidacao.length() > 0){
-           this.msgValidacao = "mensagem emitida pelo sistema: " + this.msgValidacao + " [usuário selecionou opção sim]";
+
+        if (this.msgValidacao.length() > 0) {
+            this.msgValidacao = "mensagem emitida pelo sistema: " + this.msgValidacao + " [usuário selecionou opção sim]";
         }
-        
+
         cid.put(this.msgValidacao, this.cidSelecionado);
-        
+
         //fecha o dialog e devolve o objeto selecionado
         RequestContext.getCurrentInstance().closeDialog(cid);
 
@@ -112,7 +108,7 @@ public class SelecaoCidBean implements Serializable {
         this.paramPesquisa = "";
         this.msgValidacao = "";
     }
-    
+
     /**
      * método que faz as validações para o objeto selecionado
      *
@@ -155,19 +151,18 @@ public class SelecaoCidBean implements Serializable {
         } else {
             //senão passou na validação
             //checando os parâmetros    
-            Parametros parametros = this.daoParametros.parametrosPorIdHospital(1); //passando o id do hospital manualmente
+            Parametros parametros = new ParametrosDAOImpl().parametrosPorIdHospital(1); //passando o id do hospital manualmente
             this.permiteLiberar = parametros.getCidIncompativelLeito() && parametros.getCidIncompativelPaciente();
             this.msgValidacao = this.permiteLiberar == true ? (msg + " Deseja continuar?") : this.permiteLiberar == false ? msg : "";
             return false;
         }
     }
 
-
     /**
      * @return this.cids
      */
     public List<TB_CID> listarCid() {
-        this.cids = this.daoSU.listarCidPorProcedimento(this.paramPesquisa, this.procedimentoSelecionado.getCO_PROCEDIMENTO());
+        this.cids = new SigtapUploadDAOImpl().listarCidPorProcedimento(this.paramPesquisa, this.procedimentoSelecionado.getCO_PROCEDIMENTO());
         return this.cids;
     }
 
@@ -191,7 +186,7 @@ public class SelecaoCidBean implements Serializable {
     public List<TB_CID> getCids() {
         return cids;
     }
-    
+
     /**
      * @return the leitoSelecionado
      */
@@ -220,7 +215,6 @@ public class SelecaoCidBean implements Serializable {
         this.pacienteSelecionado = pacienteSelecionado;
     }
 
-
     /**
      * @return the procedimentoSelecionado
      */
@@ -234,7 +228,7 @@ public class SelecaoCidBean implements Serializable {
     public void setProcedimentoSelecionado(TB_PROCEDIMENTO procedimentoSelecionado) {
         this.procedimentoSelecionado = procedimentoSelecionado;
     }
-    
+
     /**
      * @return the msgValidacao
      */

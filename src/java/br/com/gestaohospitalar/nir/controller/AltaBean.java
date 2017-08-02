@@ -16,6 +16,8 @@ import br.com.gestaohospitalar.nir.model.Internacao;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.Medico;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,7 +27,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -36,24 +37,20 @@ import javax.faces.context.FacesContext;
 public class AltaBean implements Serializable, InterfaceBean {
 
     private Alta alta;
-    private final AltaDAOImpl daoAlta = new AltaDAOImpl();
-
-    private final AltaQualificadaDAOImpl daoAltaQualificada = new AltaQualificadaDAOImpl();
+    private AltaDAOImpl daoAlta;
 
     private List<Alta> filtrarLista;
     private List<Alta> altas = new ArrayList<>();
 
-    private final InternacaoDAOImpl daoInternacao = new InternacaoDAOImpl();
     private List<Internacao> internacoes = new ArrayList<>();
 
-    private final MedicoDAOImpl daoMedico = new MedicoDAOImpl();
     private List<Medico> medicos = new ArrayList<>();
 
     //injetando o usuário logado
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -70,26 +67,23 @@ public class AltaBean implements Serializable, InterfaceBean {
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.altas = this.daoAlta.listar();
+        this.altas = new AltaDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
 
-        this.log = new Log();
-
         if (isEditar()) {
             this.habilitaCampos = true;
             this.cloneAlta = this.alta.clone();
-            this.medicos = this.daoMedico.listar();
+            this.medicos = new MedicoDAOImpl().listar();
             this.log.setTipo(TipoLog.ALTERAR_ALTA.get());
         } else {
-            this.internacoes = this.daoInternacao.listarParaAlta();
+            this.internacoes = new InternacaoDAOImpl().listarParaAlta();
             this.habilitaCampos = !this.internacoes.isEmpty();
             this.log.setTipo(TipoLog.REGISTRAR_ALTA.get());
             if (this.habilitaCampos) {
-                this.medicos = this.daoMedico.listar();
+                this.medicos = new MedicoDAOImpl().listar();
             }
         }
 
@@ -103,33 +97,40 @@ public class AltaBean implements Serializable, InterfaceBean {
 
     @Override
     public void salvar() {
+        this.daoAlta = new AltaDAOImpl();
 
-        //se a data da alta informada for igual que a data de entrada da internação
-        if (this.alta.getDataHoraRealizacao().compareTo(this.alta.getInternacao().getDataEntrada()) == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data da Alta não pode ser igual que a data de entrada da Internação!", null));
-            //se a data da previsão de alta informada for menor que a data de entrada da internação
-        } else if (this.alta.getDataHoraRealizacao().before(this.alta.getInternacao().getDataEntrada())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data da Alta não pode ser menor que a data de entrada da Internação!", null));
-        } else {
+        try {
 
-            //passando a alta qualificada para a alta
-            this.alta.setAltaQualificada(this.daoAltaQualificada.altaQualificadaPorIdInternacao(this.alta.getInternacao().getIdInternacao()));
+            //se a data da alta informada for igual que a data de entrada da internação
+            if (this.alta.getDataHoraRealizacao().compareTo(this.alta.getInternacao().getDataEntrada()) == 0) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data da Alta não pode ser igual que a data de entrada da Internação!");
+                //se a data da previsão de alta informada for menor que a data de entrada da internação
+            } else if (this.alta.getDataHoraRealizacao().before(this.alta.getInternacao().getDataEntrada())) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data da Alta não pode ser menor que a data de entrada da Internação!");
+            } else {
 
-            //passando a data e hora atual
-            this.alta.setDataHoraInformacao(new Date());
+                //passando a alta qualificada para a alta
+                this.alta.setAltaQualificada(new AltaQualificadaDAOImpl().altaQualificadaPorIdInternacao(this.alta.getInternacao().getIdInternacao()));
 
-            //salvando a alta
-            this.daoAlta.salvar(this.alta);
+                //passando a data e hora atual
+                this.alta.setDataHoraInformacao(new Date());
 
-            //atualizando a lista de internações
-            this.internacoes.remove(this.alta.getInternacao());
-            this.habilitaCampos = !this.internacoes.isEmpty();
+                //salvando a alta
+                this.daoAlta.salvar(this.alta);
 
-            //salvando o log
-            salvarLog();
+                //atualizando a lista de internações
+                this.internacoes.remove(this.alta.getInternacao());
+                this.habilitaCampos = !this.internacoes.isEmpty();
 
-            this.alta = new Alta();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Alta salva com sucesso!"));
+                //salvando o log
+                salvarLog();
+
+                this.alta = new Alta();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Alta salva com sucesso!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
 
     }
@@ -141,30 +142,39 @@ public class AltaBean implements Serializable, InterfaceBean {
 
     @Override
     public void excluir() {
+        this.daoAlta = new AltaDAOImpl();
 
-        //verificando se pode excluir 
-        if (this.daoInternacao.verificarSeHouveSaida(this.alta.getInternacao().getIdInternacao()) == false) {
+        try {
 
-            //excluindo alta 
-            this.daoAlta.excluir(this.alta);
+            //verificando se pode excluir 
+            if (new InternacaoDAOImpl().houveSaida(this.alta.getInternacao().getIdInternacao()) == false) {
 
-            //atualizando lista de alta 
-            this.altas.remove(this.alta);
+                //excluindo alta 
+                this.daoAlta.excluir(this.alta);
 
-            //salvando o log
-            this.log.setTipo(TipoLog.EXCLUIR_ALTA.get());
-            salvarLog();
+                //atualizando lista de alta 
+                this.altas.remove(this.alta);
 
-            this.alta = new Alta();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Alta excluída com sucesso!"));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Alta não pode ser excluída, pois já foi registrado Saída do Paciente do Leito!", null));
+                //salvando o log
+                this.log.setTipo(TipoLog.EXCLUIR_ALTA.get());
+                salvarLog();
+
+                this.alta = new Alta();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Alta excluída com sucesso!");
+
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Alta não pode ser excluída, pois já foi registrado Saída do Paciente do Leito!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
 
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = "";
 
         //se for alteração
@@ -182,7 +192,7 @@ public class AltaBean implements Serializable, InterfaceBean {
                 detalhe += " médico da alta de " + this.cloneAlta.getMedico().getNomePessoa() + " para " + this.alta.getMedico().getNomePessoa() + ",";
             }
         } else {
-                detalhe += "alta código " + this.alta.getIdAlta() + ",";
+            detalhe += "alta código " + this.alta.getIdAlta() + ",";
         }
 
         //removendo última vírgula e adicionando ponto final
@@ -200,13 +210,13 @@ public class AltaBean implements Serializable, InterfaceBean {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("internacao");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("internacao");
         return this.log != null ? "Última modificação em processo de internação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("internacao", this.alta.getInternacao().getIdInternacao());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("internacao", this.alta.getInternacao().getIdInternacao());
     }
 
     @Override

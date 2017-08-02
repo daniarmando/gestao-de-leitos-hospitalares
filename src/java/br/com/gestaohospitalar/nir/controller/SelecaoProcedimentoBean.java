@@ -33,13 +33,9 @@ public class SelecaoProcedimentoBean implements Serializable {
     private String paramPesquisa;
     private List<TB_PROCEDIMENTO> procedimentos;
 
-    private final SigtapUploadDAOImpl daoSU = new SigtapUploadDAOImpl();
-
     private TB_PROCEDIMENTO procedimentoSelecionado;
     private Leito leitoSelecionado = new Leito();
     private Paciente pacienteSelecionado = new Paciente();
-
-    private ParametrosDAOImpl daoParametros = new ParametrosDAOImpl();
 
     private Integer tipoPesq = 0;
 
@@ -93,16 +89,16 @@ public class SelecaoProcedimentoBean implements Serializable {
      *
      */
     public void liberar() {
-        
+
         //cria um map com o procedimento selecionado e com a mensagem da validação para o log
         Map<String, TB_PROCEDIMENTO> procedimento = new TreeMap<>();
-        
-        if (this.msgValidacao.length() > 0){
-           this.msgValidacao = "mensagem emitida pelo sistema: " + this.msgValidacao + " [usuário selecionou opção sim]";
+
+        if (this.msgValidacao.length() > 0) {
+            this.msgValidacao = "mensagem emitida pelo sistema: " + this.msgValidacao + " [usuário selecionou opção sim]";
         }
-        
+
         procedimento.put(this.msgValidacao, this.procedimentoSelecionado);
-        
+
         //fecha o dialog e devolve o objeto selecionado
         RequestContext.getCurrentInstance().closeDialog(procedimento);
 
@@ -130,12 +126,12 @@ public class SelecaoProcedimentoBean implements Serializable {
         int idadeMaxProc = (this.procedimentoSelecionado.getVL_IDADE_MAXIMA() > 0 && this.procedimentoSelecionado.getVL_IDADE_MAXIMA() < 9999 ? this.procedimentoSelecionado.getVL_IDADE_MAXIMA() / 12 : this.procedimentoSelecionado.getVL_IDADE_MAXIMA());
 
         //buscando os parâmetros
-        Parametros parametros = this.daoParametros.parametrosPorIdHospital(1); //passando o id do hospital manualmente
+        Parametros parametros = new ParametrosDAOImpl().parametrosPorIdHospital(1); //passando o id do hospital manualmente
 
         //se o parametro de liberar procedimento incompatível com tipo leito estiver como true
         if (parametros.getProcedimentoIncompativelLeito()) {
             //verificando se o tipo do leito está incompatível com o tipo de leito aceito pelo procedimento
-            if (this.daoSU.verificarSeExisteProcedimento(this.procedimentoSelecionado.getCO_PROCEDIMENTO(), this.leitoSelecionado.getTipo_leito().getCO_TIPO_LEITO()) == false) {
+            if (new SigtapUploadDAOImpl().temProcedimento(this.procedimentoSelecionado.getCO_PROCEDIMENTO(), this.leitoSelecionado.getTipo_leito().getCO_TIPO_LEITO()) == false) {
                 //montando a mensagem
                 msg += "Tipo de leito aceito pelo procedimento incompatível com o leito. ";
                 validacao++;
@@ -216,26 +212,26 @@ public class SelecaoProcedimentoBean implements Serializable {
             return false;
         }
     }
-    
+
     /**
-     * método que calcula idade mínima e máxima aceitas pelo procedimento
-     * é feito calculo divido por 12 pois o valor que vem do procedimento
-     * está em meses, 9999 = não se aplica
-     * 
-     * 
+     * método que calcula idade mínima e máxima aceitas pelo procedimento é
+     * feito calculo divido por 12 pois o valor que vem do procedimento está em
+     * meses, 9999 = não se aplica
+     *
+     *
      * @param idadeMin
      * @param idadeMax
      * @return idadeMin/idadeMax
      */
     public String idadeMinMax(int idadeMin, int idadeMax) {
-        return (idadeMin > 0 && idadeMin < 9999 ? Math.round(idadeMin / 12) : idadeMin) + "/" +  (idadeMax > 0 && idadeMax < 9999 ? Math.round(idadeMax / 12) : idadeMax);
+        return (idadeMin > 0 && idadeMin < 9999 ? Math.round(idadeMin / 12) : idadeMin) + "/" + (idadeMax > 0 && idadeMax < 9999 ? Math.round(idadeMax / 12) : idadeMax);
     }
 
     /**
      * @return this.procedimentos
      */
     public List<TB_PROCEDIMENTO> listarProcedimentoPorLeito() {
-        this.procedimentos = this.daoSU.listarProcedimentosPorTipoLeito(this.paramPesquisa, this.leitoSelecionado.getTipo_leito().getCO_TIPO_LEITO());
+        this.procedimentos = new SigtapUploadDAOImpl().listarProcedimentosPorTipoLeito(this.paramPesquisa, this.leitoSelecionado.getTipo_leito().getCO_TIPO_LEITO());
         this.tipoPesq = 1;
         return this.procedimentos;
     }
@@ -244,7 +240,7 @@ public class SelecaoProcedimentoBean implements Serializable {
      * @return this.procedimentos
      */
     public List<TB_PROCEDIMENTO> listarTodosProcedimentos() {
-        this.procedimentos = this.daoSU.listarTodosProcedimentos(this.paramPesquisa);
+        this.procedimentos = new SigtapUploadDAOImpl().listarTodosProcedimentos(this.paramPesquisa);
         this.tipoPesq = 2;
         return this.procedimentos;
     }
@@ -256,7 +252,7 @@ public class SelecaoProcedimentoBean implements Serializable {
      * @return true or false
      */
     public Boolean isParamProcedimento() {
-        Parametros param = this.daoParametros.parametrosPorIdHospital(1); //passando o id hospital 1 manualmente
+        Parametros param = new ParametrosDAOImpl().parametrosPorIdHospital(1); //passando o id hospital 1 manualmente
         return param.getProcedimentoIncompativelLeito();
     }
 

@@ -15,6 +15,8 @@ import br.com.gestaohospitalar.nir.model.Funcionario;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.ConsultaCPFValidator;
 import java.io.Serializable;
@@ -26,7 +28,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 /**
@@ -37,12 +38,12 @@ import javax.faces.event.AjaxBehaviorEvent;
 @SessionScoped
 public class FuncionarioBean implements InterfaceBean, Serializable {
 
-    private FuncionarioDAOImpl daoFuncionario = new FuncionarioDAOImpl();
+    private FuncionarioDAOImpl daoFuncionario;
     private Funcionario funcionario;
     private List<Funcionario> funcionarios = new ArrayList<>();
     private List<Funcionario> filtrarLista;
 
-    private final EstadoCidadeDAOImpl daoEstadoCidade = new EstadoCidadeDAOImpl();
+    private EstadoCidadeDAOImpl daoEstadoCidade;
     private List<Estado> estados;
     private List<Cidade> cidades;
     private Estado estado;
@@ -52,7 +53,7 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -67,14 +68,12 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.funcionarios = this.daoFuncionario.listar();
+        this.funcionarios = new FuncionarioDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
+        this.daoEstadoCidade = new EstadoCidadeDAOImpl();
 
         if (isEditar()) {
             this.cidades = this.daoEstadoCidade.listarCidades(this.funcionario.getEstado());
@@ -90,24 +89,32 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
 
     @Override
     public String novo() {
-        funcionario = new Funcionario();
+        this.funcionario = new Funcionario();
         return "cadastro-funcionario?faces-redirect=true";
     }
 
     @Override
     public void salvar() {
-        //Verificando CPF
-        if (ConsultaCPFValidator.verificar(this.funcionario, this.cloneFuncionario)) {
-            this.funcionario.setStatusFuncionario(Status.ATIVO.get());
-            this.funcionario.setStatusPessoa(Status.ATIVO.get());
+        this.daoFuncionario = new FuncionarioDAOImpl();
 
-            this.daoFuncionario.salvar(this.funcionario);
+        try {
 
-            //gravando o log
-            salvarLog();
+            //verificando CPF
+            if (ConsultaCPFValidator.verificar(this.funcionario, this.cloneFuncionario)) {
+                this.funcionario.setStatusFuncionario(Status.ATIVO.get());
+                this.funcionario.setStatusPessoa(Status.ATIVO.get());
 
-            this.funcionario = new Funcionario();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Funcionário salvo com sucesso!"));
+                this.daoFuncionario.salvar(this.funcionario);
+
+                //gravando o log
+                salvarLog();
+
+                this.funcionario = new Funcionario();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Funcionário salvo com sucesso!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -118,24 +125,34 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        this.funcionario.setStatusPessoa(Status.INATIVO.get());
-        this.funcionario.setStatusFuncionario(Status.INATIVO.get());
+        this.daoFuncionario = new FuncionarioDAOImpl();
 
-        this.daoFuncionario.salvar(this.funcionario);
+        try {
 
-        //Atualizando a lista de Funicionários
-        this.funcionarios.remove(this.funcionario);
+            this.funcionario.setStatusPessoa(Status.INATIVO.get());
+            this.funcionario.setStatusFuncionario(Status.INATIVO.get());
 
-        //salvando o log
-        this.log.setTipo(TipoLog.INATIVACAO.get());
-        salvarLog();
+            this.daoFuncionario.salvar(this.funcionario);
 
-        this.funcionario = new Funcionario();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Funcionário Inativado com sucesso!"));
+            //atualizando a lista de Funicionários
+            this.funcionarios.remove(this.funcionario);
+
+            //salvando o log
+            this.log.setTipo(TipoLog.INATIVACAO.get());
+            salvarLog();
+
+            this.funcionario = new Funcionario();
+
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Funcionário inativado com sucesso!");
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = null;
 
         //se for alteração
@@ -219,7 +236,7 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
 
             //removendo última vírgula e adicionando ponto final
             detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
-            
+
         }
 
         //passando as demais informações 
@@ -234,13 +251,13 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("funcionario");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("funcionario");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("funcionario", this.funcionario.getIdPessoa());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("funcionario", this.funcionario.getIdPessoa());
     }
 
     @Override
@@ -273,7 +290,7 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
      * @param event
      */
     public void listaCidades(AjaxBehaviorEvent event) {
-        this.cidades = daoEstadoCidade.listarCidades(this.funcionario.getEstado());
+        this.cidades = new EstadoCidadeDAOImpl().listarCidades(this.funcionario.getEstado());
     }
 
     /**

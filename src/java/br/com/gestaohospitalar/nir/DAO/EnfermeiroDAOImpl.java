@@ -7,11 +7,10 @@ package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.Enfermeiro;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -19,56 +18,30 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class EnfermeiroDAOImpl {
- 
-    public void salvar(Enfermeiro enfermeiro) {
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(enfermeiro);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar Enfermeiro. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
+    public void salvar(Enfermeiro enfermeiro) throws DAOException {
+
+        try {
+            this.session.saveOrUpdate(enfermeiro);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar Enfermeiro. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Enfermeiro.");
         }
     }
 
     public List<Enfermeiro> listar() {
-        List <Enfermeiro> listarEnfermeiro = null;
-        
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        
-        try {
-            listarEnfermeiro = session.createCriteria(Enfermeiro.class)
-                    .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
-                    .list();
-            transaction.commit();
-            session.close();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao listar Enfermeiro. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        
-        return listarEnfermeiro;
+
+        return (List<Enfermeiro>) this.session.createCriteria(Enfermeiro.class)
+                .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .list();
     }
-    
-    public Enfermeiro listarPorId(Integer id) {
-         
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        
-        try {
-            return (Enfermeiro) session.createCriteria(Enfermeiro.class)
-                    .add(Restrictions.idEq(id))
-                    .uniqueResult();
-            
-        }finally {
-            session.close();
-        }        
+
+    public Enfermeiro enfermeiroPorId(Integer id) {
+
+        return (Enfermeiro) this.session.createCriteria(Enfermeiro.class)
+                .add(Restrictions.idEq(id))
+                .uniqueResult();
     }
 }

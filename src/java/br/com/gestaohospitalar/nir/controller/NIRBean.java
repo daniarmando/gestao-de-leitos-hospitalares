@@ -18,6 +18,8 @@ import br.com.gestaohospitalar.nir.model.NIR;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.ConsultaCPFValidator;
 import br.com.gestaohospitalar.nir.validator.ConsultaLoginValidator;
@@ -30,7 +32,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 /**
@@ -41,25 +42,25 @@ import javax.faces.event.AjaxBehaviorEvent;
 @SessionScoped
 public class NIRBean implements InterfaceBean, Serializable {
 
-    private final NIRDAOImpl daoNIR = new NIRDAOImpl();
+    private NIRDAOImpl daoNIR;
     private NIR nir;
     private List<NIR> listaNir = new ArrayList<>();
     private List<NIR> filtrarLista;
 
-    private final EstadoCidadeDAOImpl daoEstadoCidade = new EstadoCidadeDAOImpl();
+    private EstadoCidadeDAOImpl daoEstadoCidade;
     private List<Estado> estados;
     private List<Cidade> cidades;
     private Estado estado;
     private Cidade cidade;
 
-    private final UsuarioDAOImpl daoUsuario = new UsuarioDAOImpl();
+    private UsuarioDAOImpl daoUsuario;
     private Usuario usuario;
 
     //injetando o usuário logado
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -70,24 +71,22 @@ public class NIRBean implements InterfaceBean, Serializable {
      * Creates a new instance of NIRBean
      */
     public NIRBean() {
-        nir = new NIR();
-        usuario = new Usuario();
+        this.nir = new NIR();
+        this.usuario = new Usuario();
     }
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.listaNir = this.daoNIR.listar();
+        this.listaNir = new NIRDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
+        this.daoEstadoCidade = new EstadoCidadeDAOImpl();
 
         if (isEditar()) {
             this.cidades = this.daoEstadoCidade.listarCidades(this.nir.getEstado());
-            this.usuario = this.daoUsuario.usuarioPorIdPessoa(this.nir.getIdPessoa());
+            this.usuario = new UsuarioDAOImpl().usuarioPorIdPessoa(this.nir.getIdPessoa());
             this.cloneNir = this.nir.clone();
             this.cloneUsuario = this.usuario.clone();
             this.log.setTipo(TipoLog.ALTERACAO.get());
@@ -107,40 +106,49 @@ public class NIRBean implements InterfaceBean, Serializable {
 
     @Override
     public void salvar() {
-        //Verificando CPF e login
-        if (ConsultaCPFValidator.verificar(this.nir, this.cloneNir) && ConsultaLoginValidator.verificar(this.usuario, this.cloneUsuario)) {
-            //Se a data de nascimento informada for maior que a data mínima de 18 anos
+        this.daoNIR = new NIRDAOImpl();
+        this.daoUsuario = new UsuarioDAOImpl();
 
-            this.nir.setStatusNir(Status.ATIVO.get());
-            this.nir.setStatusPessoa(Status.ATIVO.get());
+        try {
 
-            //Salvando NIR
-            daoNIR.salvar(this.nir);
+            //verificando CPF e login
+            if (ConsultaCPFValidator.verificar(this.nir, this.cloneNir) && ConsultaLoginValidator.verificar(this.usuario, this.cloneUsuario)) {
 
-            List<Autorizacao> autorizacoes = new ArrayList<>();
-            Autorizacao autorizacao = new Autorizacao();
-            autorizacao.setNome("ROLE_nir");
-            autorizacoes.add(autorizacao);
+                this.nir.setStatusNir(Status.ATIVO.get());
+                this.nir.setStatusPessoa(Status.ATIVO.get());
 
-            this.usuario.setAutorizacoes(autorizacoes);
-            this.usuario.setStatus(true);
-            this.usuario.setPessoa(this.nir);
+                //salvando NIR
+                daoNIR.salvar(this.nir);
 
-            //salvando usuário
-            this.daoUsuario.salvar(this.usuario);
-            
-            //gravando o log
-            salvarLog();
+                List<Autorizacao> autorizacoes = new ArrayList<>();
+                Autorizacao autorizacao = new Autorizacao();
+                autorizacao.setNome("ROLE_nir");
+                autorizacoes.add(autorizacao);
 
-            this.nir = new NIR();
-            this.usuario = new Usuario();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "NIR salvo com sucesso!", null));
+                this.usuario.setAutorizacoes(autorizacoes);
+                this.usuario.setStatus(true);
+                this.usuario.setPessoa(this.nir);
 
+                //salvando usuário
+                this.daoUsuario.salvar(this.usuario);
+
+                //gravando o log
+                salvarLog();
+
+                this.nir = new NIR();
+                this.usuario = new Usuario();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "NIR salvo com sucesso!");
+
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
-    
+
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = null;
 
         //se for alteração
@@ -243,18 +251,17 @@ public class NIRBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("nir");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("nir");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("nir", this.nir.getIdPessoa());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("nir", this.nir.getIdPessoa());
     }
 
     @Override
@@ -267,13 +274,13 @@ public class NIRBean implements InterfaceBean, Serializable {
     }
 
     /**
-     * Método que aciona o método que lista cidades passando o id do estado para
+     * método que aciona o método que lista cidades passando o id do estado para
      * exibir na página
      *
      * @param event
      */
     public void listaCidades(AjaxBehaviorEvent event) {
-        this.cidades = daoEstadoCidade.listarCidades(this.nir.getEstado());
+        this.cidades = new EstadoCidadeDAOImpl().listarCidades(this.nir.getEstado());
     }
 
     /**

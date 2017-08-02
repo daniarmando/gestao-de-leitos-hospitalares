@@ -14,6 +14,8 @@ import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.Setor;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,7 +25,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -33,12 +34,11 @@ import javax.faces.context.FacesContext;
 @SessionScoped
 public class SetorBean implements InterfaceBean, Serializable {
 
-    private SetorDAOImpl daoSetor = new SetorDAOImpl();
+    private SetorDAOImpl daoSetor;
     private Setor setor;
     private List<Setor> setores = new ArrayList<>();
     private List<Setor> filtrarLista;
 
-    private HospitalDAOImpl daoHospital = new HospitalDAOImpl();
     private List<Hospital> hospitais = new ArrayList<>();
 
     //injetando o usuário logado
@@ -47,9 +47,9 @@ public class SetorBean implements InterfaceBean, Serializable {
 
     private Setor cloneSetor;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
-    private List<Log> logs = new ArrayList<>();
+    private List<Log> logs;
 
     /**
      * Creates a new instance of Enfermeiro
@@ -60,14 +60,11 @@ public class SetorBean implements InterfaceBean, Serializable {
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.setores = this.daoSetor.listar();
+        this.setores = new SetorDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
 
         if (isEditar()) {
             this.cloneSetor = this.setor.clone();
@@ -76,27 +73,36 @@ public class SetorBean implements InterfaceBean, Serializable {
             this.log.setTipo(TipoLog.INCLUSAO.get());
         }
 
-        this.hospitais = this.daoHospital.listar();
+        this.hospitais = new HospitalDAOImpl().listar();
 
     }
 
     @Override
     public String novo() {
-        setSetor(new Setor());
+        this.setor = new Setor();
         return "cadastro-setor?faces-redirect=true";
     }
 
     @Override
     public void salvar() {
-        this.setor.setStatusSetor(Status.ATIVO.get());
+        this.daoSetor = new SetorDAOImpl();
 
-        this.daoSetor.salvar(this.getSetor());
+        try {
 
-        //salvando o log
-        salvarLog();
+            this.setor.setStatusSetor(Status.ATIVO.get());
 
-        this.setor = new Setor();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Setor salvo com sucesso!"));
+            this.daoSetor.salvar(this.getSetor());
+
+            //salvando o log
+            salvarLog();
+
+            this.setor = new Setor();
+
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Setor salvo com sucesso!");
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
 
     }
 
@@ -107,28 +113,39 @@ public class SetorBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        if (daoSetor.verificarSePossuiQuarto(this.setor) == false) {
-            this.setor.setStatusSetor(Status.INATIVO.get());
+        this.daoSetor = new SetorDAOImpl();
 
-            this.daoSetor.salvar(this.setor);
+        try {
 
-            //atualizando lista de setores
-            this.setores.remove(this.setor);
+            if (this.daoSetor.temQuarto(this.setor) == false) {
+                this.setor.setStatusSetor(Status.INATIVO.get());
 
-            //salvando o log
-            this.log.setTipo(TipoLog.INATIVACAO.get());
-            salvarLog();
+                this.daoSetor.salvar(this.setor);
 
-            this.setor = new Setor();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Setor Inativado com sucesso!"));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Setor não pode ser Inativado, pois possuí Quarto(s) cadastrado(s)!", null));
+                //atualizando lista de setores
+                this.setores.remove(this.setor);
+
+                //salvando o log
+                this.log.setTipo(TipoLog.INATIVACAO.get());
+                salvarLog();
+
+                this.setor = new Setor();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Setor inativado com sucesso!");
+
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Setor não pode ser inativado, pois possuí Quarto(s) cadastrado(s)!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
 
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
+
         String detalhe = null;
 
         //se for alteração
@@ -149,7 +166,7 @@ public class SetorBean implements InterfaceBean, Serializable {
             }
 
             if (!this.setor.getHospital().getNomeHospital().equals(this.cloneSetor.getHospital().getNomeHospital())) {
-                detalhe += " hospital de " + this.cloneSetor.getHospital().getNomeHospital()+ " para " + this.setor.getHospital().getNomeHospital()+ ",";
+                detalhe += " hospital de " + this.cloneSetor.getHospital().getNomeHospital() + " para " + this.setor.getHospital().getNomeHospital() + ",";
             }
 
             //removendo última vírgula e adicionando ponto final
@@ -168,13 +185,13 @@ public class SetorBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("setor");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("setor");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("setor", this.setor.getIdSetor());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("setor", this.setor.getIdSetor());
     }
 
     @Override

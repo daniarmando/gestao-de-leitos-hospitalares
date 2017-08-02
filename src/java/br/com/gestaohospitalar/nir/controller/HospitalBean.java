@@ -7,13 +7,14 @@ package br.com.gestaohospitalar.nir.controller;
 
 import br.com.gestaohospitalar.nir.DAO.HospitalDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
-import br.com.gestaohospitalar.nir.DAO.UsuarioDAOImpl;
 import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.Hospital;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +23,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -32,12 +32,11 @@ import javax.faces.context.FacesContext;
 @SessionScoped
 public class HospitalBean implements InterfaceBean, Serializable {
 
-    private HospitalDAOImpl daoHospital = new HospitalDAOImpl();
+    private HospitalDAOImpl daoHospital;
     private Hospital hospital;
     private List<Hospital> listaHospital = new ArrayList<>();
     private List<Hospital> filtrarLista;
 
-    private final UsuarioDAOImpl daoUsuario = new UsuarioDAOImpl();
     private Usuario usuario;
 
     //injetando o usuário logado
@@ -46,7 +45,7 @@ public class HospitalBean implements InterfaceBean, Serializable {
 
     private Hospital cloneHospital;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -59,14 +58,11 @@ public class HospitalBean implements InterfaceBean, Serializable {
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.listaHospital = this.daoHospital.listar();
+        this.listaHospital = new HospitalDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-
-        this.log = new Log();
 
         if (isEditar()) {
             this.cloneHospital = this.hospital.clone();
@@ -74,27 +70,34 @@ public class HospitalBean implements InterfaceBean, Serializable {
         } else {
             this.log.setTipo(TipoLog.INCLUSAO.get());
         }
-
     }
 
     @Override
     public String novo() {
-        hospital = new Hospital();
+        this.hospital = new Hospital();
         return "cadastro-hospital?faces-redirect=true";
     }
 
     @Override
     public void salvar() {
-        this.hospital.setStatusHospital(Status.ATIVO.get());
+        this.daoHospital = new HospitalDAOImpl();
 
-        this.daoHospital.salvar(this.hospital);
+        try {
 
-        //gravando o log
-        salvarLog();
+            this.hospital.setStatusHospital(Status.ATIVO.get());
 
-        this.hospital = new Hospital();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Hospital salvo com sucesso!"));
+            this.daoHospital.salvar(this.hospital);
 
+            //gravando o log
+            salvarLog();
+
+            this.hospital = new Hospital();
+
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Hospital salvo com sucesso!");
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
     }
 
     @Override
@@ -103,12 +106,12 @@ public class HospitalBean implements InterfaceBean, Serializable {
     }
 
     @Override
-    public void excluir() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public void excluir() {}
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
+
         String detalhe = null;
 
         //se for alteração
@@ -148,19 +151,17 @@ public class HospitalBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("hospital");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("hospital");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("hospital", this.hospital.getIdHospital());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("hospital", this.hospital.getIdHospital());
     }
 
     @Override
-    public void gerarRelatorio() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.  
-    }
+    public void gerarRelatorio() {}
 
     /**
      * @return the hospital

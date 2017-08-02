@@ -20,6 +20,8 @@ import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.ConsultaCPFValidator;
 import br.com.gestaohospitalar.nir.validator.ConsultaLoginValidator;
@@ -32,7 +34,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 /**
@@ -43,28 +44,27 @@ import javax.faces.event.AjaxBehaviorEvent;
 @SessionScoped
 public class EnfermeiroBean implements InterfaceBean, Serializable {
 
-    private EnfermeiroDAOImpl daoEnfermeiro = new EnfermeiroDAOImpl();
+    private EnfermeiroDAOImpl daoEnfermeiro;
     private Enfermeiro enfermeiro;
     private List<Enfermeiro> enfermeiros = new ArrayList<>();
     private List<Enfermeiro> filtrarLista;
 
-    private final EstadoCidadeDAOImpl daoEstadoCidade = new EstadoCidadeDAOImpl();
+    private EstadoCidadeDAOImpl daoEstadoCidade;
     private List<Estado> estados;
     private List<Cidade> cidades;
     private Estado estado;
     private Cidade cidade;
 
-    private GerenteEnfermagemDAOImpl daoGerenteEnfermagem = new GerenteEnfermagemDAOImpl();
     private List<GerenteEnfermagem> gerentesEnfermagem;
 
-    private final UsuarioDAOImpl daoUsuario = new UsuarioDAOImpl();
+    private UsuarioDAOImpl daoUsuario;
     private Usuario usuario;
 
     //injetando o usuário logado
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -81,18 +81,16 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.enfermeiros = this.daoEnfermeiro.listar();
+        this.enfermeiros = new EnfermeiroDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
-        
-        this.log = new Log();
+        this.daoEstadoCidade = new EstadoCidadeDAOImpl();
 
         if (isEditar()) {
             this.cidades = this.daoEstadoCidade.listarCidades(this.enfermeiro.getEstado());
-            this.usuario = this.daoUsuario.usuarioPorIdPessoa(this.enfermeiro.getIdPessoa());
+            this.usuario = new UsuarioDAOImpl().usuarioPorIdPessoa(this.enfermeiro.getIdPessoa());
             this.cloneEnfermeiro = this.enfermeiro.clone();
             this.cloneUsuario = this.usuario.clone();
             this.log.setTipo(TipoLog.ALTERACAO.get());
@@ -101,7 +99,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
         }
 
         this.estados = this.daoEstadoCidade.listarEstados();
-        this.gerentesEnfermagem = daoGerenteEnfermagem.listar();
+        this.gerentesEnfermagem = new GerenteEnfermagemDAOImpl().listar();
     }
 
     @Override
@@ -113,38 +111,47 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
 
     @Override
     public void salvar() {
-        //Verificando CPF e login
-        if (ConsultaCPFValidator.verificar(this.enfermeiro, this.cloneEnfermeiro) && ConsultaLoginValidator.verificar(this.usuario, this.cloneUsuario)) {
-            //Se a data de nascimento informada for maior que a data mínima de 18 anos
-            if (enfermeiro.getDataNascimentoPessoa().after(getMaxDate())) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Data de Nascimento deve ser menor que " + getMaxDate() + ", pois só pode ser cadastrado se for maior de 18 anos.", null));
-            } else {
+        this.daoEnfermeiro = new EnfermeiroDAOImpl();
+        this.daoUsuario = new UsuarioDAOImpl();
 
-                this.enfermeiro.setStatusEnfermeiro(Status.ATIVO.get());
-                this.enfermeiro.setStatusPessoa(Status.ATIVO.get());
+        try {
 
-                //salvando Enfermeiro
-                this.daoEnfermeiro.salvar(this.enfermeiro);
+            //verificando CPF e login
+            if (ConsultaCPFValidator.verificar(this.enfermeiro, this.cloneEnfermeiro) && ConsultaLoginValidator.verificar(this.usuario, this.cloneUsuario)) {
+                //se a data de nascimento informada for maior que a data mínima de 18 anos
+                if (enfermeiro.getDataNascimentoPessoa().after(getMaxDate())) {
+                    FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Data de Nascimento deve ser menor que " + getMaxDate() + ", pois só pode ser cadastrado se for maior de 18 anos.");
+                } else {
 
-                List<Autorizacao> autorizacoes = new ArrayList<>();
-                Autorizacao autorizacao = new Autorizacao();
-                autorizacao.setNome("ROLE_enf");
-                autorizacoes.add(autorizacao);
+                    this.enfermeiro.setStatusEnfermeiro(Status.ATIVO.get());
+                    this.enfermeiro.setStatusPessoa(Status.ATIVO.get());
 
-                this.usuario.setAutorizacoes(autorizacoes);
-                this.usuario.setStatus(true);
-                this.usuario.setPessoa(this.enfermeiro);
+                    //salvando Enfermeiro
+                    this.daoEnfermeiro.salvar(this.enfermeiro);
 
-                //salvando usuário
-                this.daoUsuario.salvar(this.usuario);
+                    List<Autorizacao> autorizacoes = new ArrayList<>();
+                    Autorizacao autorizacao = new Autorizacao();
+                    autorizacao.setNome("ROLE_enf");
+                    autorizacoes.add(autorizacao);
 
-                //gravando o log
-                salvarLog();
+                    this.usuario.setAutorizacoes(autorizacoes);
+                    this.usuario.setStatus(true);
+                    this.usuario.setPessoa(this.enfermeiro);
 
-                this.enfermeiro = new Enfermeiro();
-                this.usuario = new Usuario();
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Enfermeiro salvo com sucesso!", null));
+                    //salvando usuário
+                    this.daoUsuario.salvar(this.usuario);
+
+                    //gravando o log
+                    salvarLog();
+
+                    this.enfermeiro = new Enfermeiro();
+                    this.usuario = new Usuario();
+
+                    FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Enfermeiro salvo com sucesso!");
+                }
             }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -155,145 +162,156 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
-        this.enfermeiro.setStatusPessoa(Status.INATIVO.get());
-        this.enfermeiro.setStatusEnfermeiro(Status.INATIVO.get());
+        this.daoEnfermeiro = new EnfermeiroDAOImpl();
+        this.daoUsuario = new UsuarioDAOImpl();
 
-        this.daoEnfermeiro.salvar(this.enfermeiro);
+        try {
 
-        //Inativando o usuário
-        this.usuario = daoUsuario.usuarioPorIdPessoa(this.enfermeiro.getIdPessoa());
-        this.usuario.setPessoa(enfermeiro);
-        this.usuario.setStatus(false);
-        this.daoUsuario.salvar(this.usuario);
+            this.enfermeiro.setStatusPessoa(Status.INATIVO.get());
+            this.enfermeiro.setStatusEnfermeiro(Status.INATIVO.get());
 
-        //Atualizando lista de enfermeiros
-        this.enfermeiros.remove(this.enfermeiro);
+            this.daoEnfermeiro.salvar(this.enfermeiro);
 
-        //gravando o log
-        this.log.setTipo(TipoLog.INATIVACAO.get());
-        salvarLog();
+            //inativando o usuário
+            this.usuario = daoUsuario.usuarioPorIdPessoa(this.enfermeiro.getIdPessoa());
+            this.usuario.setPessoa(enfermeiro);
+            this.usuario.setStatus(false);
+            this.daoUsuario.salvar(this.usuario);
 
-        this.enfermeiro = new Enfermeiro();
-        this.usuario = new Usuario();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Enfermeiro Inativado com sucesso!", null));
+            //atualizando lista de enfermeiros
+            this.enfermeiros.remove(this.enfermeiro);
+
+            //gravando o log
+            this.log.setTipo(TipoLog.INATIVACAO.get());
+            salvarLog();
+
+            this.enfermeiro = new Enfermeiro();
+            this.usuario = new Usuario();
+
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Enfermeiro inativado com sucesso!");
+
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
+        }
 
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = null;
 
-        //se for alteração
-        if (this.log.getTipo().equals(TipoLog.ALTERACAO.get())) {
-            detalhe = "";
+            //se for alteração
+            if (this.log.getTipo().equals(TipoLog.ALTERACAO.get())) {
+                detalhe = "";
 
-            //compara os atributos para verificar quais foram as alterações feitas para salvar 
-            if (!this.enfermeiro.getNomePessoa().equals(this.cloneEnfermeiro.getNomePessoa())) {
-                detalhe += " nome de " + this.cloneEnfermeiro.getNomePessoa() + " para " + this.enfermeiro.getNomePessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getCorenEnfermeiro().equals(this.cloneEnfermeiro.getCorenEnfermeiro())) {
-                detalhe += " coren de " + this.cloneEnfermeiro.getCorenEnfermeiro() + " para " + this.enfermeiro.getCorenEnfermeiro() + ",";
-            }
-
-            if (!this.enfermeiro.getGerenteEnfermagem().getNomePessoa().equals(this.cloneEnfermeiro.getGerenteEnfermagem().getNomePessoa())) {
-                detalhe += " gerente de " + this.cloneEnfermeiro.getGerenteEnfermagem().getNomePessoa() + " para " + this.enfermeiro.getGerenteEnfermagem().getNomePessoa() +  ",";
-            }
-
-            if (!this.enfermeiro.getCpfPessoa().equals(this.cloneEnfermeiro.getCpfPessoa())) {
-                detalhe += " cpf de " + this.cloneEnfermeiro.getCpfPessoa() + " para " + this.enfermeiro.getCpfPessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getRgPessoa().equals(this.cloneEnfermeiro.getRgPessoa())) {
-                detalhe += " rg de " + this.cloneEnfermeiro.getRgPessoa() + " para " + this.enfermeiro.getRgPessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getSexoPessoa().equals(this.cloneEnfermeiro.getSexoPessoa())) {
-                detalhe += " sexo de "
-                        + (this.cloneEnfermeiro.getSexoPessoa().equals("M") ? " masculino " : " feminino ")
-                        + " para "
-                        + (this.enfermeiro.getSexoPessoa().equals("M") ? " masculino " : " feminino ")
-                        + ",";
-            }
-
-            if (!this.enfermeiro.getDataNascimentoPessoa().equals(this.cloneEnfermeiro.getDataNascimentoPessoa())) {
-                detalhe += " data de nascimento de " + ConverterDataHora.formatarData(this.cloneEnfermeiro.getDataNascimentoPessoa()) + " para " + ConverterDataHora.formatarData(this.enfermeiro.getDataNascimentoPessoa()) + ",";
-            }
-
-            if (!this.enfermeiro.getTelefonePessoa().equals(this.cloneEnfermeiro.getTelefonePessoa())) {
-                detalhe += " telefone de " + this.cloneEnfermeiro.getTelefonePessoa() + " para " + this.enfermeiro.getTelefonePessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getCelularPessoa().equals(this.cloneEnfermeiro.getCelularPessoa())) {
-                detalhe += " celular de " + this.cloneEnfermeiro.getCelularPessoa() + " para " + this.enfermeiro.getCelularPessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getEnderecoPessoa().equals(this.cloneEnfermeiro.getEnderecoPessoa())) {
-                detalhe += " endereço de " + this.cloneEnfermeiro.getEnderecoPessoa() + " para " + this.enfermeiro.getEnderecoPessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getNumeroPessoa().equals(this.cloneEnfermeiro.getNumeroPessoa())) {
-                detalhe += " número de " + this.cloneEnfermeiro.getNumeroPessoa() + " para " + this.enfermeiro.getNumeroPessoa() + ",";
-            }
-
-            if (this.enfermeiro.getComplementoPessoa() != null) {
-                if (!this.enfermeiro.getComplementoPessoa().equals(this.cloneEnfermeiro.getComplementoPessoa())) {
-                    detalhe += " complemento de " + this.cloneEnfermeiro.getComplementoPessoa() + " para " + this.enfermeiro.getComplementoPessoa() + ",";
+                //compara os atributos para verificar quais foram as alterações feitas para salvar 
+                if (!this.enfermeiro.getNomePessoa().equals(this.cloneEnfermeiro.getNomePessoa())) {
+                    detalhe += " nome de " + this.cloneEnfermeiro.getNomePessoa() + " para " + this.enfermeiro.getNomePessoa() + ",";
                 }
+
+                if (!this.enfermeiro.getCorenEnfermeiro().equals(this.cloneEnfermeiro.getCorenEnfermeiro())) {
+                    detalhe += " coren de " + this.cloneEnfermeiro.getCorenEnfermeiro() + " para " + this.enfermeiro.getCorenEnfermeiro() + ",";
+                }
+
+                if (!this.enfermeiro.getGerenteEnfermagem().getNomePessoa().equals(this.cloneEnfermeiro.getGerenteEnfermagem().getNomePessoa())) {
+                    detalhe += " gerente de " + this.cloneEnfermeiro.getGerenteEnfermagem().getNomePessoa() + " para " + this.enfermeiro.getGerenteEnfermagem().getNomePessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getCpfPessoa().equals(this.cloneEnfermeiro.getCpfPessoa())) {
+                    detalhe += " cpf de " + this.cloneEnfermeiro.getCpfPessoa() + " para " + this.enfermeiro.getCpfPessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getRgPessoa().equals(this.cloneEnfermeiro.getRgPessoa())) {
+                    detalhe += " rg de " + this.cloneEnfermeiro.getRgPessoa() + " para " + this.enfermeiro.getRgPessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getSexoPessoa().equals(this.cloneEnfermeiro.getSexoPessoa())) {
+                    detalhe += " sexo de "
+                            + (this.cloneEnfermeiro.getSexoPessoa().equals("M") ? " masculino " : " feminino ")
+                            + " para "
+                            + (this.enfermeiro.getSexoPessoa().equals("M") ? " masculino " : " feminino ")
+                            + ",";
+                }
+
+                if (!this.enfermeiro.getDataNascimentoPessoa().equals(this.cloneEnfermeiro.getDataNascimentoPessoa())) {
+                    detalhe += " data de nascimento de " + ConverterDataHora.formatarData(this.cloneEnfermeiro.getDataNascimentoPessoa()) + " para " + ConverterDataHora.formatarData(this.enfermeiro.getDataNascimentoPessoa()) + ",";
+                }
+
+                if (!this.enfermeiro.getTelefonePessoa().equals(this.cloneEnfermeiro.getTelefonePessoa())) {
+                    detalhe += " telefone de " + this.cloneEnfermeiro.getTelefonePessoa() + " para " + this.enfermeiro.getTelefonePessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getCelularPessoa().equals(this.cloneEnfermeiro.getCelularPessoa())) {
+                    detalhe += " celular de " + this.cloneEnfermeiro.getCelularPessoa() + " para " + this.enfermeiro.getCelularPessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getEnderecoPessoa().equals(this.cloneEnfermeiro.getEnderecoPessoa())) {
+                    detalhe += " endereço de " + this.cloneEnfermeiro.getEnderecoPessoa() + " para " + this.enfermeiro.getEnderecoPessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getNumeroPessoa().equals(this.cloneEnfermeiro.getNumeroPessoa())) {
+                    detalhe += " número de " + this.cloneEnfermeiro.getNumeroPessoa() + " para " + this.enfermeiro.getNumeroPessoa() + ",";
+                }
+
+                if (this.enfermeiro.getComplementoPessoa() != null) {
+                    if (!this.enfermeiro.getComplementoPessoa().equals(this.cloneEnfermeiro.getComplementoPessoa())) {
+                        detalhe += " complemento de " + this.cloneEnfermeiro.getComplementoPessoa() + " para " + this.enfermeiro.getComplementoPessoa() + ",";
+                    }
+                }
+
+                if (!this.enfermeiro.getBairroPessoa().equals(this.cloneEnfermeiro.getBairroPessoa())) {
+                    detalhe += " bairro de " + this.cloneEnfermeiro.getBairroPessoa() + " para " + this.enfermeiro.getBairroPessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getCepPessoa().equals(this.cloneEnfermeiro.getCepPessoa())) {
+                    detalhe += " cep de " + this.cloneEnfermeiro.getCepPessoa() + " para " + this.enfermeiro.getCepPessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getEmailPessoa().equals(this.cloneEnfermeiro.getEmailPessoa())) {
+                    detalhe += " e-mail de " + this.cloneEnfermeiro.getEmailPessoa() + " para " + this.enfermeiro.getEmailPessoa() + ",";
+                }
+
+                if (!this.enfermeiro.getStatusEnfermeiro().equals(this.cloneEnfermeiro.getStatusEnfermeiro())) {
+                    detalhe += " status de "
+                            + (this.cloneEnfermeiro.getStatusEnfermeiro().equals(Status.ATIVO.get()) ? " ativo " : " inativo ")
+                            + " para "
+                            + (this.enfermeiro.getStatusEnfermeiro().equals(Status.ATIVO.get()) ? " ativo " : " inativo ")
+                            + ",";
+                }
+
+                if (!this.enfermeiro.getEstado().getNomeEstado().equals(this.cloneEnfermeiro.getEstado().getNomeEstado())) {
+                    detalhe += " estado de " + this.cloneEnfermeiro.getEstado().getNomeEstado() + " para " + this.enfermeiro.getEstado().getNomeEstado() + ",";
+                }
+
+                if (!this.enfermeiro.getCidade().getNomeCidade().equals(this.cloneEnfermeiro.getCidade().getNomeCidade())) {
+                    detalhe += " cidade de " + this.cloneEnfermeiro.getCidade().getNomeCidade() + " para " + this.enfermeiro.getCidade().getNomeCidade() + ",";
+                }
+
+                //removendo última vírgula e adicionando ponto final
+                detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
+
             }
 
-            if (!this.enfermeiro.getBairroPessoa().equals(this.cloneEnfermeiro.getBairroPessoa())) {
-                detalhe += " bairro de " + this.cloneEnfermeiro.getBairroPessoa() + " para " + this.enfermeiro.getBairroPessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getCepPessoa().equals(this.cloneEnfermeiro.getCepPessoa())) {
-                detalhe += " cep de " + this.cloneEnfermeiro.getCepPessoa() + " para " + this.enfermeiro.getCepPessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getEmailPessoa().equals(this.cloneEnfermeiro.getEmailPessoa())) {
-                detalhe += " e-mail de " + this.cloneEnfermeiro.getEmailPessoa() + " para " + this.enfermeiro.getEmailPessoa() + ",";
-            }
-
-            if (!this.enfermeiro.getStatusEnfermeiro().equals(this.cloneEnfermeiro.getStatusEnfermeiro())) {
-                detalhe += " status de "
-                        + (this.cloneEnfermeiro.getStatusEnfermeiro().equals(Status.ATIVO.get()) ? " ativo " : " inativo ")
-                        + " para "
-                        + (this.enfermeiro.getStatusEnfermeiro().equals(Status.ATIVO.get()) ? " ativo " : " inativo ")
-                        + ",";
-            }
-
-            if (!this.enfermeiro.getEstado().getNomeEstado().equals(this.cloneEnfermeiro.getEstado().getNomeEstado())) {
-                detalhe += " estado de " + this.cloneEnfermeiro.getEstado().getNomeEstado() + " para " + this.enfermeiro.getEstado().getNomeEstado() + ",";
-            }
-
-            if (!this.enfermeiro.getCidade().getNomeCidade().equals(this.cloneEnfermeiro.getCidade().getNomeCidade())) {
-                detalhe += " cidade de " + this.cloneEnfermeiro.getCidade().getNomeCidade() + " para " + this.enfermeiro.getCidade().getNomeCidade() + ",";
-            }
-
-            //removendo última vírgula e adicionando ponto final
-            detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
-            
-        }
-
-        //passando as demais informações 
-        this.log.setDataHora(new Date());
-        this.log.setDetalhe(detalhe);
-        this.log.setObjeto("enfermeiro");
-        this.log.setIdObjeto(this.enfermeiro.getIdPessoa());
-        this.log.setUsuario(this.usuarioBean.getUsuario());
-        //salvando o log
-        this.daoLog.salvar(this.log);
+            //passando as demais informações 
+            this.log.setDataHora(new Date());
+            this.log.setDetalhe(detalhe);
+            this.log.setObjeto("enfermeiro");
+            this.log.setIdObjeto(this.enfermeiro.getIdPessoa());
+            this.log.setUsuario(this.usuarioBean.getUsuario());
+            //salvando o log
+            this.daoLog.salvar(this.log);
     }
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("enfermeiro");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("enfermeiro");
         return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("enfermeiro", this.enfermeiro.getIdPessoa());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("enfermeiro", this.enfermeiro.getIdPessoa());
     }
 
     @Override
@@ -312,7 +330,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
      * @param event
      */
     public void listaCidades(AjaxBehaviorEvent event) {
-        this.cidades = daoEstadoCidade.listarCidades(this.enfermeiro.getEstado());
+        this.cidades = new EstadoCidadeDAOImpl().listarCidades(this.enfermeiro.getEstado());
     }
 
     /**

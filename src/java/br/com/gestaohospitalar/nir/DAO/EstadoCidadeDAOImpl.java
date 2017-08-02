@@ -7,11 +7,9 @@ package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.Cidade;
 import br.com.gestaohospitalar.nir.model.Estado;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -19,54 +17,23 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class EstadoCidadeDAOImpl {
-    
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
     public Estado estadoPorId(Integer id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-
-        return (Estado) session.get(Estado.class, id);
-
+        return (Estado) this.session.get(Estado.class, id);
     }
 
     public Cidade cidadePorId(Integer id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-
-        return (Cidade) session.get(Cidade.class, id);
-
+        return (Cidade) this.session.get(Cidade.class, id);
     }
 
     public List<Estado> listarEstados() {
-        List<Estado> listarEstados = null;
-
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-
-        try {
-            listarEstados = session.createCriteria(Estado.class).list();
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao listar Estados. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-
-        return listarEstados;
+        return (List<Estado>) this.session.createCriteria(Estado.class).list();
     }
 
     public List<Cidade> listarCidades(Estado estado) {
-        List<Cidade> listarCidades = null;
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-
-        try {
-            listarCidades = session.createCriteria(Cidade.class).add(Restrictions.eq("estado", estado)).list();
-            transaction.commit();
-            session.close();
-        } catch (HibernateException e) {
-            System.out.println("Problemas ao listar Cidades. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-
-        return listarCidades;
+        return (List<Cidade>) this.session.createCriteria(Cidade.class).add(Restrictions.eq("estado", estado)).list();
     }
 }

@@ -8,12 +8,11 @@ package br.com.gestaohospitalar.nir.DAO;
 import br.com.gestaohospitalar.nir.model.Internacao;
 import br.com.gestaohospitalar.nir.model.Medico;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -22,73 +21,46 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class MedicoDAOImpl {
-    
-     public Medico medicoPorId(Integer id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
 
-        return (Medico) session.get(Medico.class, id);
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
+    public Medico medicoPorId(Integer id) {
+        return (Medico) this.session.get(Medico.class, id);
     }
-    
-    public void salvar(Medico medico) {
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(medico);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar Médico. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+
+    public void salvar(Medico medico) throws DAOException {
+
+        try {
+            this.session.saveOrUpdate(medico);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar Médico. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Médico.");
         }
     }
 
     public List<Medico> listar() {
-        List <Medico> listarMedicos = null;
-        
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        
-        try {
-             listarMedicos = session.createCriteria(Medico.class)
-                    .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
-                    .list();
-            transaction.commit();
-            session.close();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao listar Médicos. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        
-        return listarMedicos;
+
+        return (List<Medico>) this.session.createCriteria(Medico.class)
+                .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .list();
     }
-    
-    public Boolean verificarSePossuiInternacaoAberta(Medico medico) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+
+    public boolean estaEmInternacaoAberta(Medico medico) throws DAOException {
         Long resultado = null;
 
         try {
-            Criteria crit = session.createCriteria(Internacao.class)
+            Criteria crit = this.session.createCriteria(Internacao.class)
                     .setProjection(Projections.count("idInternacao"))
                     .add(Restrictions.eq("medico", medico))
                     .add(Restrictions.eq("statusInternacao", Status.ABERTA.get()));
 
-            transaction.commit();
-
             resultado = (Long) crit.uniqueResult();
 
-            session.close();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             System.out.println("Problemas ao verificar se o Médico está em Internação aberta. Erro: " + e.getMessage());
-            transaction.rollback();
+            throw new DAOException("Problemas ao validar informações no banco de dados.");
         }
         return resultado > 0;
     }
-    
+
 }

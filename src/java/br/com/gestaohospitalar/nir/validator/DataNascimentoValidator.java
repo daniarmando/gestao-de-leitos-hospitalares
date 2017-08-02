@@ -45,7 +45,7 @@ public class DataNascimentoValidator implements Validator {
         if (component.getId().equals("datanascimentopaciente")) {
             //verifica se a data digitada é maior que a data atual
             if (data != null && data.after(new Date())) {
-                descricaoErro = label + " não pode ser uma data futura.";
+                descricaoErro = label + " não pode ser uma data futura.";                
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, descricaoErro, descricaoErro);
                 throw new ValidatorException(message);
             }
@@ -59,7 +59,7 @@ public class DataNascimentoValidator implements Validator {
             }
         }
 
-        //Se constar que o ano da data de nascimento digitada é menor que 140 anos
+        //se constar que o ano da data de nascimento digitada é menor que 140 anos
         if (anoInformado != 0 && anoInformado < (anoAtual - 140)) {
 
             descricaoErro = label + " inválida!";

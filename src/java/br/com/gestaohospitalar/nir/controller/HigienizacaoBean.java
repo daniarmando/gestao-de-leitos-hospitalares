@@ -8,6 +8,7 @@ package br.com.gestaohospitalar.nir.controller;
 import br.com.gestaohospitalar.nir.DAO.FuncionarioDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.HigienizacaoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.InternacaoDAOImpl;
+import br.com.gestaohospitalar.nir.DAO.LeitoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.Funcionario;
@@ -15,6 +16,8 @@ import br.com.gestaohospitalar.nir.model.Higienizacao;
 import br.com.gestaohospitalar.nir.model.Internacao;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -24,7 +27,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -35,12 +37,10 @@ import javax.faces.context.FacesContext;
 public class HigienizacaoBean implements InterfaceBean, Serializable {
 
     private Higienizacao higienizacao;
-    private final HigienizacaoDAOImpl daoHigienizacao = new HigienizacaoDAOImpl();
+    private HigienizacaoDAOImpl daoHigienizacao;
 
-    private final FuncionarioDAOImpl daoFuncionario = new FuncionarioDAOImpl();
     private List<Funcionario> funcionarios = new ArrayList<>();
 
-    private final InternacaoDAOImpl daoInternacao = new InternacaoDAOImpl();
     private List<Internacao> internacoes = new ArrayList<>();
 
     private List<Higienizacao> filtrarLista;
@@ -50,7 +50,7 @@ public class HigienizacaoBean implements InterfaceBean, Serializable {
     @ManagedProperty(value = "#{usuarioBean}")
     private UsuarioBean usuarioBean;
 
-    private final LogDAOImpl daoLog = new LogDAOImpl();
+    private LogDAOImpl daoLog;
     private Log log;
     private List<Log> logs = new ArrayList<>();
 
@@ -67,26 +67,23 @@ public class HigienizacaoBean implements InterfaceBean, Serializable {
 
     @Override
     public void inicializarPaginaPesquisa() {
-        this.log = new Log();
-        this.higienizacoes = this.daoHigienizacao.listar();
+        this.higienizacoes = new HigienizacaoDAOImpl().listar();
     }
 
     @Override
     public void inicializarPaginaCadastro() {
 
-        this.log = new Log();
-
         if (isEditar()) {
-            this.funcionarios = this.daoFuncionario.listar();
+            this.funcionarios = new FuncionarioDAOImpl().listar();
             this.habilitaCampos = true;
             this.cloneHigienizacao = this.higienizacao.clone();
             this.log.setTipo(TipoLog.ALTERAR_HIGIENIZACAO.get());
         } else {
-            this.internacoes = this.daoInternacao.listarParaHigienizacao();
+            this.internacoes = new InternacaoDAOImpl().listarParaHigienizacao();
             this.habilitaCampos = !this.internacoes.isEmpty();
             this.log.setTipo(TipoLog.REGISTRAR_HIGIENIZACAO.get());
-            if (this.getHabilitaCampos()) {
-                this.funcionarios = this.daoFuncionario.listar();
+            if (this.habilitaCampos) {
+                this.funcionarios = new FuncionarioDAOImpl().listar();
             }
         }
 
@@ -100,28 +97,35 @@ public class HigienizacaoBean implements InterfaceBean, Serializable {
 
     @Override
     public void salvar() {
-        //se a data inicial for igual a final
-        if (this.higienizacao.getDataHoraInicio().compareTo(this.higienizacao.getDataHoraFim()) == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser igual a data e hora final!", null));
-            //se a data inicial for maior que a data final
-        } else if (this.higienizacao.getDataHoraInicio().after(this.higienizacao.getDataHoraFim())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser maior que a data e hora final!", null));
-        } else {
-            
+        this.daoHigienizacao = new HigienizacaoDAOImpl();
+
+        try {
+
+            //se a data inicial for igual a final
+            if (this.higienizacao.getDataHoraInicio().compareTo(this.higienizacao.getDataHoraFim()) == 0) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser igual a data e hora final!");
+                //se a data inicial for maior que a data final
+            } else if (this.higienizacao.getDataHoraInicio().after(this.higienizacao.getDataHoraFim())) {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser maior que a data e hora final!");
+            } else {
+
 //            if (isEditar()) {
 //                //se for alteração, deleta os funcionários
 //                this.daoHigienizacao.excluirFuncionarios(this.higienizacao.getIdHigienizacao());
 //            }
-            
-            //salvando a higienização
-            this.higienizacao.setTempoHigienizacaoMinutos(ConverterDataHora.diferencaEmMinutos(this.higienizacao.getDataHoraInicio(), this.higienizacao.getDataHoraFim()));
-            this.daoHigienizacao.salvar(this.higienizacao);
+                //salvando a higienização
+                this.higienizacao.setTempoHigienizacaoMinutos(ConverterDataHora.diferencaEmMinutos(this.higienizacao.getDataHoraInicio(), this.higienizacao.getDataHoraFim()));
+                this.daoHigienizacao.salvar(this.higienizacao);
 
-            //salvando o log
-            salvarLog();
+                //salvando o log
+                salvarLog();
 
-            this.higienizacao = new Higienizacao();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Higienização salva com sucesso!"));
+                this.higienizacao = new Higienizacao();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Higienização salva com sucesso!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
 
@@ -132,30 +136,39 @@ public class HigienizacaoBean implements InterfaceBean, Serializable {
 
     @Override
     public void excluir() {
+        this.daoHigienizacao = new HigienizacaoDAOImpl();
 
-        //verificando se pode excluir 
-        if (this.daoHigienizacao.verificarSeLeitoPossuiNovaInternacao(this.higienizacao.getInternacao()) == false) {
+        try {
 
-            //excluindo higienização
-            this.daoHigienizacao.excluir(this.higienizacao);
+            //verificando se pode excluir 
+            if (new LeitoDAOImpl().temNovaInternacao(this.higienizacao.getInternacao()) == false) {
 
-            //atualizando lista de higienização
-            this.higienizacoes.remove(this.higienizacao);
+                //excluindo higienização
+                this.daoHigienizacao.excluir(this.higienizacao);
 
-            //salvando o log
-            this.log.setTipo(TipoLog.EXCLUIR_HIGIENIZACAO.get());
-            salvarLog();
+                //atualizando lista de higienização
+                this.higienizacoes.remove(this.higienizacao);
 
-            this.higienizacao = new Higienizacao();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Higienização Excluída com sucesso!"));
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Higienização não pode ser excluída, pois já foi registrado nova Internação no Leito!", null));
+                //salvando o log
+                this.log.setTipo(TipoLog.EXCLUIR_HIGIENIZACAO.get());
+                salvarLog();
+
+                this.higienizacao = new Higienizacao();
+
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_INFO, "Higienização excluída com sucesso!");
+
+            } else {
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Higienização não pode ser excluída, pois já foi registrado nova Internação no Leito!");
+            }
+        } catch (DAOException e) {
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
 
     }
 
     @Override
     public void salvarLog() {
+        this.daoLog = new LogDAOImpl();
         String detalhe = "";
 
         //se for alteração
@@ -199,13 +212,13 @@ public class HigienizacaoBean implements InterfaceBean, Serializable {
 
     @Override
     public String ultimoLog() {
-        this.log = this.daoLog.ultimoLogPorObjeto("internacao");
+        this.log = new LogDAOImpl().ultimoLogPorObjeto("internacao");
         return this.log != null ? "Última modificação em processo de internação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 
     @Override
     public void gerarLogs() {
-        this.logs = this.daoLog.listarPorIdObjeto("internacao", this.higienizacao.getInternacao().getIdInternacao());
+        this.logs = new LogDAOImpl().listarPorIdObjeto("internacao", this.higienizacao.getInternacao().getIdInternacao());
     }
 
     @Override

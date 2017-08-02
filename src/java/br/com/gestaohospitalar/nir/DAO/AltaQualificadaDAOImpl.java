@@ -8,12 +8,11 @@ package br.com.gestaohospitalar.nir.DAO;
 import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.Alta;
 import br.com.gestaohospitalar.nir.model.AltaQualificada;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -23,107 +22,66 @@ import org.hibernate.sql.JoinType;
  * @author Daniel
  */
 public class AltaQualificadaDAOImpl {
-    
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
     //Busca a última chaveMesAno
-    private String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
-    
-    public void salvar(AltaQualificada altaQualificada) {
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(altaQualificada);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar a Alta Qualificada. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+    private final String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+
+    public void salvar(AltaQualificada altaQualificada) throws DAOException {
+
+        try {
+            this.session.saveOrUpdate(altaQualificada);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar Alta Qualificada. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Alta Qualificada.");
         }
     }
-    
+
     public List<AltaQualificada> listar() {
-        List <AltaQualificada> listarAltasQualificadas = null;
-        
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        
-        try {
-            Criteria crit = session.createCriteria(AltaQualificada.class)
-                    .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                    //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
-                    .createAlias("internacao.procedimento", "p", JoinType.LEFT_OUTER_JOIN , Restrictions.eq("p.chaveMesAno", chaveMesAno))
-                    .createAlias("internacao.cid", "c", JoinType.LEFT_OUTER_JOIN , Restrictions.eq("c.chaveMesAno", chaveMesAno))
-                    .createAlias("internacao.leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN , Restrictions.eq("tl.chaveMesAno", chaveMesAno));
-            
-            listarAltasQualificadas = crit.list();
-            
-            transaction.commit();
-            session.close();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao listar Altas Qualificadas. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        
-        return listarAltasQualificadas;
+
+        return (List<AltaQualificada>) this.session.createCriteria(AltaQualificada.class)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
+                .createAlias("internacao.procedimento", "p", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("p.chaveMesAno", chaveMesAno))
+                .createAlias("internacao.cid", "c", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("c.chaveMesAno", chaveMesAno))
+                .createAlias("internacao.leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("tl.chaveMesAno", chaveMesAno))
+                .list();
     }
-    
+
     public AltaQualificada altaQualificadaPorIdInternacao(Integer idInternacao) {
-         
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        
-        try {
-            return (AltaQualificada) session.createCriteria(AltaQualificada.class)
-                    .add(Restrictions.eq("internacao.idInternacao", idInternacao))
-                    .uniqueResult();
-            
-        }finally {
-            session.close();
-        }        
+
+        return (AltaQualificada) this.session.createCriteria(AltaQualificada.class)
+                .add(Restrictions.eq("internacao.idInternacao", idInternacao))
+                .uniqueResult();
+
     }
-      
-      public void excluir(AltaQualificada altaQualificada) {
-        
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.delete(altaQualificada);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao Excluir Alta Qualificada. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+
+    public void excluir(AltaQualificada altaQualificada) throws DAOException {
+
+        try {
+            this.session.delete(altaQualificada);
+        } catch (Exception e) {
+            System.out.println("Problemas ao excluir Alta Qualificada. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao excluir Alta Qualificada.");
         }
     }
-      
-      public Boolean verificarSePossuiAlta(Integer idAltaQualificada) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
+
+    public boolean temAlta(Integer idAltaQualificada) throws DAOException {
         Long resultado = null;
 
         try {
-            Criteria crit = session.createCriteria(Alta.class)
+            Criteria crit = this.session.createCriteria(Alta.class)
                     .setProjection(Projections.count("idAlta"))
                     .add(Restrictions.eq("altaQualificada.idAltaQualificada", idAltaQualificada));
 
-            transaction.commit();
-
             resultado = (Long) crit.uniqueResult();
 
-            session.close();
-        } catch (HibernateException e) {
+        } catch (Exception e) {
             System.out.println("Problemas ao verificar se a Alta Qualificada está registrada em alguma Alta. Erro: " + e.getMessage());
-            transaction.rollback();
+            throw new DAOException("Problemas ao validar informações no banco de dados.");
         }
         return resultado > 0;
     }
-    
+
 }

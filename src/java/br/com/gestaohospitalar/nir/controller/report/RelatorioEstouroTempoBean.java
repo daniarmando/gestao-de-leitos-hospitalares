@@ -6,18 +6,16 @@
 package br.com.gestaohospitalar.nir.controller.report;
 
 import br.com.gestaohospitalar.nir.controller.UsuarioBean;
-import br.com.gestaohospitalar.nir.model.Setor;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.PeriodoValidator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
-import javax.faces.context.FacesContext;
 
 /**
  *
@@ -47,7 +45,7 @@ public class RelatorioEstouroTempoBean {
 
         //verificando se data inicial está menor que a data final
         if (PeriodoValidator.comparaDatas(dataInicial, dataFinal) == false) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "A data inicial não pode ser maior que a data final.", null));
+            FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data inicial não pode ser maior que a data final.");
         } else {
 
             //vinculando os parâmetros do relatório
@@ -65,7 +63,7 @@ public class RelatorioEstouroTempoBean {
 
             //se relatório não foi gerado
             if (relatorio.isRelatorioGerado() == false) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Não foram encontradas informações para o relatório solicitado.", null));
+                FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Não foram encontradas informações para o relatório solicitado.");
             }
         }
 

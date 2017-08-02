@@ -4,13 +4,13 @@
  * and open the template in the editor.
  */
 package br.com.gestaohospitalar.nir.DAO;
+
 import br.com.gestaohospitalar.nir.model.Hospital;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
-import br.com.gestaohospitalar.nir.util.HibernateUtil;
+import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -18,51 +18,27 @@ import org.hibernate.criterion.Restrictions;
  * @author Daniel
  */
 public class HospitalDAOImpl {
-    
+
+    private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+
     public Hospital hospitalPorId(Integer id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-
-        return (Hospital) session.get(Hospital.class, id);
-
+        return (Hospital) this.session.get(Hospital.class, id);
     }
-    
-    public void salvar(Hospital hospital) {
-        
-        Session session = null;
-        
-        try{
-           session = HibernateUtil.getSessionFactory().openSession();
-           session.beginTransaction();
-           session.saveOrUpdate(hospital);
-           session.getTransaction().commit();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao cadastrar hospital. Erro: " + e.getMessage());
-            session.getTransaction().rollback();
-        }finally {
-            if (session != null) {
-                session.close();
-            }
+
+    public void salvar(Hospital hospital) throws DAOException {
+
+        try {
+            this.session.saveOrUpdate(hospital);
+        } catch (Exception e) {
+            System.out.println("Problemas ao salvar Hospital. Erro: " + e.getMessage());
+            throw new DAOException("Problemas ao salvar Hospital.");
         }
     }
 
     public List<Hospital> listar() {
-        List <Hospital> listarHospital = null;
-        
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        
-        try {
-            listarHospital = session.createCriteria(Hospital.class)
-                    .add(Restrictions.eq("statusHospital", Status.ATIVO.get()))
-                    .list();
-            transaction.commit();
-            session.close();
-        }catch (HibernateException e) {
-            System.out.println("Problemas ao listar hospital. Erro: " + e.getMessage());
-            transaction.rollback();
-        }
-        
-        return listarHospital;
+
+        return (List<Hospital>) this.session.createCriteria(Hospital.class)
+                .add(Restrictions.eq("statusHospital", Status.ATIVO.get()))
+                .list();
     }
-    
 }

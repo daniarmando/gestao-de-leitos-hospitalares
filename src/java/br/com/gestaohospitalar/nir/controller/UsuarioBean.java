@@ -32,16 +32,13 @@ import org.springframework.security.core.userdetails.User;
 public final class UsuarioBean implements Serializable {
 
     private Usuario usuario;
-    private UsuarioDAOImpl daoUsuario = new UsuarioDAOImpl();
+    private UsuarioDAOImpl daoUsuario;
 
-    private NIR nir;
-    private NIRDAOImpl daoNIR = new NIRDAOImpl();
+    private NIR nir;  
 
     private GerenteEnfermagem gerenteEnfermagem;
-    private GerenteEnfermagemDAOImpl daoGerenteEnfermagem = new GerenteEnfermagemDAOImpl();
 
     private Enfermeiro enfermeiro;
-    private EnfermeiroDAOImpl daoEnfermeiro = new EnfermeiroDAOImpl();
 
     String tipoAutorizacao = "";
     private Integer autorizacao = 0;
@@ -49,43 +46,44 @@ public final class UsuarioBean implements Serializable {
     public UsuarioBean() {
 
         this.usuario = new Usuario();
+        this.daoUsuario = new UsuarioDAOImpl();
 
         SecurityContext context = SecurityContextHolder.getContext();
         if (context instanceof SecurityContext) {
             Authentication authentication = context.getAuthentication();
             if (authentication instanceof Authentication) {
-                //Recupera o login digitado pelo usuário 
+                //recupera o login digitado pelo usuário 
                 usuario.setLogin(((User) authentication.getPrincipal()).getUsername());
 
-                //Lista o usuário por meio do seu login
-                this.usuario = daoUsuario.usuarioPorLogin(this.usuario.getLogin());
+                //lista o usuário por meio do seu login
+                this.usuario = this.daoUsuario.usuarioPorLogin(this.usuario.getLogin());
 
-                //Recupera as autorizações do usuário logado 
+                //recupera as autorizações do usuário logado 
                 List<Object> autorizacoes = new ArrayList(((User) authentication.getPrincipal()).getAuthorities());
 
-                //Pega a autorização do usuário logado e atribui a variável String tipoAutorização
+                //pega a autorização do usuário logado e atribui a variável String tipoAutorização
                 for (Object a : autorizacoes) {
-                    tipoAutorizacao = a.toString();
+                    this.tipoAutorizacao = a.toString();
                 }
 
                 //atribui um valor para a variável Integer autorizacao de acordo com a autorização do usuário 
                 //logado para depois utilizar na renderização de componentes JSF,
                 //também traz uma lista da pessoa que pertence ao usuário logado através do ID
-                switch (tipoAutorizacao) {
+                switch (this.tipoAutorizacao) {
                     case "ROLE_nir":
                         this.autorizacao = 1;
                         this.nir = new NIR();
-                        this.nir = this.daoNIR.listarPorId(this.usuario.getPessoa().getIdPessoa());
+                        this.nir = new NIRDAOImpl().nirPorId(this.usuario.getPessoa().getIdPessoa());
                         break;
                     case "ROLE_gen":
                         this.autorizacao = 2;
                         this.gerenteEnfermagem = new GerenteEnfermagem();
-                        this.gerenteEnfermagem = this.daoGerenteEnfermagem.listarPorId(this.usuario.getPessoa().getIdPessoa());
+                        this.gerenteEnfermagem = new GerenteEnfermagemDAOImpl().gerenteEnfermagemPorId(this.usuario.getPessoa().getIdPessoa());
                         break;
                     case "ROLE_enf":
                         this.autorizacao = 3;
                         this.enfermeiro = new Enfermeiro();
-                        this.enfermeiro = this.daoEnfermeiro.listarPorId(this.usuario.getPessoa().getIdPessoa());
+                        this.enfermeiro = new EnfermeiroDAOImpl().enfermeiroPorId(this.usuario.getPessoa().getIdPessoa());
                         break;
                     default:
                         System.out.println("Erro");

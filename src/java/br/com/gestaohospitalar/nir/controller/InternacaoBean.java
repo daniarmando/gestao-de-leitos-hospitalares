@@ -303,7 +303,7 @@ public class InternacaoBean implements Serializable {
             this.habilitaCampos = !this.leitos.isEmpty();
 
             //envia mensagem para usuários conectados e atualiza a página dashboard
-            notificar(TipoLog.REGISTRAR_INTERNACAO.get(), this.internacao.getLeito().getIdLeito());
+            notificar(TipoLog.REGISTRAR_INTERNACAO.get(), this.internacao);
 
             this.internacao = new Internacao();
             this.medicos = new ArrayList<>();
@@ -347,7 +347,7 @@ public class InternacaoBean implements Serializable {
                 salvarLog();
 
                 //envia mensagem para usuários conectados e atualiza a página dashboard
-                notificar(TipoLog.REGISTRAR_ALTA_QUALIFICADA.get(), this.altaQualificada.getInternacao().getLeito().getIdLeito());
+                notificar(TipoLog.REGISTRAR_ALTA_QUALIFICADA.get(), this.altaQualificada.getInternacao());
 
                 this.altaQualificada = new AltaQualificada();
             }
@@ -394,7 +394,7 @@ public class InternacaoBean implements Serializable {
                 salvarLog();
 
                 //envia mensagem para usuários conectados e atualiza a página dashboard
-                notificar(TipoLog.REGISTRAR_ALTA.get(), this.alta.getInternacao().getLeito().getIdLeito());
+                notificar(TipoLog.REGISTRAR_ALTA.get(), this.alta.getInternacao());
 
                 this.alta = new Alta();
                 this.altaQualificada = new AltaQualificada();
@@ -425,7 +425,7 @@ public class InternacaoBean implements Serializable {
             salvarLog();
 
             //envia mensagem para usuários conectados e atualiza a página dashboard
-            notificar(TipoLog.REGISTRAR_SAIDA.get(), this.internacaoSelecionada.getLeito().getIdLeito());
+            notificar(TipoLog.REGISTRAR_SAIDA.get(), this.internacaoSelecionada);
 
             this.internacaoSelecionada = new Internacao();
 
@@ -465,7 +465,7 @@ public class InternacaoBean implements Serializable {
                 salvarLog();
 
                 //envia mensagem para usuários conectados e atualiza a página dashboard
-                notificar(TipoLog.REGISTRAR_HIGIENIZACAO.get(), this.higienizacao.getInternacao().getLeito().getIdLeito());
+                notificar(TipoLog.REGISTRAR_HIGIENIZACAO.get(), this.higienizacao.getInternacao());
 
                 this.higienizacao = new Higienizacao();
                 this.funcionarios = new ArrayList<>();
@@ -502,7 +502,7 @@ public class InternacaoBean implements Serializable {
                 salvarLog();
 
                 //envia mensagem para usuários conectados e atualiza a página dashboard
-                notificar(TipoLog.CANCELAR_INTERNACAO.get(), internacao.getLeito().getIdLeito());
+                notificar(TipoLog.CANCELAR_INTERNACAO.get(), internacao);
 
             } else {
                 FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Internação não pode mais ser cancelada.");
@@ -517,17 +517,23 @@ public class InternacaoBean implements Serializable {
     /**
      * método para notificar usuários conectados
      *
-     * @param info
-     * @param objeto
+     * @param msg
+     * @param internacao
+     *
      */
-    public void notificar(String info, int objeto) {
+    public void notificar(String msg, Internacao internacao) {
 
-        info += " no Leito: " + objeto + ".";
+        msg += ". Setor: " + internacao.getLeito().getQuarto().getSetor().getIdSetor() +
+                ". Quarto: " + internacao.getLeito().getQuarto().getIdQuarto() + 
+                ". Leito: " + internacao.getLeito().getIdLeito() + 
+                ".";
+        
         String detalhe = "Feita por: " + this.usuarioBean.getUsuario().getLogin() + ".";
+        
         String CANAL = "/notificar";
 
         EventBus eventBus = EventBusFactory.getDefault().eventBus();
-        eventBus.publish(CANAL, new FacesMessage(info, detalhe));
+        eventBus.publish(CANAL, new FacesMessage(msg, detalhe));
 
     }
 

@@ -92,9 +92,9 @@
                 </p:toolbarGroup>
 
                 <p:toolbarGroup align="right">
+                    <div style="margin: 5px 0">
                     <p:clock id="relogio" pattern="dd/MM/yyyy HH:mm:ss" />
-                    <p:commandButton id="atualizarPainel" icon="fa fa-refresh" update=":frm:leitoDataGrid"/>
-                    <p:tooltip id="toolTipFadeAtualizarPainel" for="atualizarPainel" position="bottom" value="Atualizar"/>
+                    </div>
                 </p:toolbarGroup>
             </p:toolbar>
             <!--fim barra de ferramentas superior-->
@@ -168,7 +168,7 @@
                             <p:commandButton id="historico" icon="fa  fa-history" actionListener="#{leitoBean.listarHistoricoInternacoes(leito.idLeito)}" update=":historicoleito" oncomplete="PF('dlghistorico').show()" />                           
                             <p:tooltip id="toolTipFadeHistorico" for="historico" position="bottom" value="Histórico do Leito"/>
 
-                            <p:commandButton id="cancelarInternacao" icon="fa  fa-close" actionListener="#{internacaoBean.cancelarInternacao(leito.internacao)}" update=":frm:growlmsg :frm:leitoDataGrid" rendered="#{leito.statusLeito eq 'INT'}">
+                            <p:commandButton id="cancelarInternacao" icon="fa  fa-close" actionListener="#{internacaoBean.cancelarInternacao(leito.internacao)}" rendered="#{leito.statusLeito eq 'INT'}">
                                 <p:confirm header="Confirmação" message="Confirma o cancelamento da Internação #{leito.internacao.idInternacao}-#{leito.internacao.codigoInternacaoHospital}?" icon="ui-icon-alert" />
                             </p:commandButton>
                             <p:tooltip id="toolTipFadeCancelarInternacao" for="cancelarInternacao" position="bottom" value="Cancelar Internação"/>
@@ -246,7 +246,7 @@
                                 <p:calendar id="dataentrada" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.internacao.dataEntrada}" required="true" pattern="dd/MM/yyyy HH:mm" />
 
                                 <p:commandButton style="width: auto;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarInternacao()}"
-                                                 process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :forminternacao " oncomplete="PF('dlginternacao').hide();" />
+                                                 process="tabview @this" update=":forminternacao" oncomplete="PF('dlginternacao').hide();" />
 
                                 <p:commandButton icon="fa fa-close" value="Cancelar"
                                                  update=":forminternacao" immediate="true" onclick="PF('dlginternacao').hide();" />
@@ -288,7 +288,7 @@
                                 <p:calendar id="dataaltaqualificada" required="true" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.altaQualificada.dataHoraPrevisao}" pattern="dd/MM/yyyy HH:mm" />
 
                                 <p:commandButton style="width: auto;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarAltaQualificada()}"
-                                                 process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :formaltaqualificada" oncomplete="PF('dlgaltaqualificada').hide();" />
+                                                 process="tabview @this" update=":formaltaqualificada" oncomplete="PF('dlgaltaqualificada').hide();" />
 
                                 <p:commandButton icon="fa fa-close" value="Cancelar"
                                                  update=":formaltaqualificada" immediate="true" onclick="PF('dlgaltaqualificada').hide();" />
@@ -340,7 +340,7 @@
                                 </p:selectOneMenu>
 
                                 <p:commandButton style="width: auto;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarAlta()}"
-                                                 process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :formalta" oncomplete="PF('dlgalta').hide();" />
+                                                 process="tabview @this" update="formalta" oncomplete="PF('dlgalta').hide();" />
 
                                 <p:commandButton icon="fa fa-close" value="Cancelar"
                                                  update=":formalta" immediate="true" onclick="PF('dlgalta').hide();" />
@@ -376,7 +376,7 @@
                                 <p:calendar id="datasaida" locale="pt" mask="99/99/9999 99:99" value="#{internacaoBean.internacaoSelecionada.dataSaidaLeito}" pattern="dd/MM/yyyy HH:mm" />
 
                                 <p:commandButton style="width: auto;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarSaida()}"
-                                                 process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :formsaida" oncomplete="PF('dlgsaida').hide();" />
+                                                 process="tabview @this" update=":formsaida" oncomplete="PF('dlgsaida').hide();" />
 
                                 <p:commandButton icon="fa fa-close" value="Cancelar"
                                                  update=":formsaida" immediate="true" onclick="PF('dlgsaida').hide();" />
@@ -439,7 +439,7 @@
                     </p:tabView>
                     <!--fim campos para cadastrar ou alterar dados na segunda aba-->
                     <p:commandButton style="width: auto; margin: 10px; left: 64%;" icon="fa fa-save" value="Salvar" actionListener="#{internacaoBean.registrarHigienizacao()}"
-                                     process="tabview @this" update=":frm:growlmsg :frm:leitoDataGrid :formhigienizacao" oncomplete="PF('dlghigienizacao').hide();" />
+                                     process="tabview @this" update=":formhigienizacao" oncomplete="PF('dlghigienizacao').hide();" />
 
                     <p:commandButton style="width: auto; left: 64%;" icon="fa fa-close" value="Cancelar"
                                      update=":formhigienizacao" immediate="true" onclick="PF('dlghigienizacao').hide();" />

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import org.primefaces.context.RequestContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +35,7 @@ public final class UsuarioBean implements Serializable {
     private Usuario usuario;
     private UsuarioDAOImpl daoUsuario;
 
-    private NIR nir;  
+    private NIR nir;
 
     private GerenteEnfermagem gerenteEnfermagem;
 
@@ -42,6 +43,9 @@ public final class UsuarioBean implements Serializable {
 
     String tipoAutorizacao = "";
     private Integer autorizacao = 0;
+
+    //usado para abrir ou fechar o notification bar de chat, começa true para começar abrindo
+    private boolean isOpenNBChat = true; 
 
     public UsuarioBean() {
 
@@ -154,6 +158,20 @@ public final class UsuarioBean implements Serializable {
      */
     public Integer getAutorizacao() {
         return autorizacao;
+    }
+
+    /**
+     * método que abre ou fecha o notification bar
+     */
+    public void abreFechaNB() {
+        if (this.isOpenNBChat) {
+            this.isOpenNBChat = false;
+            RequestContext.getCurrentInstance().execute("PF('nbJanelaChat').show();");
+        } else {
+            this.isOpenNBChat = true;
+            RequestContext.getCurrentInstance().execute("PF('nbJanelaChat').hide();");
+        }
+
     }
 
 }

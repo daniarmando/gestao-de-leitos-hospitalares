@@ -44,6 +44,11 @@
                 </p:commandLink>
                 <p:tooltip id="toolTipAlternaMenu" for="alternamenu" position="bottom" value="Menu Lateral" />
 
+                <p:commandLink id="mensagem" title="Mensagens" class="nir-alternarmenu" update=":frmChat" actionListener="#{usuarioBean.abreFechaNB()}" >
+                    <i class="fa fa-comment"></i>
+                </p:commandLink>
+                <p:tooltip id="toolTipMensagem" for="mensagem" position="bottom"/>
+
                 <h:outputText id="usuario" title="usuário" class="nir-alternarmenu" value="${usuarioBean.usuario.login}" />
                 <p:tooltip id="toolTipUsuario" for="usuario" position="bottom" value="Usuário Logado" />
 
@@ -78,7 +83,7 @@
                     </p:submenu>
 
                     <p:submenu label="Internação" >
-                        <p:menuitem value="Painel de Informações" outcome="dashboard" icon="fa  fa-fw  fa-dashboard" />
+                        <p:menuitem value="Painel de Informações" outcome="painel-informacoes" icon="fa  fa-fw  fa-dashboard" />
                         <p:menuitem value="Internação" outcome="pesquisa-internacoes" icon="fa  fa-fw  fa-bed" />
                         <p:menuitem value="Alta Qualificada" outcome="pesquisa-alta-qualificada" icon="fa  fa-fw  fa-check-square-o" />
                         <p:menuitem value="Alta" outcome="pesquisa-alta" icon="fa  fa-fw  fa-check-square" />
@@ -116,6 +121,37 @@
 
         <!--inicio da area de conteudo-->
         <section class="nir-conteudo js-conteudo">
+
+            <!--inicio janela de chat-->
+            <h:form id="frmChat">
+                <p:notificationBar id="janelaChat" position="bottom" effect="fade" style="width: 150px; height: 100%; top: 50px; right: 0;" widgetVar="nbJanelaChat">
+                    
+                    <br /><br /><br /><br />
+                    <i class="fa fa-user"></i>
+                    <h:outputText value="Daniel" /><br />
+                    <i class="fa fa-user"></i>
+                    <h:outputText value="NIR" /><br />
+                     <i class="fa fa-user"></i>
+                    <h:outputText value="Joao" /><br />
+                     <i class="fa fa-user"></i>
+                    <h:outputText value="Maria" /><br />
+                     <i class="fa fa-user"></i>
+                    <h:outputText value="Jose" /><br />
+                     <i class="fa fa-user"></i>
+                    <h:outputText value="Rita" /><br />
+                     <i class="fa fa-user"></i>
+                    <h:outputText value="Tiao" /><br />
+                     <i class="fa fa-user"></i>
+                    <h:outputText value="Tiburcio" /><br />
+                     <i class="fa fa-user"></i>
+                    <h:outputText value="Enfermeiro" /><br />
+                     <i class="fa fa-user"></i>
+                    <h:outputText value="GerEnf" /><br />
+
+                </p:notificationBar>
+            </h:form>
+            <!--fim janela de chat-->
+
             <ui:insert name="conteudo" />
         </section>
         <!--fim da area de conteudo-->

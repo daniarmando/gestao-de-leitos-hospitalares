@@ -8,6 +8,7 @@ package br.com.gestaohospitalar.nir.DAO;
 import br.com.gestaohospitalar.nir.model.Usuario;
 import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
+import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -29,6 +30,11 @@ public class UsuarioDAOImpl {
             throw new DAOException("Problemas ao salvar Usuário.");
         }
     }
+    
+    public List<Usuario> listar() {
+        return (List<Usuario>) this.session.createCriteria(Usuario.class).list();  
+    }
+
 
     public Usuario usuarioPorLogin(String login) {
 

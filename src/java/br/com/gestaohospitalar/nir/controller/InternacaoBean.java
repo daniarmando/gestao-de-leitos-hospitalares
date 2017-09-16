@@ -121,7 +121,7 @@ public class InternacaoBean implements Serializable {
 
     /**
      * método que executa as tarefas necessárias antes de cadastrar a internação
-     * usado pela página dashboard
+     * usado pela página painel de informações
      */
     public void prepararInternacao() {
 
@@ -140,7 +140,7 @@ public class InternacaoBean implements Serializable {
 
     /**
      * método que executa as tarefas necessárias antes de cadastrar a alta
-     * qualificada usado pela página dashboard
+     * qualificada usado pela página painel de informações
      */
     public void prepararAltaQualificada() {
 
@@ -151,7 +151,7 @@ public class InternacaoBean implements Serializable {
 
     /**
      * método que executa as tarefas necessárias antes de cadastrar a alta usado
-     * pela página dashboard
+     * pela página painel de informações
      */
     public void prepararAlta() {
 
@@ -165,7 +165,7 @@ public class InternacaoBean implements Serializable {
 
     /**
      * método que executa as tarefas necessárias antes de cadastrar a
-     * higienização usado pela página dashboard
+     * higienização usado pela página painel de informações
      */
     public void prepararHigienizacao() {
 
@@ -302,7 +302,7 @@ public class InternacaoBean implements Serializable {
             this.leitos = new LeitoDAOImpl().listarParaInternacao();
             this.habilitaCampos = !this.leitos.isEmpty();
 
-            //envia mensagem para usuários conectados e atualiza a página dashboard
+            //envia mensagem para usuários conectados e atualiza a página painel de informações
             notificar(TipoLog.REGISTRAR_INTERNACAO.get(), this.internacao);
 
             this.internacao = new Internacao();
@@ -346,7 +346,7 @@ public class InternacaoBean implements Serializable {
                 this.log.setDetalhe("alta qualiificada código " + this.altaQualificada.getIdAltaQualificada() + ".");
                 salvarLog();
 
-                //envia mensagem para usuários conectados e atualiza a página dashboard
+                //envia mensagem para usuários conectados e atualiza a página painel de informações
                 notificar(TipoLog.REGISTRAR_ALTA_QUALIFICADA.get(), this.altaQualificada.getInternacao());
 
                 this.altaQualificada = new AltaQualificada();
@@ -393,7 +393,7 @@ public class InternacaoBean implements Serializable {
                 this.log.setDetalhe("alta código " + this.alta.getIdAlta() + ".");
                 salvarLog();
 
-                //envia mensagem para usuários conectados e atualiza a página dashboard
+                //envia mensagem para usuários conectados e atualiza a página painel de informações
                 notificar(TipoLog.REGISTRAR_ALTA.get(), this.alta.getInternacao());
 
                 this.alta = new Alta();
@@ -424,7 +424,7 @@ public class InternacaoBean implements Serializable {
             this.log.setIdObjeto(this.internacaoSelecionada.getIdInternacao());
             salvarLog();
 
-            //envia mensagem para usuários conectados e atualiza a página dashboard
+            //envia mensagem para usuários conectados e atualiza a página painel de informações
             notificar(TipoLog.REGISTRAR_SAIDA.get(), this.internacaoSelecionada);
 
             this.internacaoSelecionada = new Internacao();
@@ -464,7 +464,7 @@ public class InternacaoBean implements Serializable {
                 this.log.setDetalhe("higienização código " + this.higienizacao.getIdHigienizacao() + ".");
                 salvarLog();
 
-                //envia mensagem para usuários conectados e atualiza a página dashboard
+                //envia mensagem para usuários conectados e atualiza a página painel de informações
                 notificar(TipoLog.REGISTRAR_HIGIENIZACAO.get(), this.higienizacao.getInternacao());
 
                 this.higienizacao = new Higienizacao();
@@ -501,7 +501,7 @@ public class InternacaoBean implements Serializable {
                 this.log.setIdObjeto(internacao.getIdInternacao());
                 salvarLog();
 
-                //envia mensagem para usuários conectados e atualiza a página dashboard
+                //envia mensagem para usuários conectados e atualiza a página painel de informações
                 notificar(TipoLog.CANCELAR_INTERNACAO.get(), internacao);
 
             } else {
@@ -524,9 +524,9 @@ public class InternacaoBean implements Serializable {
     public void notificar(String msg, Internacao internacao) {
 
         msg += ". Setor: " + internacao.getLeito().getQuarto().getSetor().getIdSetor() +
-                ". Quarto: " + internacao.getLeito().getQuarto().getIdQuarto() + 
-                ". Leito: " + internacao.getLeito().getIdLeito() + 
-                ".";
+               ". Quarto: " + internacao.getLeito().getQuarto().getIdQuarto() + 
+               ". Leito: " + internacao.getLeito().getIdLeito() + 
+               ".";
         
         String detalhe = "Feita por: " + this.usuarioBean.getUsuario().getLogin() + ".";
         

@@ -11,6 +11,7 @@
 .ui-panelmenu-panel {
 
 }
+
 .ui-panelmenu-panel a{
     text-decoration: none;
     background-color: #fff;
@@ -66,7 +67,7 @@
     margin-right: 10px;
 }
 
-/*LEGENDA DE CORES DA DASHBOARD*/
+/*LEGENDA DE CORES DA PAINEL DE INFORMAÇÕES*/
 .nir-boxlegenda {
     width: auto;
     height: auto;

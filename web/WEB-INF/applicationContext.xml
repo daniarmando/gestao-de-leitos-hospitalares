@@ -55,7 +55,7 @@
         <intercept-url pattern="/relatorio-estatisticas.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         
         <intercept-url pattern="/configuracao-kanban.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/dashboard.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/painel-informacoes.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         <intercept-url pattern="/parametros.xhtml" access="hasRole('ROLE_nir')" />
         <intercept-url pattern="/selecaoCid.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         <intercept-url pattern="/selecaoPaciente.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />

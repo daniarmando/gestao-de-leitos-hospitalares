@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioEstouroTempo" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f1c520fc-2c6f-4cf3-9127-5d8447895d80">
-	<property name="ireport.zoom" value="1.0000000000000135"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="2.143588810000033"/>
+	<property name="ireport.x" value="1220"/>
+	<property name="ireport.y" value="241"/>
 	<parameter name="data_inicial" class="java.util.Date">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
@@ -12,10 +12,12 @@
 	<parameter name="LOGO" class="java.awt.Image"/>
 	<parameter name="usuario" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT TIMESTAMPDIFF(DAY, i.dataHoraLimiteVermelho, i.dataAlta) AS tempoEstouroDias,
-	TIMESTAMPDIFF(HOUR, i.dataHoraLimiteVermelho, i.dataAlta) AS tempoEstouroHoras,
-        	TIMESTAMPDIFF(MINUTE, i.dataHoraLimiteVermelho, i.dataAlta) AS tempoEstouroMinutos,
-		CONCAT(i.idInternacao, '-', i.codigoInternacaoHospital) AS codInternacao,
+		<![CDATA[SELECT 
+TIMESTAMPDIFF(SECOND, i.dataHoraLimiteVermelho, i.dataAlta) AS tempoEstouroSegundos,
+TIMESTAMPDIFF(DAY, i.dataHoraLimiteVermelho, i.dataAlta) AS tempoEstouroDias,
+lpad(TIMESTAMPDIFF(HOUR, i.dataHoraLimiteVermelho, i.dataAlta) - (TIMESTAMPDIFF(DAY, i.dataHoraLimiteVermelho, i.dataAlta) * 24), 2, '0') AS tempoEstouroHoras,
+lpad(TIMESTAMPDIFF(MINUTE, i.dataHoraLimiteVermelho, i.dataAlta) - ((TIMESTAMPDIFF(DAY, i.dataHoraLimiteVermelho, i.dataAlta) * 1440) + ((TIMESTAMPDIFF(HOUR, i.dataHoraLimiteVermelho, i.dataAlta) - (TIMESTAMPDIFF(DAY, i.dataHoraLimiteVermelho, i.dataAlta) * 24)) * 60)), 2, '0') AS tempoEstouroMinutos,
+CONCAT(i.idInternacao, '-', i.codigoInternacaoHospital) AS codInternacao,
 		i.dataEntrada, i.dataHoraLimiteVermelho AS dataVencimento, i.dataAlta,
         s.idSetor, s.tipoSetor,
         q.idQuarto, q.tipoQuarto,
@@ -36,9 +38,10 @@ AND i.statusInternacao != 'C'
 AND i.dataEntrada BETWEEN $P{data_inicial} AND $P{data_final}
 ORDER BY s.idSetor, q.idQuarto, l.idLeito, i.DataEntrada;]]>
 	</queryString>
+	<field name="tempoEstouroSegundos" class="java.lang.Long"/>
 	<field name="tempoEstouroDias" class="java.lang.Long"/>
-	<field name="tempoEstouroHoras" class="java.lang.Long"/>
-	<field name="tempoEstouroMinutos" class="java.lang.Long"/>
+	<field name="tempoEstouroHoras" class="java.lang.String"/>
+	<field name="tempoEstouroMinutos" class="java.lang.String"/>
 	<field name="codInternacao" class="java.lang.String"/>
 	<field name="dataEntrada" class="java.sql.Timestamp">
 		<fieldDescription><![CDATA[]]></fieldDescription>
@@ -73,6 +76,9 @@ ORDER BY s.idSetor, q.idQuarto, l.idLeito, i.DataEntrada;]]>
 	<field name="no_procedimento" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
+	<variable name="tempoTotalEstouroSegundos" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tempoEstouroSegundos}]]></variableExpression>
+	</variable>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -211,21 +217,21 @@ ORDER BY s.idSetor, q.idQuarto, l.idLeito, i.DataEntrada;]]>
 				<textElement textAlignment="Right">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tempoEstouroDias} > 0 ? $F{tempoEstouroDias} + "d" : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{tempoEstouroDias} != null ? $F{tempoEstouroDias} + "D  " : ""]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="756" y="1" width="20" height="13" uuid="9ae7f5ad-6b99-44ee-b60e-2d9bece88a3d"/>
 				<textElement textAlignment="Right">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tempoEstouroHoras} > 0 ? $F{tempoEstouroHoras} + "h" : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{tempoEstouroHoras} != null ? $F{tempoEstouroHoras} + "H  " : ""]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="775" y="1" width="22" height="13" uuid="238f7955-de47-414c-a8da-c3fecf0776df"/>
 				<textElement textAlignment="Right">
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tempoEstouroMinutos} > 0 ? $F{tempoEstouroMinutos} + "m" : ""]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{tempoEstouroMinutos} != null ? $F{tempoEstouroMinutos} + "M" : ""]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="486" y="0" width="78" height="13" uuid="ceb36141-d49b-497f-b527-e118e41fd596"/>
@@ -239,21 +245,21 @@ ORDER BY s.idSetor, q.idQuarto, l.idLeito, i.DataEntrada;]]>
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{idSetor} + " - " + $F{tipoSetor}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{tipoSetor}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="223" y="0" width="127" height="13" uuid="01b559e6-fa35-4228-bd92-ced66ee76d55"/>
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{idQuarto} + " - " + $F{tipoQuarto}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{tipoQuarto}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="355" y="0" width="128" height="13" uuid="e5089962-59d5-49b1-be26-10ee2f68469a"/>
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{idLeito} + " - " + $F{descricaoLeito}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{descricaoLeito}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -288,4 +294,38 @@ ORDER BY s.idSetor, q.idQuarto, l.idLeito, i.DataEntrada;]]>
 			</image>
 		</band>
 	</pageFooter>
+	<summary>
+		<band height="30">
+			<staticText>
+				<reportElement x="684" y="8" width="46" height="13" uuid="aa757ddf-919f-4944-87ed-05cab525ce77"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="729" y="8" width="28" height="13" uuid="2bc52587-a40a-4f99-871f-84be9c3ccd59"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($V{tempoTotalEstouroSegundos} / 86400).intValue() + "D  "
+]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="756" y="8" width="20" height="13" uuid="b8a1e043-6731-4b22-8630-e02dcf6a7de8"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[(($V{tempoTotalEstouroSegundos} / 3600).intValue() - (($V{tempoTotalEstouroSegundos} / 86400).intValue()) * 24) + "H  "
+]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="775" y="8" width="22" height="13" uuid="a96d5525-7ff9-4a99-88b4-13f9c536c39d"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[(($V{tempoTotalEstouroSegundos} / 60).intValue() - (((($V{tempoTotalEstouroSegundos} / 86400).intValue()) * 1440) + (($V{tempoTotalEstouroSegundos} / 3600).intValue() - (($V{tempoTotalEstouroSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
 </jasperReport>

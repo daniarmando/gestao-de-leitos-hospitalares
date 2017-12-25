@@ -16,6 +16,7 @@ import br.com.gestaohospitalar.nir.model.Medico;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.service.DAOException;
+import br.com.gestaohospitalar.nir.service.WSViaCEP;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
 import br.com.gestaohospitalar.nir.validator.ConsultaCPFValidator;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -151,6 +153,29 @@ public class MedicoBean implements InterfaceBean, Serializable {
             FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, e.getMessage());
         }
     }
+
+//    public void buscarEnderecoPorCEP() {
+//        //consulta o WebService da via CEP
+//        
+//        String CEP = this.medico.getCepPessoa().replace("-", "");
+//        
+//        WSViaCEP ws = new WSViaCEP(CEP);
+//        Map<String, String> mapa = ws.consultarPorCEP();
+//        
+//        String estado = mapa.get("uf");
+//
+//        //mapa.keySet().forEach((data) -> {
+//
+//        //});
+//        
+//        //this.medico.setEnderecoPessoa(enderecoPessoa);
+//        //this.medico.setNumeroPessoa(numeroPessoa);
+//        //this.medico.setBairroPessoa(bairroPessoa);
+//        //this.medico.setCidade(cidade);
+//        //this.medico.setEstado(estado);
+//        //this.medico.setComplementoPessoa(complementoPessoa);
+//        
+//    }
 
     @Override
     public void salvarLog() {

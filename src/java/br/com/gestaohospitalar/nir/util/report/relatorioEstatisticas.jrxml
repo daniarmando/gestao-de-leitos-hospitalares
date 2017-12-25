@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioEstatisticas" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f1c520fc-2c6f-4cf3-9127-5d8447895d80">
-	<property name="ireport.zoom" value="5.054470284993001"/>
-	<property name="ireport.x" value="148"/>
-	<property name="ireport.y" value="493"/>
+	<property name="ireport.zoom" value="1.948717100000024"/>
+	<property name="ireport.x" value="395"/>
+	<property name="ireport.y" value="61"/>
 	<parameter name="data_inicial" class="java.util.Date">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
@@ -206,9 +206,8 @@ ORDER BY
 					<textElement>
 						<font size="10" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Setor: " + $F{setor_idSetor} + " - " + $F{setor_tipoSetor} + "     /     " +
-"Quarto: " + $F{quarto_idQuarto} + " - " + $F{quarto_tipoQuarto} + "     /     " +
-"Leito: " + $F{leito_idLeito} + " - " + $F{leito_descricaoLeito}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{quarto_tipoQuarto} + "-" +
+$F{leito_descricaoLeito}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -260,6 +259,13 @@ ORDER BY
 				</textElement>
 				<text><![CDATA[a]]></text>
 			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="386" y="71" width="254" height="13" uuid="f401a38b-6488-4486-9c30-cd86692bdd81"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Setor: " + $F{setor_tipoSetor}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<columnHeader>
@@ -550,7 +556,7 @@ null]]></textFieldExpression>
 (($V{tempoMediaSaidaAteHigienizacaoSegundos} / 3600).intValue() - (($V{tempoMediaSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 24) + "H " +
 (($V{tempoMediaSaidaAteHigienizacaoSegundos} / 60).intValue() - (((($V{tempoMediaSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 1440) + (($V{tempoMediaSaidaAteHigienizacaoSegundos} / 3600).intValue() - (($V{tempoMediaSaidaAteHigienizacaoSegundos} / 86400).intValue()) * 24) * 60)) + "M"]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="###0.00" isBlankWhenNull="true">
 				<reportElement x="634" y="9" width="67" height="13" uuid="cf76f2d2-39cb-4e8a-9097-42bb56e9ed34"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>

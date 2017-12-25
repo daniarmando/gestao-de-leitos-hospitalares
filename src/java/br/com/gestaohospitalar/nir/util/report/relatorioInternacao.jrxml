@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioInternacao" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="719d0261-dd2b-4e18-961d-d14bd2b837a7">
-	<property name="ireport.zoom" value="2.8531167061100207"/>
-	<property name="ireport.x" value="100"/>
-	<property name="ireport.y" value="359"/>
+	<property name="ireport.zoom" value="1.4641000000000104"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="LOGO" class="java.awt.Image"/>
 	<field name="idInternacao" class="java.lang.String"/>
 	<field name="dataEntrada" class="java.util.Date"/>
@@ -20,6 +20,8 @@
 	<field name="leito.idLeito" class="java.lang.String"/>
 	<field name="leito.descricaoLeito" class="java.lang.String"/>
 	<field name="statusInternacao" class="java.lang.String"/>
+	<field name="leito.quarto.tipoQuarto" class="java.lang.String"/>
+	<field name="leito.quarto.setor.tipoSetor" class="java.lang.String"/>
 	<group name="Group3">
 		<groupFooter>
 			<band/>
@@ -45,93 +47,93 @@
 		</band>
 	</title>
 	<columnHeader>
-		<band height="49">
+		<band height="47">
 			<staticText>
-				<reportElement x="0" y="29" width="55" height="20" uuid="e3295250-1659-4110-90b4-a6d41b3d7f7b"/>
+				<reportElement x="0" y="3" width="55" height="20" uuid="e3295250-1659-4110-90b4-a6d41b3d7f7b"/>
 				<textElement>
 					<font size="10" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Código]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="152" y="5" width="146" height="20" uuid="a590a30b-8308-4c27-b897-1d2f4b0239f9"/>
-				<textElement>
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Médico]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="427" y="5" width="75" height="20" uuid="296716db-4568-45eb-9a76-9ecf44520000"/>
-				<textElement textAlignment="Center">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Entrada]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="298" y="5" width="129" height="20" uuid="51120f8f-6819-4216-a059-a21031b660af"/>
-				<textElement>
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Leito]]></text>
-			</staticText>
 			<line>
 				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="802" height="1" uuid="9ac8bdeb-78ce-4a5f-9078-2011eefaf0a1"/>
 			</line>
 			<staticText>
-				<reportElement x="0" y="5" width="152" height="20" uuid="87cfd9de-834f-45d6-885c-367bb1c26d99"/>
-				<textElement>
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Paciente]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="502" y="5" width="75" height="20" uuid="84162ffe-9043-45c2-8bd1-3a70effd6dde"/>
-				<textElement textAlignment="Center">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Vencimento]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="577" y="5" width="75" height="20" uuid="5066ffd6-d043-40a2-93f3-166227e86a02"/>
-				<textElement textAlignment="Center">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Previsão]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="652" y="5" width="75" height="20" uuid="91439f52-8af6-432f-b1dc-b92b12e4b467"/>
-				<textElement textAlignment="Center">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Alta]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="727" y="5" width="75" height="20" uuid="0ec10b61-d894-4fbf-9455-06ea18a89fcb"/>
-				<textElement textAlignment="Right">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Saída]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="732" y="29" width="70" height="20" uuid="7cb2eadb-9600-48cf-add1-11e10d6ec218"/>
+				<reportElement x="732" y="3" width="70" height="20" uuid="7cb2eadb-9600-48cf-add1-11e10d6ec218"/>
 				<textElement textAlignment="Right">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Status]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="55" y="29" width="384" height="20" uuid="453adbde-f7ef-43c7-8fc3-e5dc06569504"/>
+				<reportElement x="55" y="3" width="384" height="20" uuid="453adbde-f7ef-43c7-8fc3-e5dc06569504"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Procedimento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="451" y="29" width="258" height="20" uuid="e2f3694b-aeef-43a1-aed2-7b781fef5b52"/>
+				<reportElement x="451" y="3" width="258" height="20" uuid="e2f3694b-aeef-43a1-aed2-7b781fef5b52"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[CID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="152" y="26" width="146" height="20" uuid="a590a30b-8308-4c27-b897-1d2f4b0239f9"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Médico]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="427" y="26" width="75" height="20" uuid="296716db-4568-45eb-9a76-9ecf44520000"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Entrada]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="298" y="26" width="129" height="20" uuid="51120f8f-6819-4216-a059-a21031b660af"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Leito]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="26" width="152" height="20" uuid="87cfd9de-834f-45d6-885c-367bb1c26d99"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Paciente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="502" y="26" width="75" height="20" uuid="84162ffe-9043-45c2-8bd1-3a70effd6dde"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vencimento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="577" y="26" width="75" height="20" uuid="5066ffd6-d043-40a2-93f3-166227e86a02"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Previsão]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="652" y="26" width="75" height="20" uuid="91439f52-8af6-432f-b1dc-b92b12e4b467"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Alta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="727" y="26" width="75" height="20" uuid="0ec10b61-d894-4fbf-9455-06ea18a89fcb"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Saída]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -159,7 +161,9 @@
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{leito.idLeito} + " - " + $F{leito.descricaoLeito}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{leito.quarto.setor.tipoSetor} + " " + 
+$F{leito.quarto.tipoQuarto} + "-" + 
+$F{leito.descricaoLeito}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="34" width="152" height="20" uuid="d0861a9f-e59e-4a0a-bbb4-91cd09a537ea"/>

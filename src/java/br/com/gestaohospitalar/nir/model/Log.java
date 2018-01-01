@@ -35,6 +35,10 @@ public class Log implements Serializable {
 
     public Log() {
     }
+    
+    public Log(String tipo) {
+        this.tipo = tipo;
+    }
 
     public Log(Integer id, String tipo, String detalhe, Date dataHora, String objeto, Integer idObjeto, Usuario usuario) {
         this.id = id;
@@ -151,14 +155,8 @@ public class Log implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 89 * hash + Objects.hashCode(this.id);
-        hash = 89 * hash + Objects.hashCode(this.tipo);
-        hash = 89 * hash + Objects.hashCode(this.detalhe);
-        hash = 89 * hash + Objects.hashCode(this.dataHora);
-        hash = 89 * hash + Objects.hashCode(this.objeto);
-        hash = 89 * hash + Objects.hashCode(this.idObjeto);
-        hash = 89 * hash + Objects.hashCode(this.usuario);
+        int hash = 5;
+        hash = 83 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -174,30 +172,10 @@ public class Log implements Serializable {
             return false;
         }
         final Log other = (Log) obj;
-        if (!Objects.equals(this.tipo, other.tipo)) {
-            return false;
-        }
-        if (!Objects.equals(this.detalhe, other.detalhe)) {
-            return false;
-        }
-        if (!Objects.equals(this.objeto, other.objeto)) {
-            return false;
-        }
         if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        if (!Objects.equals(this.dataHora, other.dataHora)) {
-            return false;
-        }
-        if (!Objects.equals(this.idObjeto, other.idObjeto)) {
-            return false;
-        }
-        if (!Objects.equals(this.usuario, other.usuario)) {
             return false;
         }
         return true;
     }
-    
-    
-    
+
 }

@@ -25,6 +25,10 @@ public class AltaDAOImpl {
 
     //Busca a última chaveMesAno
     private final String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+    
+    public Alta porId(Integer id) {
+        return (Alta) this.session.get(Alta.class, id);
+    }
 
     public void salvar(Alta alta) throws DAOException {
 
@@ -36,7 +40,7 @@ public class AltaDAOImpl {
         }
     }
 
-    public List<Alta> listar() {
+    public List<Alta> todas() {
 
         return (List<Alta>) this.session.createCriteria(Alta.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)

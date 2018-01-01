@@ -163,14 +163,8 @@ public class Parametros implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + Objects.hashCode(this.idParametros);
-        hash = 29 * hash + Objects.hashCode(this.leitoIncompativelPaciente);
-        hash = 29 * hash + Objects.hashCode(this.procedimentoIncompativelLeito);
-        hash = 29 * hash + Objects.hashCode(this.procedimentoIncompativelPaciente);
-        hash = 29 * hash + Objects.hashCode(this.cidIncompativelLeito);
-        hash = 29 * hash + Objects.hashCode(this.cidIncompativelPaciente);
-        hash = 29 * hash + Objects.hashCode(this.hospital);
+        int hash = 5;
+        hash = 53 * hash + Objects.hashCode(this.idParametros);
         return hash;
     }
 
@@ -187,24 +181,6 @@ public class Parametros implements Serializable {
         }
         final Parametros other = (Parametros) obj;
         if (!Objects.equals(this.idParametros, other.idParametros)) {
-            return false;
-        }
-        if (!Objects.equals(this.leitoIncompativelPaciente, other.leitoIncompativelPaciente)) {
-            return false;
-        }
-        if (!Objects.equals(this.procedimentoIncompativelLeito, other.procedimentoIncompativelLeito)) {
-            return false;
-        }
-        if (!Objects.equals(this.procedimentoIncompativelPaciente, other.procedimentoIncompativelPaciente)) {
-            return false;
-        }
-        if (!Objects.equals(this.cidIncompativelLeito, other.cidIncompativelLeito)) {
-            return false;
-        }
-        if (!Objects.equals(this.cidIncompativelPaciente, other.cidIncompativelPaciente)) {
-            return false;
-        }
-        if (!Objects.equals(this.hospital, other.hospital)) {
             return false;
         }
         return true;

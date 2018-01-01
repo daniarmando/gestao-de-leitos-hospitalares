@@ -118,14 +118,25 @@ public class AltaQualificada implements Serializable {
         this.internacao = internacao;
     }
 
+    /**
+     * método que gera uma cópia do objeto
+     *
+     * @return
+     */
+    @Override
+    public AltaQualificada clone() {
+        AltaQualificada clone = new AltaQualificada();
+        clone.setDataHoraInformacao(dataHoraInformacao);
+        clone.setDataHoraPrevisao(dataHoraPrevisao);
+        clone.setDataHoraRealizacao(dataHoraRealizacao);
+        
+        return clone;
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.idAltaQualificada);
-        hash = 97 * hash + Objects.hashCode(this.dataHoraInformacao);
-        hash = 97 * hash + Objects.hashCode(this.dataHoraPrevisao);
-        hash = 97 * hash + Objects.hashCode(this.dataHoraRealizacao);
-        hash = 97 * hash + Objects.hashCode(this.internacao);
+        hash = 83 * hash + Objects.hashCode(this.idAltaQualificada);
         return hash;
     }
 
@@ -144,34 +155,7 @@ public class AltaQualificada implements Serializable {
         if (!Objects.equals(this.idAltaQualificada, other.idAltaQualificada)) {
             return false;
         }
-        if (!Objects.equals(this.dataHoraInformacao, other.dataHoraInformacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.dataHoraPrevisao, other.dataHoraPrevisao)) {
-            return false;
-        }
-        if (!Objects.equals(this.dataHoraRealizacao, other.dataHoraRealizacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.internacao, other.internacao)) {
-            return false;
-        }
         return true;
-    }
-    
-    /**
-     * método que gera uma cópia do objeto
-     *
-     * @return
-     */
-    @Override
-    public AltaQualificada clone() {
-        AltaQualificada clone = new AltaQualificada();
-        clone.setDataHoraInformacao(dataHoraInformacao);
-        clone.setDataHoraPrevisao(dataHoraPrevisao);
-        clone.setDataHoraRealizacao(dataHoraRealizacao);
-        
-        return clone;
-    }
+    }        
     
 }

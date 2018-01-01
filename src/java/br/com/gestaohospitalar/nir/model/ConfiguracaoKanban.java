@@ -113,14 +113,27 @@ public class ConfiguracaoKanban implements Serializable {
         this.hospital = hospital;
     }
 
+     /**
+     * Método que gera uma cópia do objeto
+     *
+     * @return
+     */
+    @Override
+    public ConfiguracaoKanban clone() {
+        ConfiguracaoKanban clone = new ConfiguracaoKanban();
+        clone.setIdConfiguracaoKanban(idConfiguracaoKanban);
+        clone.setValorVerdeKanban(valorVerdeKanban);
+        clone.setValorAmareloKanban(valorAmareloKanban);
+        clone.setValorVermelhoKanban(valorVermelhoKanban);
+        clone.setHospital(hospital);
+        
+        return clone;
+    }  
+
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + Objects.hashCode(this.idConfiguracaoKanban);
-        hash = 97 * hash + Objects.hashCode(this.valorVerdeKanban);
-        hash = 97 * hash + Objects.hashCode(this.valorAmareloKanban);
-        hash = 97 * hash + Objects.hashCode(this.valorVermelhoKanban);
-        hash = 97 * hash + Objects.hashCode(this.hospital);
+        int hash = 5;
+        hash = 47 * hash + Objects.hashCode(this.idConfiguracaoKanban);
         return hash;
     }
 
@@ -139,36 +152,7 @@ public class ConfiguracaoKanban implements Serializable {
         if (!Objects.equals(this.idConfiguracaoKanban, other.idConfiguracaoKanban)) {
             return false;
         }
-        if (!Objects.equals(this.valorVerdeKanban, other.valorVerdeKanban)) {
-            return false;
-        }
-        if (!Objects.equals(this.valorAmareloKanban, other.valorAmareloKanban)) {
-            return false;
-        }
-        if (!Objects.equals(this.valorVermelhoKanban, other.valorVermelhoKanban)) {
-            return false;
-        }
-        if (!Objects.equals(this.hospital, other.hospital)) {
-            return false;
-        }
         return true;
     }
-
-     /**
-     * Método que gera uma cópia do objeto
-     *
-     * @return
-     */
-    @Override
-    public ConfiguracaoKanban clone() {
-        ConfiguracaoKanban clone = new ConfiguracaoKanban();
-        clone.setIdConfiguracaoKanban(idConfiguracaoKanban);
-        clone.setValorVerdeKanban(valorVerdeKanban);
-        clone.setValorAmareloKanban(valorAmareloKanban);
-        clone.setValorVermelhoKanban(valorVermelhoKanban);
-        clone.setHospital(hospital);
-        
-        return clone;
-    }  
- 
+    
 }

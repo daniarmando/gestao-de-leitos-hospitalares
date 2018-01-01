@@ -6,7 +6,6 @@
 package br.com.gestaohospitalar.nir.model;
 
 import java.io.Serializable;
-import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -39,32 +38,7 @@ public class Autorizacao implements Serializable {
      */
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 89 * hash + Objects.hashCode(this.nome);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Autorizacao other = (Autorizacao) obj;
-        if (!Objects.equals(this.nome, other.nome)) {
-            return false;
-        }
-        return true;
-    }
+    }    
 
     @ManyToOne
     public Usuario getUsuario() {

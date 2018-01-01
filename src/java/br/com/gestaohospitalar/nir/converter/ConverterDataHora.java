@@ -60,6 +60,19 @@ public class ConverterDataHora {
     }
     
     /**
+     * método que pega a data atual e subtrai 18 
+     * anos para retornar uma data maior de idade
+     *
+     * @return now.getTime()
+     */
+    public static Date gerarDataMaiorDeIdade() {
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.YEAR, - 18);
+
+        return now.getTime();
+    }
+    
+    /**
      * método que traz a última chaveMesAno cadastrada
      *
      * @return the umtilaChaveMesAno

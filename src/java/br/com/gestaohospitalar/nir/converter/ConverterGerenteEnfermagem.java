@@ -23,7 +23,7 @@ public class ConverterGerenteEnfermagem implements Converter {
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             GerenteEnfermagemDAOImpl daoGerenteEnfermagem = new GerenteEnfermagemDAOImpl();
-            return daoGerenteEnfermagem.gerenteEnfermagemPorId(Integer.valueOf(value));
+            return daoGerenteEnfermagem.porId(Integer.valueOf(value));
         }
         return null;
     }

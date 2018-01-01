@@ -11,56 +11,57 @@
         
         <intercept-url pattern="/index.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         
-        <intercept-url pattern="/cadastro-alta-qualificada.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/cadastro-alta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/cadastro-enfermeiro.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen')" />
-        <intercept-url pattern="/cadastro-fisioterapeuta.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-funcionario.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-gerente-enfermagem.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/cadastro-hospital.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-internacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/cadastro-leito.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-medico.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-nir.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-paciente.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/cadastro-quarto.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-setor.xhtml" access="hasRole('ROLE_nir')" />
-        <intercept-url pattern="/cadastro-terapeuta-ocupacional.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/internacoes/altas-qualificadas/cadastro.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/internacoes/altas/cadastro.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/equipe/enfermeiros/cadastro.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen')" />
+        <intercept-url pattern="/equipe/fisioterapeutas/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/equipe/funcionarios/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/equipe/gerentes-enfermagem/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/internacoes/higienizacoes/cadastro.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/hospital/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/internacoes/cadastro.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/hospital/setores/quartos/leitos/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/equipe/medicos/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/nir/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/pacientes/cadastro.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/hospital/setores/quartos/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/hospital/setores/cadastro.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/equipe/terapeutas-ocupacionais/cadastro.xhtml" access="hasRole('ROLE_nir')" />
         
-        <intercept-url pattern="/pesquisa-alta-qualificada.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-alta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-enfermeiros.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-fisioterapeutas.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-funcionarios.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-gerentes-enfermagem.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-hospital.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-internacoes.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-leitos.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-medicos.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-nir.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-pacientes.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-quartos.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-setores.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/pesquisa-terapeutas-ocupacionais.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/internacoes/altas-qualificadas/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/internacoes/altas/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/equipe/enfermeiros/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/equipe/fisioterapeutas/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/equipe/funcionarios/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/equipe/gerentes-enfermagem/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/internacoes/higienizacoes/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/hospital/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/internacoes/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/hospital/setores/quartos/leitos/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/equipe/medicos/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/nir/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/pacientes/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/hospital/setores/quartos/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/hospital/setores/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/equipe/terapeutas-ocupacionais/consulta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         
-        <intercept-url pattern="/grafico-alta-qualificada-alta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/grafico-saida-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/grafico-tempo-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/grafico-tempo-internacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/grafico-tempo-ociosidade.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/grafico-tempo-saida-paciente.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/estatisticas/graficos/alta-qualificada-alta.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/estatisticas/graficos/saida-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/estatisticas/graficos/tempo-higienizacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/estatisticas/graficos/tempo-internacao.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/estatisticas/graficos/tempo-ociosidade.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/estatisticas/graficos/tempo-saida-paciente.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         
-        <intercept-url pattern="/relatorio-estatisticas.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/estatisticas/relatorios/estatisticas.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
+        <intercept-url pattern="/estatisticas/relatorios/estouro-tempo" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         
-        <intercept-url pattern="/configuracao-kanban.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/configuracoes/kanban.xhtml" access="hasRole('ROLE_nir')" />
         <intercept-url pattern="/painel-informacoes.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/parametros.xhtml" access="hasRole('ROLE_nir')" />
+        <intercept-url pattern="/configuracoes/parametros.xhtml" access="hasRole('ROLE_nir')" />
         <intercept-url pattern="/selecaoCid.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         <intercept-url pattern="/selecaoPaciente.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
         <intercept-url pattern="/selecaoProcedimento.xhtml" access="hasAnyRole('ROLE_nir', 'ROLE_gen', 'ROLE_enf')" />
-        <intercept-url pattern="/sigtap-upload.xhtml" access="hasRole('ROLE_nir')" />        
+        <intercept-url pattern="/sigtap/upload.xhtml" access="hasRole('ROLE_nir')" />        
         
         <form-login login-page="/login.xhtml" authentication-failure-url="/login.xhtml?erro=true"/>
     </http>

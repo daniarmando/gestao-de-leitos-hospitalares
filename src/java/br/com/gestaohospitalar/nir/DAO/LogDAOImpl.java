@@ -6,7 +6,6 @@
 package br.com.gestaohospitalar.nir.DAO;
 
 import br.com.gestaohospitalar.nir.model.Log;
-import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Session;
@@ -29,7 +28,7 @@ public class LogDAOImpl {
         }
     }
 
-    public Log ultimoLogPorObjeto(String objeto) {
+    public Log ultimoPorObjeto(String objeto) {
 
         return (Log) this.session.createCriteria(Log.class)
                 .add(Restrictions.eq("objeto", objeto))
@@ -38,7 +37,7 @@ public class LogDAOImpl {
                 .uniqueResult();
     }
 
-    public List<Log> listarPorIdObjeto(String objeto, Integer idObjeto) {
+    public List<Log> porIdObjeto(String objeto, Integer idObjeto) {
 
         return (List<Log>) this.session.createCriteria(Log.class)
                 .add(Restrictions.eq("objeto", objeto))

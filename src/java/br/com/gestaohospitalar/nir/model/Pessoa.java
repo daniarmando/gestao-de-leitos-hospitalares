@@ -26,8 +26,8 @@ import javax.persistence.Temporal;
 @Entity
 @Table(name = "pessoa")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Pessoa implements Serializable{
-    
+public class Pessoa implements Serializable {
+
     protected Integer idPessoa;
     protected String nomePessoa;
     protected String cpfPessoa;
@@ -126,7 +126,8 @@ public class Pessoa implements Serializable{
     public void setRgPessoa(String rgPessoa) {
         this.rgPessoa = rgPessoa;
     }
-     /**
+
+    /**
      * @return the sexoPessoa
      */
     public String getSexoPessoa() {
@@ -139,7 +140,7 @@ public class Pessoa implements Serializable{
     public void setSexoPessoa(String sexoPessoa) {
         this.sexoPessoa = sexoPessoa;
     }
-    
+
     /**
      * @return the dataNascimentoPessoa
      */
@@ -266,7 +267,7 @@ public class Pessoa implements Serializable{
     public void setEmailPessoa(String emailPessoa) {
         this.emailPessoa = emailPessoa;
     }
-    
+
     /**
      * @return the statusPessoa
      */
@@ -285,7 +286,7 @@ public class Pessoa implements Serializable{
      * @return the estado
      */
     @ManyToOne
-    @JoinColumn (name = "idEstado")
+    @JoinColumn(name = "idEstado")
     public Estado getEstado() {
         return estado;
     }
@@ -301,7 +302,7 @@ public class Pessoa implements Serializable{
      * @return the cidade
      */
     @ManyToOne
-    @JoinColumn (name = "idCidade")
+    @JoinColumn(name = "idCidade")
     public Cidade getCidade() {
         return cidade;
     }
@@ -312,27 +313,19 @@ public class Pessoa implements Serializable{
     public void setCidade(Cidade cidade) {
         this.cidade = cidade;
     }
+    
+    public String nomeReduzidoPessoa() {
+        return this.nomePessoa.split(" ")[0];
+    }
+
+    public String nomeReduzidoPessoa(String nome) {
+        return nome.split(" ")[0];
+    }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.idPessoa);
-        hash = 79 * hash + Objects.hashCode(this.nomePessoa);
-        hash = 79 * hash + Objects.hashCode(this.cpfPessoa);
-        hash = 79 * hash + Objects.hashCode(this.rgPessoa);
-        hash = 79 * hash + Objects.hashCode(this.sexoPessoa);
-        hash = 79 * hash + Objects.hashCode(this.dataNascimentoPessoa);
-        hash = 79 * hash + Objects.hashCode(this.telefonePessoa);
-        hash = 79 * hash + Objects.hashCode(this.celularPessoa);
-        hash = 79 * hash + Objects.hashCode(this.enderecoPessoa);
-        hash = 79 * hash + Objects.hashCode(this.numeroPessoa);
-        hash = 79 * hash + Objects.hashCode(this.complementoPessoa);
-        hash = 79 * hash + Objects.hashCode(this.bairroPessoa);
-        hash = 79 * hash + Objects.hashCode(this.cepPessoa);
-        hash = 79 * hash + Objects.hashCode(this.emailPessoa);
-        hash = 79 * hash + Objects.hashCode(this.statusPessoa);
-        hash = 79 * hash + Objects.hashCode(this.estado);
-        hash = 79 * hash + Objects.hashCode(this.cidade);
+        int hash = 5;
+        hash = 53 * hash + Objects.hashCode(this.idPessoa);
         return hash;
     }
 
@@ -348,58 +341,10 @@ public class Pessoa implements Serializable{
             return false;
         }
         final Pessoa other = (Pessoa) obj;
-        if (!Objects.equals(this.nomePessoa, other.nomePessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.cpfPessoa, other.cpfPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.rgPessoa, other.rgPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.telefonePessoa, other.telefonePessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.celularPessoa, other.celularPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.enderecoPessoa, other.enderecoPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.numeroPessoa, other.numeroPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.complementoPessoa, other.complementoPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.bairroPessoa, other.bairroPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.cepPessoa, other.cepPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.emailPessoa, other.emailPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.statusPessoa, other.statusPessoa)) {
-            return false;
-        }
         if (!Objects.equals(this.idPessoa, other.idPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.sexoPessoa, other.sexoPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.dataNascimentoPessoa, other.dataNascimentoPessoa)) {
-            return false;
-        }
-        if (!Objects.equals(this.estado, other.estado)) {
-            return false;
-        }
-        if (!Objects.equals(this.cidade, other.cidade)) {
             return false;
         }
         return true;
     }
-    
+
 }

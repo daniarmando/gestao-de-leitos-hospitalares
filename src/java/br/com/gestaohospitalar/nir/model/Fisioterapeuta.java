@@ -7,7 +7,6 @@ package br.com.gestaohospitalar.nir.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -60,35 +59,6 @@ public class Fisioterapeuta extends Pessoa implements Serializable, Cloneable {
     public void setStatusFisioterapeuta(String statusFisioterapeuta) {
         this.statusFisioterapeuta = statusFisioterapeuta;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + Objects.hashCode(this.crefitoFisioterapeuta);
-        hash = 97 * hash + Objects.hashCode(this.statusFisioterapeuta);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Fisioterapeuta other = (Fisioterapeuta) obj;
-        if (!Objects.equals(this.crefitoFisioterapeuta, other.crefitoFisioterapeuta)) {
-            return false;
-        }
-        if (!Objects.equals(this.statusFisioterapeuta, other.statusFisioterapeuta)) {
-            return false;
-        }
-        return true;
-    }
     
     /**
      * método que gera uma cópia do objeto
@@ -119,6 +89,37 @@ public class Fisioterapeuta extends Pessoa implements Serializable, Cloneable {
         clone.setCidade(cidade);
 
         return clone;
+    }
+    
+      //hashCode e equals não gerados pela IDE
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((idPessoa == null) ? 0 : idPessoa.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Fisioterapeuta other = (Fisioterapeuta) obj;
+        if (idPessoa == null) {
+            if (other.idPessoa != null) {
+                return false;
+            }
+        } else if (!idPessoa.equals(other.idPessoa)) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -11,6 +11,7 @@ import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -20,6 +21,21 @@ import org.hibernate.criterion.Restrictions;
 public class EnfermeiroDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+    
+    public Enfermeiro porId(Integer id) {
+
+        return (Enfermeiro) this.session.createCriteria(Enfermeiro.class)
+                .add(Restrictions.idEq(id))
+                .uniqueResult();
+    }
+    
+    public List<Enfermeiro> ativos() {
+
+        return (List<Enfermeiro>) this.session.createCriteria(Enfermeiro.class)
+                .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .addOrder(Order.asc("idPessoa"))
+                .list();
+    }
 
     public void salvar(Enfermeiro enfermeiro) throws DAOException {
 
@@ -31,17 +47,4 @@ public class EnfermeiroDAOImpl {
         }
     }
 
-    public List<Enfermeiro> listar() {
-
-        return (List<Enfermeiro>) this.session.createCriteria(Enfermeiro.class)
-                .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
-                .list();
-    }
-
-    public Enfermeiro enfermeiroPorId(Integer id) {
-
-        return (Enfermeiro) this.session.createCriteria(Enfermeiro.class)
-                .add(Restrictions.idEq(id))
-                .uniqueResult();
-    }
 }

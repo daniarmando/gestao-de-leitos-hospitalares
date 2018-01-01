@@ -11,6 +11,7 @@ import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -21,12 +22,12 @@ public class HospitalDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
-    public Hospital hospitalPorId(Integer id) {
+    public Hospital porId(Integer id) {
         return (Hospital) this.session.get(Hospital.class, id);
     }
 
     public void salvar(Hospital hospital) throws DAOException {
-
+        
         try {
             this.session.saveOrUpdate(hospital);
         } catch (Exception e) {
@@ -35,10 +36,11 @@ public class HospitalDAOImpl {
         }
     }
 
-    public List<Hospital> listar() {
+    public List<Hospital> ativos() {
 
         return (List<Hospital>) this.session.createCriteria(Hospital.class)
                 .add(Restrictions.eq("statusHospital", Status.ATIVO.get()))
+                .addOrder(Order.asc("idHospital"))
                 .list();
     }
 }

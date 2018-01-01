@@ -23,7 +23,7 @@ public class ConverterInternacao implements Converter {
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             InternacaoDAOImpl daoInternacao = new InternacaoDAOImpl();
-            return daoInternacao.internacaoPorId(Integer.valueOf(value));
+            return daoInternacao.porId(Integer.valueOf(value));
         }
         return null;
     }

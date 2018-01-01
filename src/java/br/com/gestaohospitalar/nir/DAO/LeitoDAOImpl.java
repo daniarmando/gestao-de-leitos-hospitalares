@@ -30,7 +30,7 @@ public class LeitoDAOImpl {
     //Busca a última chaveMesAno
     private final String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
 
-    public Leito leitoPorId(Integer id) {
+    public Leito porId(Integer id) {
         return (Leito) this.session.get(Leito.class, id);
     }
 
@@ -43,7 +43,7 @@ public class LeitoDAOImpl {
         }
     }
 
-    public List<Leito> listar() {
+    public List<Leito> todosDisponiveis() {
 
         return (List<Leito>) this.session.createCriteria(Leito.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
@@ -52,7 +52,7 @@ public class LeitoDAOImpl {
                 .list();
     }
 
-    public List<Leito> listarParaInternacao() {
+    public List<Leito> disponiveisParaInternacao() {
 
         return (List<Leito>) this.session.createCriteria(Leito.class)
                 //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
@@ -66,7 +66,7 @@ public class LeitoDAOImpl {
                 .list();
     }
 
-    public List<Leito> listarPorIdSetor(Integer idSetor) {
+    public List<Leito> disponiveisPorIdSetor(Integer idSetor) {
         
         return (List<Leito>) this.session.createCriteria(Leito.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
@@ -78,7 +78,7 @@ public class LeitoDAOImpl {
                 .list();
     }
 
-    public List<Leito> listarPorIdQuarto(Integer idQuarto) {
+    public List<Leito> disponiveisPorIdQuarto(Integer idQuarto) {
 
         return (List<Leito>) this.session.createCriteria(Leito.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
@@ -88,7 +88,7 @@ public class LeitoDAOImpl {
                 .list();
     }
 
-    public List<Leito> listarPorIdMedico(Integer idMedico) {
+    public List<Leito> emInternacaoPorIdMedico(Integer idMedico) {
 
         return (List<Leito>) this.session.createCriteria(Leito.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)

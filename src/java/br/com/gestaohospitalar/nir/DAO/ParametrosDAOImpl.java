@@ -19,13 +19,13 @@ public class ParametrosDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
-    public Parametros parametrosPorId(Integer id) {
+    public Parametros porId(Integer id) {
         return (Parametros) this.session.createCriteria(Parametros.class)
                 .add(Restrictions.idEq(id))
                 .uniqueResult();
     }
 
-    public Parametros parametrosPorIdHospital(Integer idHospital) {
+    public Parametros porIdHospital(Integer idHospital) {
         return (Parametros) this.session.createCriteria(Parametros.class)
                 .add(Restrictions.eq("hospital.idHospital", idHospital))
                 .uniqueResult();

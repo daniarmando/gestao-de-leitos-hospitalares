@@ -25,6 +25,10 @@ public class HigienizacaoDAOImpl {
 
     //Busca a última chaveMesAno
     String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+    
+    public Higienizacao porId(Integer id) {
+        return (Higienizacao) this.session.get(Higienizacao.class, id);
+    }
 
     public void salvar(Higienizacao higienizacao) throws DAOException {
 
@@ -36,7 +40,7 @@ public class HigienizacaoDAOImpl {
         }
     }
 
-    public List<Higienizacao> listar() {
+    public List<Higienizacao> todas() {
 
         return (List<Higienizacao>) this.session.createCriteria(Higienizacao.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)

@@ -28,11 +28,11 @@ public class EstadoCidadeDAOImpl {
         return (Cidade) this.session.get(Cidade.class, id);
     }
 
-    public List<Estado> listarEstados() {
+    public List<Estado> todosEstados() {
         return (List<Estado>) this.session.createCriteria(Estado.class).list();
     }
 
-    public List<Cidade> listarCidades(Estado estado) {
+    public List<Cidade> cidadesPorEstado(Estado estado) {
 
         return (List<Cidade>) this.session.createCriteria(Cidade.class).add(Restrictions.eq("estado", estado)).list();
     }

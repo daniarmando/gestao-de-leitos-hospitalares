@@ -161,55 +161,6 @@ public class Higienizacao implements Serializable {
         this.funcionarios = funcionarios;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + Objects.hashCode(this.idHigienizacao);
-        hash = 31 * hash + Objects.hashCode(this.internacao);
-        hash = 31 * hash + Objects.hashCode(this.dataHoraInicio);
-        hash = 31 * hash + Objects.hashCode(this.dataHoraFim);
-        hash = 31 * hash + Objects.hashCode(this.tempoHigienizacaoMinutos);
-        hash = 31 * hash + Objects.hashCode(this.observacoesHigienizacao);
-        hash = 31 * hash + Objects.hashCode(this.funcionarios);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Higienizacao other = (Higienizacao) obj;
-        if (!Objects.equals(this.observacoesHigienizacao, other.observacoesHigienizacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.idHigienizacao, other.idHigienizacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.internacao, other.internacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.dataHoraInicio, other.dataHoraInicio)) {
-            return false;
-        }
-        if (!Objects.equals(this.dataHoraFim, other.dataHoraFim)) {
-            return false;
-        }
-        if (!Objects.equals(this.tempoHigienizacaoMinutos, other.tempoHigienizacaoMinutos)) {
-            return false;
-        }
-        if (!Objects.equals(this.funcionarios, other.funcionarios)) {
-            return false;
-        }
-        return true;
-    }
-
      /**
      * Método que gera uma cópia do objeto
      *
@@ -228,4 +179,29 @@ public class Higienizacao implements Serializable {
         return clone;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + Objects.hashCode(this.idHigienizacao);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Higienizacao other = (Higienizacao) obj;
+        if (!Objects.equals(this.idHigienizacao, other.idHigienizacao)) {
+            return false;
+        }
+        return true;
+    }
+    
 }

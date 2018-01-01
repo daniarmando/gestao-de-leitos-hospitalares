@@ -23,7 +23,7 @@ public class ConverterSetor implements Converter {
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             SetorDAOImpl daoSetor = new SetorDAOImpl();
-            return daoSetor.setorPorId(Integer.valueOf(value));
+            return daoSetor.porId(Integer.valueOf(value));
         }
         return null;
     }

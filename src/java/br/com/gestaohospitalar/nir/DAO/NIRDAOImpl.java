@@ -19,6 +19,13 @@ import org.hibernate.criterion.Restrictions;
 public class NIRDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+    
+    public NIR porId(Integer id) {
+
+        return (NIR) this.session.createCriteria(NIR.class)
+                .add(Restrictions.idEq(id))
+                .uniqueResult();
+    }
 
     public void salvar(NIR nir) throws DAOException {
 
@@ -30,14 +37,8 @@ public class NIRDAOImpl {
         }
     }
 
-    public List<NIR> listar() {
+    public List<NIR> todos() {
         return (List<NIR>) this.session.createCriteria(NIR.class).list();
     }
 
-    public NIR nirPorId(Integer id) {
-
-        return (NIR) this.session.createCriteria(NIR.class)
-                .add(Restrictions.idEq(id))
-                .uniqueResult();
-    }
 }

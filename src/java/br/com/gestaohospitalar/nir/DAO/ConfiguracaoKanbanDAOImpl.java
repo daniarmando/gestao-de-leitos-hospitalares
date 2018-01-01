@@ -19,6 +19,16 @@ public class ConfiguracaoKanbanDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
+    public ConfiguracaoKanban porId(Integer id) {
+        return (ConfiguracaoKanban) this.session.get(ConfiguracaoKanban.class, id);
+    }
+
+    public ConfiguracaoKanban porIdHospital(Integer idHospital) {
+        return (ConfiguracaoKanban) this.session.createCriteria(ConfiguracaoKanban.class)
+                .add(Restrictions.eq("hospital.idHospital", idHospital))
+                .uniqueResult();
+    }
+
     public void salvar(ConfiguracaoKanban configuracaoKanban) throws DAOException {
 
         try {
@@ -27,12 +37,7 @@ public class ConfiguracaoKanbanDAOImpl {
             System.out.println("Problemas ao salva a Configuração Kanban. Erro: " + e.getMessage());
             throw new DAOException("Problemas ao salvar Configuração Kanban.");
         }
-        
+
     }
 
-    public ConfiguracaoKanban configuracaoKanbanPorId(Integer id) {
-        return (ConfiguracaoKanban) this.session.createCriteria(ConfiguracaoKanban.class)
-                .add(Restrictions.idEq(id))
-                .uniqueResult();
-    }
 }

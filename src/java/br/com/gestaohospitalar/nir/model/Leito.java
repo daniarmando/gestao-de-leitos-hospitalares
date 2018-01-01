@@ -211,8 +211,29 @@ public class Leito implements Serializable {
      */
     public void setInternacao(Internacao internacao) {
         this.internacao = internacao;
-    }
+    }    
 
+    /**
+     * Método que gera uma cópia do objeto
+     *
+     * @return
+     */
+    @Override
+    public Leito clone() {
+        Leito clone = new Leito();
+        clone.setIdLeito(idLeito);
+        clone.setCodigoLeito(codigoLeito);
+        clone.setDescricaoLeito(descricaoLeito);
+        clone.setStatusLeito(statusLeito);
+        clone.setQuarto(quarto);
+        clone.setTipo_leito(tipo_leito);
+        clone.setTipoSexo(tipoSexo);
+        clone.setIdadeMinima(idadeMinima);
+        clone.setIdadeMaxima(idadeMaxima);
+
+        return clone;
+    }
+    
     //hashCode e equals não gerados pela IDE
     @Override
     public int hashCode() {
@@ -242,27 +263,6 @@ public class Leito implements Serializable {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Método que gera uma cópia do objeto
-     *
-     * @return
-     */
-    @Override
-    public Leito clone() {
-        Leito clone = new Leito();
-        clone.setIdLeito(idLeito);
-        clone.setCodigoLeito(codigoLeito);
-        clone.setDescricaoLeito(descricaoLeito);
-        clone.setStatusLeito(statusLeito);
-        clone.setQuarto(quarto);
-        clone.setTipo_leito(tipo_leito);
-        clone.setTipoSexo(tipoSexo);
-        clone.setIdadeMinima(idadeMinima);
-        clone.setIdadeMaxima(idadeMaxima);
-
-        return clone;
     }
 
 }

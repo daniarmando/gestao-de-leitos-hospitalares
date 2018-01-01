@@ -63,53 +63,53 @@
                 <p:panelMenu>
 
                     <p:submenu label="Instituição">
-                        <p:menuitem value="Hospital" outcome="pesquisa-hospital" icon="fa  fa-fw  fa-hospital-o" />
-                        <p:menuitem value="Setores" outcome="pesquisa-setores" icon="fa  fa-fw  fa-th-large" />
-                        <p:menuitem value="Quartos" outcome="pesquisa-quartos" icon="fa  fa-fw  fa-square" />
-                        <p:menuitem value="Leitos" outcome="pesquisa-leitos" icon="fa  fa-fw  fa-hotel" />
+                        <p:menuitem value="Hospital" outcome="/hospital/consulta" icon="fa  fa-fw  fa-hospital-o" />
+                        <p:menuitem value="Setores" outcome="/hospital/setores/consulta" icon="fa  fa-fw  fa-th-large" />
+                        <p:menuitem value="Quartos" outcome="/hospital/setores/quartos/consulta" icon="fa  fa-fw  fa-square" />
+                        <p:menuitem value="Leitos" outcome="/hospital/setores/quartos/leitos/consulta" icon="fa  fa-fw  fa-hotel" />
                     </p:submenu>
 
-                    <p:submenu label="Profissionais">
-                        <p:menuitem value="Médicos" outcome="pesquisa-medicos" icon="fa  fa-fw  fa-user-md" />
-                        <p:menuitem value="Ger. de Enfermagem" outcome="pesquisa-gerentes-enfermagem" icon="fa  fa-fw  fa-user-md" />
-                        <p:menuitem value="Enfermeiros" outcome="pesquisa-enfermeiros" icon="fa  fa-fw  fa-user-md" />
-                        <p:menuitem value="Fisioterapeutas" outcome="pesquisa-fisioterapeutas" icon="fa  fa-fw  fa-user-md" />
-                        <p:menuitem value="Terapeutas Oc." outcome="pesquisa-terapeutas-ocupacionais" icon="fa  fa-fw  fa-user-md" />
-                        <p:menuitem value="Funcionários" outcome="pesquisa-funcionarios" icon="fa  fa-fw  fa-group" />
+                    <p:submenu label="Equipe">
+                        <p:menuitem value="Médicos" outcome="/equipe/medicos/consulta" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Ger. de Enfermagem" outcome="/equipe/gerentes-enfermagem/consulta" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Enfermeiros" outcome="/equipe/enfermeiros/consulta" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Fisioterapeutas" outcome="/equipe/fisioterapeutas/consulta" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Terapeutas Oc." outcome="/equipe/terapeutas-ocupacionais/consulta" icon="fa  fa-fw  fa-user-md" />
+                        <p:menuitem value="Funcionários" outcome="/equipe/funcionarios/consulta" icon="fa  fa-fw  fa-group" />
                     </p:submenu>
 
                     <p:submenu label="SigTap" rendered="#{usuarioBean.autorizacao eq 1}">
-                        <p:menuitem value="Importar Tabela" outcome="sigtap-upload" icon="fa  fa-fw  fa-upload" />
+                        <p:menuitem value="Importar Tabela" outcome="/sigtap/upload" icon="fa  fa-fw  fa-upload" />
                     </p:submenu>
 
                     <p:submenu label="Internação" >
-                        <p:menuitem value="Painel de Informações" outcome="painel-informacoes" icon="fa  fa-fw  fa-dashboard" />
-                        <p:menuitem value="Internação" outcome="pesquisa-internacoes" icon="fa  fa-fw  fa-bed" />
-                        <p:menuitem value="Alta Qualificada" outcome="pesquisa-alta-qualificada" icon="fa  fa-fw  fa-check-square-o" />
-                        <p:menuitem value="Alta" outcome="pesquisa-alta" icon="fa  fa-fw  fa-check-square" />
-                        <p:menuitem value="Higienização" outcome="pesquisa-higienizacao" icon="fa  fa-fw  fa-asterisk" />
-                        <p:menuitem value="Pacientes" outcome="pesquisa-pacientes" icon="fa  fa-fw  fa-user" />
+                        <p:menuitem value="Painel de Informações" outcome="/painel-informacoes" icon="fa  fa-fw  fa-dashboard" />
+                        <p:menuitem value="Internação" outcome="/internacoes/consulta" icon="fa  fa-fw  fa-bed" />
+                        <p:menuitem value="Alta Qualificada" outcome="/internacoes/altas-qualificadas/consulta" icon="fa  fa-fw  fa-check-square-o" />
+                        <p:menuitem value="Alta" outcome="/internacoes/altas/consulta" icon="fa  fa-fw  fa-check-square" />
+                        <p:menuitem value="Higienização" outcome="/internacoes/higienizacoes/consulta" icon="fa  fa-fw  fa-asterisk" />
+                        <p:menuitem value="Pacientes" outcome="/pacientes/consulta" icon="fa  fa-fw  fa-user" />
                     </p:submenu>
 
                     <p:submenu label="Estatísticas" >
                         <p:submenu label="Gráficos" icon="fa  fa-fw  fa-bar-chart">
-                            <p:menuitem value="Tempo Internação" outcome="grafico-tempo-internacao" icon="fa  fa-fw  fa-line-chart" />
-                            <p:menuitem value="Previsão x Alta" outcome="grafico-alta-qualificada-alta" icon="fa  fa-fw  fa-line-chart" />
-                            <p:menuitem value="Tempo Saída" outcome="grafico-tempo-saida-paciente" icon="fa  fa-fw  fa-line-chart" />
-                            <p:menuitem value="Saída x Higienização" outcome="grafico-saida-higienizacao" icon="fa  fa-fw  fa-line-chart" />
-                            <p:menuitem value="Tempo Higienização" outcome="grafico-tempo-higienizacao" icon="fa  fa-fw  fa-line-chart" />
-                            <p:menuitem value="Tempo Ociosidade" outcome="grafico-tempo-ociosidade" icon="fa  fa-fw  fa-line-chart" />                            
+                            <p:menuitem value="Tempo Internação" outcome="/estatisticas/graficos/tempo-internacao" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Previsão x Alta" outcome="/estatisticas/graficos/alta-qualificada-alta" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Tempo Saída" outcome="/estatisticas/graficos/tempo-saida-paciente" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Saída x Higienização" outcome="/estatisticas/graficos/saida-higienizacao" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Tempo Higienização" outcome="/estatisticas/graficos/tempo-higienizacao" icon="fa  fa-fw  fa-line-chart" />
+                            <p:menuitem value="Tempo Ociosidade" outcome="/estatisticas/graficos/tempo-ociosidade" icon="fa  fa-fw  fa-line-chart" />                            
                         </p:submenu>
                         <p:submenu label="Relatórios" icon="fa fa-file-text-o" >
-                            <p:menuitem value="Tempo em Leitos" outcome="relatorio-estatisticas" icon="fa  fa-fw fa-file-text" />
-                            <p:menuitem value="Estouro de Tempo" outcome="relatorio-estouro-tempo" icon="fa  fa-fw fa-file-text" />
+                            <p:menuitem value="Tempo em Leitos" outcome="/estatisticas/relatorios/estatisticas" icon="fa  fa-fw fa-file-text" />
+                            <p:menuitem value="Estouro de Tempo" outcome="/estatisticas/relatorios/estouro-tempo" icon="fa  fa-fw fa-file-text" />
                         </p:submenu>
                     </p:submenu>
 
                     <p:submenu label="Configurações">
-                        <p:menuitem value="NIR" outcome="pesquisa-nir" icon="fa  fa-fw  fa-user-plus" />
-                        <p:menuitem value="Kanban" outcome="configuracao-kanban" icon="fa  fa-fw  fa-sliders" rendered="#{usuarioBean.autorizacao eq 1}" />
-                        <p:menuitem value="Parâmetros" outcome="parametros" icon="fa  fa-fw  fa-gears" rendered="#{usuarioBean.autorizacao eq 1}" />
+                        <p:menuitem value="NIR" outcome="/nir/consulta" icon="fa  fa-fw  fa-user-plus" />
+                        <p:menuitem value="Kanban" outcome="/configuracoes/kanban" icon="fa  fa-fw  fa-sliders" rendered="#{usuarioBean.autorizacao eq 1}" />
+                        <p:menuitem value="Parâmetros" outcome="/configuracoes/parametros" icon="fa  fa-fw  fa-gears" rendered="#{usuarioBean.autorizacao eq 1}" />
                     </p:submenu>
 
                 </p:panelMenu>

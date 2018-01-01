@@ -83,9 +83,7 @@ public class SigtapUploadLog implements Serializable{
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.id);
-        hash = 89 * hash + Objects.hashCode(this.dataImportacao);
-        hash = 89 * hash + Objects.hashCode(this.chaveMesAno);
+        hash = 37 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -101,16 +99,10 @@ public class SigtapUploadLog implements Serializable{
             return false;
         }
         final SigtapUploadLog other = (SigtapUploadLog) obj;
-        if (!Objects.equals(this.chaveMesAno, other.chaveMesAno)) {
-            return false;
-        }
         if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        if (!Objects.equals(this.dataImportacao, other.dataImportacao)) {
             return false;
         }
         return true;
     }
-  
+
 }

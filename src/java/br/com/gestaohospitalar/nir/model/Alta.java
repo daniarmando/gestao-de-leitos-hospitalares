@@ -138,15 +138,25 @@ public class Alta implements Serializable {
         this.altaQualificada = altaQualificada;
     }
 
+    /**
+     * método que gera uma cópia do objeto
+     *
+     * @return
+     */
+    @Override
+    public Alta clone() {
+        Alta clone = new Alta();
+        clone.setDataHoraInformacao(dataHoraInformacao);
+        clone.setDataHoraRealizacao(dataHoraRealizacao);
+        clone.setMedico(medico);
+        
+        return clone;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 61 * hash + Objects.hashCode(this.idAlta);
-        hash = 61 * hash + Objects.hashCode(this.dataHoraInformacao);
-        hash = 61 * hash + Objects.hashCode(this.dataHoraRealizacao);
-        hash = 61 * hash + Objects.hashCode(this.internacao);
-        hash = 61 * hash + Objects.hashCode(this.medico);
-        hash = 61 * hash + Objects.hashCode(this.altaQualificada);
+        int hash = 5;
+        hash = 73 * hash + Objects.hashCode(this.idAlta);
         return hash;
     }
 
@@ -165,37 +175,7 @@ public class Alta implements Serializable {
         if (!Objects.equals(this.idAlta, other.idAlta)) {
             return false;
         }
-        if (!Objects.equals(this.dataHoraInformacao, other.dataHoraInformacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.dataHoraRealizacao, other.dataHoraRealizacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.internacao, other.internacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.medico, other.medico)) {
-            return false;
-        }
-        if (!Objects.equals(this.altaQualificada, other.altaQualificada)) {
-            return false;
-        }
         return true;
-    }
-    
-    /**
-     * método que gera uma cópia do objeto
-     *
-     * @return
-     */
-    @Override
-    public Alta clone() {
-        Alta clone = new Alta();
-        clone.setDataHoraInformacao(dataHoraInformacao);
-        clone.setDataHoraRealizacao(dataHoraRealizacao);
-        clone.setMedico(medico);
-        
-        return clone;
     }
     
 }

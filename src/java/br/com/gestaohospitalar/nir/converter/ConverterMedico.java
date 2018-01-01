@@ -23,7 +23,7 @@ public class ConverterMedico implements Converter {
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             MedicoDAOImpl daoMedico = new MedicoDAOImpl();
-            return daoMedico.medicoPorId(Integer.valueOf(value));
+            return daoMedico.porId(Integer.valueOf(value));
         }
         return null;
     }

@@ -97,43 +97,6 @@ public class Quarto implements Serializable {
         this.statusQuarto = statusQuarto;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 89 * hash + Objects.hashCode(this.idQuarto);
-        hash = 89 * hash + Objects.hashCode(this.tipoQuarto);
-        hash = 89 * hash + Objects.hashCode(this.statusQuarto);
-        hash = 89 * hash + Objects.hashCode(this.setor);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Quarto other = (Quarto) obj;
-        if (!Objects.equals(this.tipoQuarto, other.tipoQuarto)) {
-            return false;
-        }
-        if (!Objects.equals(this.statusQuarto, other.statusQuarto)) {
-            return false;
-        }
-        if (!Objects.equals(this.idQuarto, other.idQuarto)) {
-            return false;
-        }
-        if (!Objects.equals(this.setor, other.setor)) {
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Método que gera uma cópia do objeto
      *
@@ -150,4 +113,29 @@ public class Quarto implements Serializable {
         return clone;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + Objects.hashCode(this.idQuarto);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Quarto other = (Quarto) obj;
+        if (!Objects.equals(this.idQuarto, other.idQuarto)) {
+            return false;
+        }
+        return true;
+    }
+    
 }

@@ -23,7 +23,7 @@ public class ConverterHospital implements Converter {
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             HospitalDAOImpl daoHospital = new HospitalDAOImpl();
-            return daoHospital.hospitalPorId(Integer.valueOf(value));
+            return daoHospital.porId(Integer.valueOf(value));
         }
         return null;
     }

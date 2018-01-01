@@ -260,19 +260,7 @@ public class Estatisticas implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 29 * hash + Objects.hashCode(this.idEstatisticas);
-        hash = 29 * hash + Objects.hashCode(this.internacao);
-        hash = 29 * hash + Objects.hashCode(this.leito);
-        hash = 29 * hash + Objects.hashCode(this.altaQualificada);
-        hash = 29 * hash + Objects.hashCode(this.alta);
-        hash = 29 * hash + Objects.hashCode(this.higienizacao);
-        hash = 29 * hash + Objects.hashCode(this.tempoInternacao);
-        hash = 29 * hash + Objects.hashCode(this.tempoAltaQualificadaAteAlta);
-        hash = 29 * hash + Objects.hashCode(this.tempoSaidaPaciente);
-        hash = 29 * hash + Objects.hashCode(this.tempoSaidaAteHigienizacao);
-        hash = 29 * hash + Objects.hashCode(this.tempoHigienizacao);
-        hash = 29 * hash + Objects.hashCode(this.IdInternacaoPosterior);
-        hash = 29 * hash + Objects.hashCode(this.tempoOciosidade);
+        hash = 17 * hash + Objects.hashCode(this.idEstatisticas);
         return hash;
     }
 
@@ -291,43 +279,7 @@ public class Estatisticas implements Serializable {
         if (!Objects.equals(this.idEstatisticas, other.idEstatisticas)) {
             return false;
         }
-        if (!Objects.equals(this.internacao, other.internacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.leito, other.leito)) {
-            return false;
-        }
-        if (!Objects.equals(this.altaQualificada, other.altaQualificada)) {
-            return false;
-        }
-        if (!Objects.equals(this.alta, other.alta)) {
-            return false;
-        }
-        if (!Objects.equals(this.higienizacao, other.higienizacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.tempoInternacao, other.tempoInternacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.tempoAltaQualificadaAteAlta, other.tempoAltaQualificadaAteAlta)) {
-            return false;
-        }
-        if (!Objects.equals(this.tempoSaidaPaciente, other.tempoSaidaPaciente)) {
-            return false;
-        }
-        if (!Objects.equals(this.tempoSaidaAteHigienizacao, other.tempoSaidaAteHigienizacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.tempoHigienizacao, other.tempoHigienizacao)) {
-            return false;
-        }
-        if (!Objects.equals(this.IdInternacaoPosterior, other.IdInternacaoPosterior)) {
-            return false;
-        }
-        if (!Objects.equals(this.tempoOciosidade, other.tempoOciosidade)) {
-            return false;
-        }
         return true;
     }
-    
+
 }

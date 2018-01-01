@@ -31,19 +31,19 @@ public class UsuarioDAOImpl {
         }
     }
     
-    public List<Usuario> listar() {
+    public List<Usuario> todos() {
         return (List<Usuario>) this.session.createCriteria(Usuario.class).list();  
     }
 
 
-    public Usuario usuarioPorLogin(String login) {
+    public Usuario porLogin(String login) {
 
         return (Usuario) this.session.createCriteria(Usuario.class)
                 .add(Restrictions.eq("login", login))
                 .uniqueResult();
     }
 
-    public Usuario usuarioPorIdPessoa(Integer idPessoa) {
+    public Usuario porIdPessoa(Integer idPessoa) {
 
         return (Usuario) this.session.createCriteria(Usuario.class)
                 .add(Restrictions.eq("pessoa.idPessoa", idPessoa))

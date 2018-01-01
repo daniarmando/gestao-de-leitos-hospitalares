@@ -23,7 +23,7 @@ public class ConverterLeito implements Converter {
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             LeitoDAOImpl daoLeito = new LeitoDAOImpl();
-            return daoLeito.leitoPorId(Integer.valueOf(value));
+            return daoLeito.porId(Integer.valueOf(value));
         }
         return null;
     }

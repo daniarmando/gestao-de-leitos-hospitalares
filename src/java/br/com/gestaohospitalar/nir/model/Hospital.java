@@ -116,51 +116,6 @@ public class Hospital  implements Serializable {
         this.statusHospital = statusHospital;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 79 * hash + Objects.hashCode(this.idHospital);
-        hash = 79 * hash + Objects.hashCode(this.nomeHospital);
-        hash = 79 * hash + Objects.hashCode(this.emailHospital);
-        hash = 79 * hash + Objects.hashCode(this.telefoneHospital);
-        hash = 79 * hash + Objects.hashCode(this.siteHospital);
-        hash = 79 * hash + Objects.hashCode(this.statusHospital);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Hospital other = (Hospital) obj;
-        if (!Objects.equals(this.nomeHospital, other.nomeHospital)) {
-            return false;
-        }
-        if (!Objects.equals(this.emailHospital, other.emailHospital)) {
-            return false;
-        }
-        if (!Objects.equals(this.telefoneHospital, other.telefoneHospital)) {
-            return false;
-        }
-        if (!Objects.equals(this.siteHospital, other.siteHospital)) {
-            return false;
-        }
-        if (!Objects.equals(this.statusHospital, other.statusHospital)) {
-            return false;
-        }
-        if (!Objects.equals(this.idHospital, other.idHospital)) {
-            return false;
-        }
-        return true;
-    }
-
      /**
      * Método que gera uma cópia do objeto
      *
@@ -178,6 +133,32 @@ public class Hospital  implements Serializable {
         
         return clone;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 37 * hash + Objects.hashCode(this.idHospital);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Hospital other = (Hospital) obj;
+        if (!Objects.equals(this.idHospital, other.idHospital)) {
+            return false;
+        }
+        return true;
+    }
+    
 }
 
 

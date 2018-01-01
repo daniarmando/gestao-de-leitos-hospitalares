@@ -5,9 +5,11 @@
  */
 package br.com.gestaohospitalar.nir.model;
 
+import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_PROCEDIMENTO;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_CID;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +26,7 @@ import javax.persistence.Temporal;
 @Entity
 @Table(name = "internacao")
 public class Internacao implements Serializable {
-    
+
     private Integer idInternacao;
     private Date dataEntrada;
     private Date dataPrevisaoAlta;
@@ -45,7 +47,7 @@ public class Internacao implements Serializable {
 
     public Internacao() {
     }
-    
+
     public Internacao(Integer idInternacao, Date dataPrevisaoAlta, Date dataEntrada, Date dataAlta, Date dataSaidaLeito, Integer codigoInternacaoHospital, String statusInternacao, Date dataHoraLimiteVerde, Date dataHoraLimiteAmarelo, Date dataHoraLimiteVermelho, Paciente paciente, Medico medico, Leito leito, TB_PROCEDIMENTO procedimento, String chaveMesAnoProcedimento, TB_CID cid, String chaveMesAnoCID) {
         this.idInternacao = idInternacao;
         this.dataEntrada = dataEntrada;
@@ -96,8 +98,8 @@ public class Internacao implements Serializable {
     public void setDataEntrada(Date dataEntrada) {
         this.dataEntrada = dataEntrada;
     }
-    
-     /**
+
+    /**
      * @return the dataPrevisaoAlta
      */
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
@@ -111,7 +113,6 @@ public class Internacao implements Serializable {
     public void setDataPrevisaoAlta(Date dataPrevisaoAlta) {
         this.dataPrevisaoAlta = dataPrevisaoAlta;
     }
-    
 
     /**
      * @return the dataAlta
@@ -323,6 +324,52 @@ public class Internacao implements Serializable {
     public void setChaveMesAnoCID(String chaveMesAnoCID) {
         this.chaveMesAnoCID = chaveMesAnoCID;
     }
+    
+
+    public void calcularLimiteTempoCoresKanban(ConfiguracaoKanban kanban, LocalDateTime dataEntrada) {
+        
+        //verde
+        Long verde = Math.round(((this.procedimento.getQT_DIAS_PERMANENCIA() * 24) * kanban.getValorVerdeKanban()) / 100.0);
+        LocalDateTime tempoLimiteVerde = dataEntrada.plusHours(verde);
+        this.dataHoraLimiteVerde = ConverterDataHora.paraDate(tempoLimiteVerde);
+        
+        //amarelo
+        Long amarelo = verde + Math.round(((this.procedimento.getQT_DIAS_PERMANENCIA() * 24) * kanban.getValorAmareloKanban()) / 100.0);
+        LocalDateTime tempoLimiteAmarelo = dataEntrada.plusHours(amarelo);
+        this.dataHoraLimiteAmarelo = ConverterDataHora.paraDate(tempoLimiteAmarelo);
+        
+        //vermelho
+        Long vermelho = Long.valueOf(this.procedimento.getQT_DIAS_PERMANENCIA() * 24);
+        LocalDateTime tempoLimiteVermelho = dataEntrada.plusHours(vermelho);
+        this.dataHoraLimiteVermelho = ConverterDataHora.paraDate(tempoLimiteVermelho);
+    }
+    
+    /**
+     * Método que gera uma cópia do objeto
+     *
+     * @return
+     */
+    @Override
+    public Internacao clone() {
+        Internacao clone = new Internacao();
+        clone.setIdInternacao(idInternacao);
+        clone.setDataEntrada(dataEntrada);
+        clone.setDataPrevisaoAlta(dataPrevisaoAlta);
+        clone.setDataAlta(dataAlta);
+        clone.setDataSaidaLeito(dataSaidaLeito);
+        clone.setCodigoInternacaoHospital(codigoInternacaoHospital);
+        clone.setStatusInternacao(statusInternacao);
+        clone.setDataHoraLimiteVerde(dataHoraLimiteVerde);
+        clone.setDataHoraLimiteAmarelo(dataHoraLimiteAmarelo);
+        clone.setDataHoraLimiteVermelho(dataHoraLimiteVermelho);
+        clone.setPaciente(paciente);
+        clone.setMedico(medico);
+        clone.setLeito(leito);
+        clone.setProcedimento(procedimento);
+        clone.setCid(cid);
+
+        return clone;
+    }
 
     //hashCode e equals não gerados pela IDE
     @Override
@@ -353,33 +400,6 @@ public class Internacao implements Serializable {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Método que gera uma cópia do objeto
-     *
-     * @return
-     */
-    @Override
-    public Internacao clone() {
-        Internacao clone = new Internacao();
-        clone.setIdInternacao(idInternacao);
-        clone.setDataEntrada(dataEntrada);
-        clone.setDataPrevisaoAlta(dataPrevisaoAlta);
-        clone.setDataAlta(dataAlta);
-        clone.setDataSaidaLeito(dataSaidaLeito);
-        clone.setCodigoInternacaoHospital(codigoInternacaoHospital);
-        clone.setStatusInternacao(statusInternacao);
-        clone.setDataHoraLimiteVerde(dataHoraLimiteVerde);
-        clone.setDataHoraLimiteAmarelo(dataHoraLimiteAmarelo);
-        clone.setDataHoraLimiteVermelho(dataHoraLimiteVermelho);
-        clone.setPaciente(paciente);
-        clone.setMedico(medico);
-        clone.setLeito(leito);
-        clone.setProcedimento(procedimento);
-        clone.setCid(cid);
-        
-        return clone;
     }
 
 }

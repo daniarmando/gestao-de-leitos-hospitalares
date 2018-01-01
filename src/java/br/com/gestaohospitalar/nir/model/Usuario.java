@@ -134,51 +134,6 @@ public class Usuario implements Serializable, Cloneable {
         this.pessoa = pessoa;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.id);
-        hash = 97 * hash + Objects.hashCode(this.login);
-        hash = 97 * hash + Objects.hashCode(this.senha);
-        hash = 97 * hash + (this.status ? 1 : 0);
-        hash = 97 * hash + Objects.hashCode(this.autorizacoes);
-        hash = 97 * hash + Objects.hashCode(this.pessoa);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Usuario other = (Usuario) obj;
-        if (this.status != other.status) {
-            return false;
-        }
-        if (!Objects.equals(this.login, other.login)) {
-            return false;
-        }
-        if (!Objects.equals(this.senha, other.senha)) {
-            return false;
-        }
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        if (!Objects.equals(this.autorizacoes, other.autorizacoes)) {
-            return false;
-        }
-        if (!Objects.equals(this.pessoa, other.pessoa)) {
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Método que gera uma cópia do objeto
      *
@@ -194,4 +149,29 @@ public class Usuario implements Serializable, Cloneable {
         return clone;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Usuario other = (Usuario) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
+    }
+    
 }

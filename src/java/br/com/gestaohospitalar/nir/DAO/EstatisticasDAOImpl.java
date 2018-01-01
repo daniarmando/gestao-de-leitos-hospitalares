@@ -25,7 +25,7 @@ public class EstatisticasDAOImpl {
     private final DateFormat DATE_FORMAT_ANO = new SimpleDateFormat("yyyy");
     private String calculo = "";
 
-    public List<Estatisticas> listarPorPeriodoIdLeito(Integer idLeito, Date dataInicial, Date dataFinal) {
+    public List<Estatisticas> porPeriodoEIdLeito(Integer idLeito, Date dataInicial, Date dataFinal) {
 
         //montando comando SQL
         String sql = "SELECT e.* "
@@ -45,7 +45,7 @@ public class EstatisticasDAOImpl {
                 .list();
     }
 
-    public List<Estatisticas> listarPorPeriodoIdSetor(Integer idSetor, Date dataInicial, Date dataFinal, int tipoCalculo) {
+    public List<Estatisticas> porPeriodoEIdSetor(Integer idSetor, Date dataInicial, Date dataFinal, int tipoCalculo) {
 
         // tipoCalculo 1 = média, 2 = soma
         this.calculo = tipoCalculo == 1 ? "AVG(e.tempoOciosidade) AS tempoOciosidade" : "SUM(e.tempoOciosidade) AS tempoOciosidade";
@@ -75,7 +75,7 @@ public class EstatisticasDAOImpl {
                 .list();
     }
 
-    public List<Estatisticas> listarPorPeriodoTodosSetores(Date dataInicial, Date dataFinal, int tipoCalculo) {
+    public List<Estatisticas> porPeriodoETodosSetores(Date dataInicial, Date dataFinal, int tipoCalculo) {
 
         // tipoCalculo 1 = média, 2 = soma
         this.calculo = tipoCalculo == 1 ? "AVG(e.tempoOciosidade) AS tempoOciosidade" : "SUM(e.tempoOciosidade) AS tempoOciosidade";
@@ -104,7 +104,7 @@ public class EstatisticasDAOImpl {
                 .list();
     }
 
-    public Estatisticas estatisticasParaDetalhes(String dataEntrada, String descricaoLeito) {
+    public Estatisticas paraDetalhesGrafico(String dataEntrada, String descricaoLeito) {
 
         //montando comando SQL
         String sql = "SELECT e.* "

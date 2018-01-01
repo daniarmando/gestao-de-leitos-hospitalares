@@ -80,9 +80,7 @@ public class Estado implements Serializable {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 53 * hash + Objects.hashCode(this.idEstado);
-        hash = 53 * hash + Objects.hashCode(this.nomeEstado);
-        hash = 53 * hash + Objects.hashCode(this.ufEstado);
+        hash = 71 * hash + Objects.hashCode(this.idEstado);
         return hash;
     }
 
@@ -98,16 +96,10 @@ public class Estado implements Serializable {
             return false;
         }
         final Estado other = (Estado) obj;
-        if (!Objects.equals(this.nomeEstado, other.nomeEstado)) {
-            return false;
-        }
-        if (!Objects.equals(this.ufEstado, other.ufEstado)) {
-            return false;
-        }
         if (!Objects.equals(this.idEstado, other.idEstado)) {
             return false;
         }
         return true;
     }
-       
+
 }

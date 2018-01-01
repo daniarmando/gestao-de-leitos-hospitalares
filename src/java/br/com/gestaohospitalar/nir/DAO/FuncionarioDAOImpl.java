@@ -11,6 +11,7 @@ import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -21,7 +22,7 @@ public class FuncionarioDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
-    public Funcionario funcionarioPorId(Integer id) {
+    public Funcionario porId(Integer id) {
         return (Funcionario) this.session.get(Funcionario.class, id);
     }
 
@@ -35,10 +36,11 @@ public class FuncionarioDAOImpl {
         }
     }
 
-    public List<Funcionario> listar() {
+    public List<Funcionario> ativos() {
 
         return (List<Funcionario>) this.session.createCriteria(Funcionario.class)
                 .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .addOrder(Order.asc("idPessoa"))
                 .list();
     }
 }

@@ -97,13 +97,26 @@ public class Setor implements Serializable {
         this.hospital = hospital;
     }
 
+     /**
+     * Método que gera uma cópia do objeto
+     *
+     * @return
+     */
+    @Override
+    public Setor clone() {
+        Setor clone = new Setor();
+        clone.setIdSetor(idSetor);
+        clone.setTipoSetor(tipoSetor);
+        clone.setStatusSetor(statusSetor);
+        clone.setHospital(hospital);
+
+        return clone;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 73 * hash + Objects.hashCode(this.idSetor);
-        hash = 73 * hash + Objects.hashCode(this.tipoSetor);
-        hash = 73 * hash + Objects.hashCode(this.statusSetor);
-        hash = 73 * hash + Objects.hashCode(this.hospital);
+        int hash = 5;
+        hash = 89 * hash + Objects.hashCode(this.idSetor);
         return hash;
     }
 
@@ -119,35 +132,10 @@ public class Setor implements Serializable {
             return false;
         }
         final Setor other = (Setor) obj;
-        if (!Objects.equals(this.tipoSetor, other.tipoSetor)) {
-            return false;
-        }
         if (!Objects.equals(this.idSetor, other.idSetor)) {
             return false;
         }
-        if (!Objects.equals(this.statusSetor, other.statusSetor)) {
-            return false;
-        }
-        if (!Objects.equals(this.hospital, other.hospital)) {
-            return false;
-        }
         return true;
-    }
-    
-     /**
-     * Método que gera uma cópia do objeto
-     *
-     * @return
-     */
-    @Override
-    public Setor clone() {
-        Setor clone = new Setor();
-        clone.setIdSetor(idSetor);
-        clone.setTipoSetor(tipoSetor);
-        clone.setStatusSetor(statusSetor);
-        clone.setHospital(hospital);
-
-        return clone;
     }
     
 }

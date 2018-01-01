@@ -23,7 +23,7 @@ public class ConverterQuarto implements Converter {
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             QuartoDAOImpl daoQuarto = new QuartoDAOImpl();
-            return daoQuarto.quartoPorId(Integer.valueOf(value));
+            return daoQuarto.porId(Integer.valueOf(value));
         }
         return null;
     }

@@ -27,6 +27,10 @@ public class AltaQualificadaDAOImpl {
 
     //Busca a última chaveMesAno
     private final String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+    
+    public AltaQualificada porId(Integer id) {
+        return (AltaQualificada) this.session.get(AltaQualificada.class, id);
+    }
 
     public void salvar(AltaQualificada altaQualificada) throws DAOException {
 
@@ -38,18 +42,18 @@ public class AltaQualificadaDAOImpl {
         }
     }
 
-    public List<AltaQualificada> listar() {
+    public List<AltaQualificada> todas() {
 
         return (List<AltaQualificada>) this.session.createCriteria(AltaQualificada.class)
                 .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-                //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
+                //passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
                 .createAlias("internacao.procedimento", "p", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("p.chaveMesAno", chaveMesAno))
                 .createAlias("internacao.cid", "c", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("c.chaveMesAno", chaveMesAno))
                 .createAlias("internacao.leito.tipo_leito", "tl", JoinType.LEFT_OUTER_JOIN, Restrictions.eq("tl.chaveMesAno", chaveMesAno))
                 .list();
     }
 
-    public AltaQualificada altaQualificadaPorIdInternacao(Integer idInternacao) {
+    public AltaQualificada porIdInternacao(Integer idInternacao) {
 
         return (AltaQualificada) this.session.createCriteria(AltaQualificada.class)
                 .add(Restrictions.eq("internacao.idInternacao", idInternacao))

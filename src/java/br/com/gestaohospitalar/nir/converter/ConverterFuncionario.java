@@ -23,7 +23,7 @@ public class ConverterFuncionario implements Converter{
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             FuncionarioDAOImpl daoFuncionario = new FuncionarioDAOImpl();
-            return daoFuncionario.funcionarioPorId(Integer.valueOf(value));
+            return daoFuncionario.porId(Integer.valueOf(value));
         }
         return null;
     }

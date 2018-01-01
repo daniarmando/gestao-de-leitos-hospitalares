@@ -13,6 +13,7 @@ import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -24,7 +25,7 @@ public class GerenteEnfermagemDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
-    public GerenteEnfermagem gerenteEnfermagemPorId(Integer id) {
+    public GerenteEnfermagem porId(Integer id) {
         return (GerenteEnfermagem) this.session.get(GerenteEnfermagem.class, id);
     }
 
@@ -38,10 +39,11 @@ public class GerenteEnfermagemDAOImpl {
         }
     }
 
-    public List<GerenteEnfermagem> listar() {
+    public List<GerenteEnfermagem> ativos() {
 
         return (List<GerenteEnfermagem>) this.session.createCriteria(GerenteEnfermagem.class)
                 .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .addOrder(Order.asc("idPessoa"))
                 .list();
     }
 

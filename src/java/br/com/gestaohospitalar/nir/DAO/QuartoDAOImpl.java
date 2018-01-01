@@ -13,6 +13,7 @@ import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -24,7 +25,7 @@ public class QuartoDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
-    public Quarto quartoPorId(Integer id) {
+    public Quarto porId(Integer id) {
         return (Quarto) this.session.get(Quarto.class, id);
     }
 
@@ -39,18 +40,20 @@ public class QuartoDAOImpl {
 
     }
 
-    public List<Quarto> listar() {
+    public List<Quarto> ativos() {
 
         return (List<Quarto>) this.session.createCriteria(Quarto.class)
                 .add(Restrictions.eq("statusQuarto", Status.ATIVO.get()))
+                .addOrder(Order.asc("idQuarto"))
                 .list();
     }
 
-    public List<Quarto> listarPorIdSetor(Integer idSetor) {
+    public List<Quarto> ativosPorIdSetor(Integer idSetor) {
 
         return (List<Quarto>) this.session.createCriteria(Quarto.class)
                 .add(Restrictions.eq("setor.idSetor", idSetor))
                 .add(Restrictions.eq("statusQuarto", Status.ATIVO.get()))
+                .addOrder(Order.asc("idQuarto"))
                 .list();
     }
 

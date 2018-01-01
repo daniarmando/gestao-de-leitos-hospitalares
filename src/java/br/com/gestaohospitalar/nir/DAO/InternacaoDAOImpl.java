@@ -30,7 +30,7 @@ public class InternacaoDAOImpl {
     private Boolean isAltaQualificada = false;
     private Boolean isAlta = false;
 
-    public Internacao internacaoPorId(Integer id) {
+    public Internacao porId(Integer id) {
 
         return (Internacao) this.session.createCriteria(Internacao.class)
                 .add(Restrictions.idEq(id))
@@ -48,7 +48,7 @@ public class InternacaoDAOImpl {
         }
     }
 
-    public List<Internacao> listar() {
+    public List<Internacao> todas() {
 
         //Consulta as internações distinguindo pelo id da internação
         return (List<Internacao>) this.session.createCriteria(Internacao.class)
@@ -56,24 +56,24 @@ public class InternacaoDAOImpl {
                 .list();
     }
 
-    public List<Internacao> listarParaHigienizacao() {
+    public List<Internacao> paraHigienizacao() {
         //passando status da internação e da alta como critério para consulta
-        return listarPorStatus(Status.HIGIENIZACAO.get(), Status.HIGIENIZACAO.get());
+        return porStatus(Status.HIGIENIZACAO.get(), Status.HIGIENIZACAO.get());
     }
 
-    public List<Internacao> listarParaAltaQualificada() {
+    public List<Internacao> paraAltaQualificada() {
         isAltaQualificada = true;
         //passando status da internação e da alta como critério para consulta
-        return listarPorStatus(Status.ABERTA.get(), Status.INTERNACAO.get());
+        return porStatus(Status.ABERTA.get(), Status.INTERNACAO.get());
     }
 
-    public List<Internacao> listarParaAlta() {
+    public List<Internacao> paraAlta() {
         isAlta = true;
         //passando status da internação e da alta como critério para consulta
-        return listarPorStatus(Status.ABERTA.get(), Status.INTERNACAO.get());
+        return porStatus(Status.ABERTA.get(), Status.INTERNACAO.get());
     }
 
-    public List<Internacao> listarPorStatus(String statusInternacao, String statusLeito) {
+    public List<Internacao> porStatus(String statusInternacao, String statusLeito) {
 
         Criteria crit = this.session.createCriteria(Internacao.class)
                 //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno
@@ -103,7 +103,7 @@ public class InternacaoDAOImpl {
 
     }
 
-    public List<Internacao> listarHistoricoInternacoesPorLeito(Integer idLeito) {
+    public List<Internacao> historicoInternacoesPorLeito(Integer idLeito) {
 
         return (List<Internacao>) this.session.createCriteria(Internacao.class)
                 //Passando a regras para trazer informações das tabelas sigtap de acordo com a chaveMesAno

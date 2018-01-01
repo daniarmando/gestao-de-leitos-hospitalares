@@ -1,9 +1,9 @@
 package br.com.gestaohospitalar.nir.socket;
  
-import br.com.gestaohospitalar.nir.controller.ChatUsers;
-import br.com.gestaohospitalar.nir.controller.Message;
-import br.com.gestaohospitalar.nir.controller.MessageDecoder;
-import br.com.gestaohospitalar.nir.controller.MessageEncoder;
+import br.com.gestaohospitalar.nir.view.ChatUsers;
+import br.com.gestaohospitalar.nir.view.Message;
+import br.com.gestaohospitalar.nir.view.MessageDecoder;
+import br.com.gestaohospitalar.nir.view.MessageEncoder;
 import org.primefaces.push.EventBus;
 import org.primefaces.push.RemoteEndpoint;
 import org.primefaces.push.annotation.OnClose;

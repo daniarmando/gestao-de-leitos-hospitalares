@@ -13,6 +13,7 @@ import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -24,7 +25,7 @@ public class SetorDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
-    public Setor setorPorId(Integer id) {
+    public Setor porId(Integer id) {
         return (Setor) this.session.get(Setor.class, id);
     }
 
@@ -37,10 +38,11 @@ public class SetorDAOImpl {
         }
     }
 
-    public List<Setor> listar() {
+    public List<Setor> ativos() {
 
         return (List<Setor>) this.session.createCriteria(Setor.class)
                 .add(Restrictions.eq("statusSetor", Status.ATIVO.get()))
+                .addOrder(Order.asc("idSetor"))
                 .list();
     }
 

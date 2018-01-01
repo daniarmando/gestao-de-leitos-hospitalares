@@ -13,6 +13,7 @@ import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -24,7 +25,7 @@ public class MedicoDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
-    public Medico medicoPorId(Integer id) {
+    public Medico porId(Integer id) {
         return (Medico) this.session.get(Medico.class, id);
     }
 
@@ -38,10 +39,11 @@ public class MedicoDAOImpl {
         }
     }
 
-    public List<Medico> listar() {
+    public List<Medico> ativos() {
 
         return (List<Medico>) this.session.createCriteria(Medico.class)
                 .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .addOrder(Order.asc("idPessoa"))
                 .list();
     }
 

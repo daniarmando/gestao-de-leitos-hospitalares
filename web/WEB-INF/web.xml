@@ -91,7 +91,7 @@
     
     <error-page>
         <error-code>403</error-code>
-        <location>/403.xhtml</location>
+        <location>/erro/403.xhtml</location>
     </error-page>
     
 </web-app>

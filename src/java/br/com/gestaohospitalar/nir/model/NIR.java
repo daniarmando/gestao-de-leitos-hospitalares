@@ -7,7 +7,6 @@ package br.com.gestaohospitalar.nir.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -45,30 +44,6 @@ public class NIR extends Pessoa implements Serializable, Cloneable {
         this.statusNir = statusNir;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 67 * hash + Objects.hashCode(this.statusNir);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final NIR other = (NIR) obj;
-        if (!Objects.equals(this.statusNir, other.statusNir)) {
-            return false;
-        }
-        return true;
-    }
 
     /**
      * Método que gera uma cópia do objeto
@@ -98,6 +73,37 @@ public class NIR extends Pessoa implements Serializable, Cloneable {
         clone.setCidade(cidade);
 
         return clone;
+    }
+    
+    //hashCode e equals não gerados pela IDE
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((idPessoa == null) ? 0 : idPessoa.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        NIR other = (NIR) obj;
+        if (idPessoa == null) {
+            if (other.idPessoa != null) {
+                return false;
+            }
+        } else if (!idPessoa.equals(other.idPessoa)) {
+            return false;
+        }
+        return true;
     }
 
 }

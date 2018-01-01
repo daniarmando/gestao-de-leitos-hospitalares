@@ -82,40 +82,7 @@ public class Enfermeiro extends Pessoa implements Serializable, Cloneable {
     public void setGerenteEnfermagem(GerenteEnfermagem gerenteEnfermagem) {
         this.gerenteEnfermagem = gerenteEnfermagem;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 19 * hash + Objects.hashCode(this.corenEnfermeiro);
-        hash = 19 * hash + Objects.hashCode(this.statusEnfermeiro);
-        hash = 19 * hash + Objects.hashCode(this.gerenteEnfermagem);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Enfermeiro other = (Enfermeiro) obj;
-        if (!Objects.equals(this.corenEnfermeiro, other.corenEnfermeiro)) {
-            return false;
-        }
-        if (!Objects.equals(this.statusEnfermeiro, other.statusEnfermeiro)) {
-            return false;
-        }
-        if (!Objects.equals(this.gerenteEnfermagem, other.gerenteEnfermagem)) {
-            return false;
-        }
-        return true;
-    }
-
+   
     /**
      * Método que gera uma cópia do objeto
      *
@@ -146,5 +113,36 @@ public class Enfermeiro extends Pessoa implements Serializable, Cloneable {
         clone.setCidade(cidade);
 
         return clone;
+    }
+    
+      //hashCode e equals não gerados pela IDE
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((idPessoa == null) ? 0 : idPessoa.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Enfermeiro other = (Enfermeiro) obj;
+        if (idPessoa == null) {
+            if (other.idPessoa != null) {
+                return false;
+            }
+        } else if (!idPessoa.equals(other.idPessoa)) {
+            return false;
+        }
+        return true;
     }
 }

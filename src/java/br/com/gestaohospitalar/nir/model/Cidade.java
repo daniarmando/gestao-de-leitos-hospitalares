@@ -84,9 +84,7 @@ public class Cidade implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + Objects.hashCode(this.idCidade);
-        hash = 37 * hash + Objects.hashCode(this.nomeCidade);
-        hash = 37 * hash + Objects.hashCode(this.estado);
+        hash = 41 * hash + Objects.hashCode(this.idCidade);
         return hash;
     }
 
@@ -102,13 +100,7 @@ public class Cidade implements Serializable {
             return false;
         }
         final Cidade other = (Cidade) obj;
-        if (!Objects.equals(this.nomeCidade, other.nomeCidade)) {
-            return false;
-        }
         if (!Objects.equals(this.idCidade, other.idCidade)) {
-            return false;
-        }
-        if (!Objects.equals(this.estado, other.estado)) {
             return false;
         }
         return true;

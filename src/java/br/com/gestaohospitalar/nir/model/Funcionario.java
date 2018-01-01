@@ -44,6 +44,36 @@ public class Funcionario extends Pessoa implements Serializable, Cloneable {
         this.statusFuncionario = statusFuncionario;
     }
 
+    /**
+     * Método que gera uma cópia do objeto
+     *
+     * @return
+     */
+    @Override
+    public Funcionario clone() {
+        Funcionario clone = new Funcionario();
+        clone.setStatusFuncionario(statusFuncionario);
+        clone.setIdPessoa(idPessoa);
+        clone.setNomePessoa(nomePessoa);
+        clone.setCpfPessoa(cpfPessoa);
+        clone.setRgPessoa(rgPessoa);
+        clone.setSexoPessoa(sexoPessoa);
+        clone.setDataNascimentoPessoa(dataNascimentoPessoa);
+        clone.setTelefonePessoa(telefonePessoa);
+        clone.setCelularPessoa(celularPessoa);
+        clone.setEnderecoPessoa(enderecoPessoa);
+        clone.setNumeroPessoa(numeroPessoa);
+        clone.setComplementoPessoa(complementoPessoa);
+        clone.setBairroPessoa(bairroPessoa);
+        clone.setCepPessoa(cepPessoa);
+        clone.setEmailPessoa(emailPessoa);
+        clone.setStatusPessoa(statusPessoa);
+        clone.setEstado(estado);
+        clone.setCidade(cidade);
+
+        return clone;
+    }
+    
     //hashCode e equals não gerados pela IDE
     @Override
     public int hashCode() {
@@ -73,36 +103,6 @@ public class Funcionario extends Pessoa implements Serializable, Cloneable {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Método que gera uma cópia do objeto
-     *
-     * @return
-     */
-    @Override
-    public Funcionario clone() {
-        Funcionario clone = new Funcionario();
-        clone.setStatusFuncionario(statusFuncionario);
-        clone.setIdPessoa(idPessoa);
-        clone.setNomePessoa(nomePessoa);
-        clone.setCpfPessoa(cpfPessoa);
-        clone.setRgPessoa(rgPessoa);
-        clone.setSexoPessoa(sexoPessoa);
-        clone.setDataNascimentoPessoa(dataNascimentoPessoa);
-        clone.setTelefonePessoa(telefonePessoa);
-        clone.setCelularPessoa(celularPessoa);
-        clone.setEnderecoPessoa(enderecoPessoa);
-        clone.setNumeroPessoa(numeroPessoa);
-        clone.setComplementoPessoa(complementoPessoa);
-        clone.setBairroPessoa(bairroPessoa);
-        clone.setCepPessoa(cepPessoa);
-        clone.setEmailPessoa(emailPessoa);
-        clone.setStatusPessoa(statusPessoa);
-        clone.setEstado(estado);
-        clone.setCidade(cidade);
-
-        return clone;
     }
 
 }

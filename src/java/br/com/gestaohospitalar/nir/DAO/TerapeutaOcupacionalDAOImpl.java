@@ -6,6 +6,7 @@ import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /*
@@ -20,6 +21,10 @@ import org.hibernate.criterion.Restrictions;
 public class TerapeutaOcupacionalDAOImpl {
 
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
+    
+    public TerapeutaOcupacional porId(Integer id) {
+        return (TerapeutaOcupacional) this.session.get(TerapeutaOcupacional.class, id);
+    }
 
     public void salvar(TerapeutaOcupacional terapeutaOcupacional) throws DAOException {
 
@@ -31,10 +36,11 @@ public class TerapeutaOcupacionalDAOImpl {
         }
     }
 
-    public List<TerapeutaOcupacional> listar() {
+    public List<TerapeutaOcupacional> ativos() {
 
         return (List<TerapeutaOcupacional>) this.session.createCriteria(TerapeutaOcupacional.class)
                 .add(Restrictions.eq("statusPessoa", Status.ATIVO.get()))
+                .addOrder(Order.asc("idPessoa"))
                 .list();
     }
 

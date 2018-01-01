@@ -23,7 +23,7 @@ public class ConverterPaciente implements Converter {
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
         if (value != null && !value.equals("")) {
             PacienteDAOImpl daoPaciente = new PacienteDAOImpl();
-            return daoPaciente.pacientePorId(Integer.valueOf(value));
+            return daoPaciente.porId(Integer.valueOf(value));
         }
         return null;
     }

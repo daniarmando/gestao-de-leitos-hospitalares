@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="conteudo">
+
+        <f:metadata>
+            <f:viewAction action="#{quartoBean.inicializarConsulta()}"  />
+        </f:metadata>
+
+        <h1 class="nir-titulopagina">Consulta de Quartos</h1>
+
+        <h:form id="frm">
+
+            <!--inicio barra de ferramentas superior com botao para cadastrar novos dados-->
+            <p:toolbar rendered="#{quartoBean.usuario.autorizacao eq 1}" > 
+                <p:toolbarGroup align="right">
+                    <p:commandButton icon="fa fa-file-text" value="Relatório" action="#{quartoBean.gerarRelatorio()}"
+                                     ajax="false" onclick="this.form.target = '_blank'" disabled="#{empty quartoBean.quartos}" />
+                    <p:button icon="fa fa-plus" value="Novo Quarto" outcome="cadastro" />
+                </p:toolbarGroup>
+            </p:toolbar>
+            <!--fim barra de ferramentas superior com botao para cadastrar novos dados-->
+
+            <p:messages autoUpdate="true" closable="true" />
+
+            <!--inicio tabela de dados que lista dados-->
+            <p:dataTable id="tabelaDeDados" value="#{quartoBean.quartos}" var="quarto"
+                         widgetVar="tabelaDeDados"
+                         paginator="true"     
+                         rows="10"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                         reflow="true" emptyMessage="Não há dados de quarto"
+                         sortBy="#{quarto.idQuarto}"
+                         filteredValue="#{quartoBean.quartosFiltrados}">
+
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <p:inputText id="globalFilter" onkeyup="PF('tabelaDeDados').filter()" style="width:auto" placeholder="Digite aqui para consultar"/>
+                    </p:outputPanel>
+                </f:facet>
+
+                <p:column headerText="Código" sortBy="#{quarto.idQuarto}" filterBy="#{quarto.idQuarto}">
+                    <h:outputText value="#{quarto.idQuarto}" />
+                </p:column> 
+                <p:column headerText="Tipo" sortBy="#{quarto.tipoQuarto}" filterBy="#{quarto.tipoQuarto}">
+                    <h:outputText value="#{quarto.tipoQuarto}" />
+                </p:column> 
+                <p:column headerText="Setor" filterBy="#{quarto.setor.tipoSetor}" filterStyle="display: none;">
+                    <h:outputText value="#{quarto.setor.tipoSetor}" />
+                </p:column> 
+                <p:column>
+                    <center>
+                        <p:button id="editar" icon="ui-icon-pencil" outcome="cadastro"
+                                  rendered="#{quartoBean.usuario.autorizacao eq 1}" >
+
+                            <f:param name="codigo" value="#{quarto.idQuarto}" />
+                        </p:button>
+                        <p:tooltip id="tpEditar" for="editar" value="Editar" position="bottom"/>
+
+                        <p:commandButton id="excluir" rendered="#{quartoBean.usuario.autorizacao eq 1}"
+                                         actionListener="#{quartoBean.excluir()}"
+                                         icon="fa fa-trash"
+                                         update=":frm:tabelaDeDados :frm:ultimolog">
+                            <p:confirm header="Confirmação" message="Confirma inativação do registro selecionado?" icon="ui-icon-alert" />
+                            <f:setPropertyActionListener target="#{quartoBean.quarto}" value="#{quarto}" />
+                        </p:commandButton>
+                        <p:tooltip id="tpExluir" for="excluir" value="Exluir" position="bottom"/>
+
+                        <p:commandButton id="gerarLogs" icon="fa fa-calendar" process="tabelaDeDados" update=":frm:logs" 
+                                         oncomplete="PF('logsDialog').show()" 
+                                         actionListener="#{quartoBean.gerarLogs(quarto.idQuarto)}" />
+                        <p:tooltip id="tpLogs" for="gerarLogs" value="Eventos" position="bottom"/>
+                    </center>
+                </p:column>
+
+            </p:dataTable>
+            <!--fim tabela de dados que lista dados-->
+
+            <h:outputText id="ultimolog" styleClass="ui-outputtext log" value="#{quartoBean.ultimoLog()}" />
+
+            <!--inicio janela modal que pede confirmação de exclusão -->
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+            <!--fim janela modal que pede confirmação de exclusão -->
+
+            <!--inicio janela modal que exibe logs do cadastro selecionado-->
+            <p:dialog width="550px" header="Eventos" widgetVar="logsDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" >
+                <p:dataList id="logs" value="#{quartoBean.logs}" var="log" type="definition" 
+                            paginator="true" rows="5" 
+                            paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                            paginatorPosition="bottom"
+                            emptyMessage="Não há eventos">
+                    <f:facet name="header">     
+                        #{quartoBean.quarto.tipoQuarto}
+                    </f:facet>
+                    <h:outputText value="#{log.dataHora}" style="margin-left: 10px;">
+                        <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss '-'" locale="pt_BR" />
+                    </h:outputText>
+                    <h:outputText value=" #{log.tipo}" style="font-weight: bold" />
+                    <h:outputText value=" feita por" />
+                    <h:outputText value=" #{log.usuario.login}. " id="usuario" />
+                    <p:tooltip id="toolTipUsuario" for="usuario" value="#{log.usuario.pessoa.nomePessoa}" position="right"/>
+
+                    <p:commandLink update=":frm:detalhesLog" id="detalhes" oncomplete="PF('dlgDetalhesLog').show()" title="Detalhes" styleClass="ui-icon ui-icon-search" style="float:right;margin-right:10px" rendered="#{not empty log.detalhe}">
+                        <f:setPropertyActionListener value="#{log}" target="#{quartoBean.log}" />
+                    </p:commandLink>
+                    <p:tooltip id="toolTipDetalhes" for="detalhes" value="Detalhes" position="right"/>
+                    <p:separator  style="margin: 5px;"/>                    
+
+                </p:dataList>
+
+            </p:dialog>
+            <!--fim janela modal que exibe logs do cadastro selecionado-->
+
+            <!--inicio janela modal que exibe detalhes do log do cadastro selecionado-->
+            <p:dialog header="Detalhes" widgetVar="dlgDetalhesLog" modal="true" showEffect="blind" hideEffect="explode" width="460px" resizable="false" closeOnEscape="true" >
+                <p:outputPanel id="detalhesLog" style="text-align: justify;">
+                    <h:outputText value="#{quartoBean.log.detalhe}" />
+                </p:outputPanel>
+            </p:dialog>
+            <!--fim janela modal que exibe detalhes do log do cadastro selecionado-->
+
+        </h:form>
+    </ui:define>
+</ui:composition>

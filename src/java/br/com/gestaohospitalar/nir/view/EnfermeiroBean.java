@@ -20,6 +20,7 @@ import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.model.enumerator.TipoUsuario;
 import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
@@ -133,6 +134,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
                     autorizacoes.add(autorizacao);
 
                     this.usuarioEnfermeiro.setAutorizacoes(autorizacoes);
+                    this.usuarioEnfermeiro.setTipo(TipoUsuario.ENFERMEIRO.get());
                     this.usuarioEnfermeiro.setStatus(true);
                     this.usuarioEnfermeiro.setPessoa(this.enfermeiro);
 

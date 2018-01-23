@@ -46,7 +46,7 @@ public class SetorBean implements InterfaceBean, Serializable {
 
     private LogDAOImpl daoLog;
     private Log log;
-    private List<Log> logs;
+    private List<Log> logs;       
 
     /**
      * Creates a new instance of SetorBean

@@ -28,6 +28,7 @@ public class Usuario implements Serializable, Cloneable {
     private Integer id;
     private String login;
     private String senha;
+    private String tipo;
     private boolean status;
     private List<Autorizacao> autorizacoes;
     private Pessoa pessoa;
@@ -35,10 +36,11 @@ public class Usuario implements Serializable, Cloneable {
     public Usuario() {
     }
 
-    public Usuario(Integer id, String login, String senha, boolean status, List<Autorizacao> autorizacoes, Pessoa pessoa) {
+    public Usuario(Integer id, String login, String senha, String tipo, boolean status, List<Autorizacao> autorizacoes, Pessoa pessoa) {
         this.id = id;
         this.login = login;
         this.senha = senha;
+        this.tipo = tipo;
         this.status = status;
         this.autorizacoes = autorizacoes;
         this.pessoa = pessoa;
@@ -86,6 +88,14 @@ public class Usuario implements Serializable, Cloneable {
      */
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+    
+    public String getTipo() {
+        return this.tipo;
+    }
+    
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     /**

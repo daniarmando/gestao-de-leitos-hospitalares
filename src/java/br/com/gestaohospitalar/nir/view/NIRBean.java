@@ -18,6 +18,7 @@ import br.com.gestaohospitalar.nir.model.NIR;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.model.enumerator.TipoUsuario;
 import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
@@ -123,6 +124,7 @@ public class NIRBean implements InterfaceBean, Serializable {
                 autorizacoes.add(autorizacao);
 
                 this.usuarioNIR.setAutorizacoes(autorizacoes);
+                this.usuarioNIR.setTipo(TipoUsuario.NIR.get());
                 this.usuarioNIR.setStatus(true);
                 this.usuarioNIR.setPessoa(this.NIR);
 

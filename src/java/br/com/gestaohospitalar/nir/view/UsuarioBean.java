@@ -5,19 +5,12 @@
  */
 package br.com.gestaohospitalar.nir.view;
 
-import br.com.gestaohospitalar.nir.DAO.EnfermeiroDAOImpl;
-import br.com.gestaohospitalar.nir.DAO.GerenteEnfermagemDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.HospitalDAOImpl;
-import br.com.gestaohospitalar.nir.DAO.NIRDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.UsuarioDAOImpl;
-import br.com.gestaohospitalar.nir.model.Enfermeiro;
-import br.com.gestaohospitalar.nir.model.GerenteEnfermagem;
 import br.com.gestaohospitalar.nir.model.Hospital;
-import br.com.gestaohospitalar.nir.model.NIR;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.model.enumerator.TipoUsuario;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.primefaces.context.RequestContext;
@@ -35,17 +28,11 @@ import org.springframework.security.core.userdetails.User;
 public final class UsuarioBean implements Serializable {
 
     private UsuarioDAOImpl daoUsuario;
-    private Usuario usuario;
-
-    private NIR nir;
-
-    private GerenteEnfermagem gerenteEnfermagem;
-
-    private Enfermeiro enfermeiro;
+    private Usuario usuario;       
     
     private Hospital hospital;
 
-    String tipoAutorizacao = "";
+    //String tipoAutorizacao = "";
     private Integer autorizacao = 0;
 
     //usado para abrir ou fechar o notification bar de chat, começa true para começar abrindo
@@ -67,31 +54,25 @@ public final class UsuarioBean implements Serializable {
                 this.usuario = this.daoUsuario.porLogin(this.usuario.getLogin());               
 
                 //recupera as autorizações do usuário logado 
-                List<Object> autorizacoes = new ArrayList(((User) authentication.getPrincipal()).getAuthorities());
+                //List<Object> autorizacoes = new ArrayList(((User) authentication.getPrincipal()).getAuthorities());
 
                 //pega a autorização do usuário logado e atribui a variável String tipoAutorização
-                for (Object a : autorizacoes) {
-                    this.tipoAutorizacao = a.toString();
-                }
+                //for (Object a : autorizacoes) {
+                    //this.tipoAutorizacao = a.toString();
+                //}
 
-                //atribui um valor para a variável Integer autorizacao de acordo com a autorização do usuário 
-                //logado para depois utilizar na renderização de componentes JSF,
-                //também traz uma lista da pessoa que pertence ao usuário logado através do ID
-                switch (this.tipoAutorizacao) {
-                    case "ROLE_nir":
+                
+                //monta a autorizaçao do usuario
+                switch (TipoUsuario.valueOf(this.usuario.getTipo())) {
+                    case NIR:
                         this.autorizacao = 1;
-                        this.nir = new NIR();
-                        this.nir = new NIRDAOImpl().porId(this.usuario.getPessoa().getIdPessoa());
                         break;
-                    case "ROLE_gen":
+                    case MEDICO:
+                    case GERENTE_ENFERMAGEM:
                         this.autorizacao = 2;
-                        this.gerenteEnfermagem = new GerenteEnfermagem();
-                        this.gerenteEnfermagem = new GerenteEnfermagemDAOImpl().porId(this.usuario.getPessoa().getIdPessoa());
                         break;
-                    case "ROLE_enf":
+                    case ENFERMEIRO:
                         this.autorizacao = 3;
-                        this.enfermeiro = new Enfermeiro();
-                        this.enfermeiro = new EnfermeiroDAOImpl().porId(this.usuario.getPessoa().getIdPessoa());
                         break;
                     default:
                         System.out.println("Erro");
@@ -111,30 +92,6 @@ public final class UsuarioBean implements Serializable {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
-    }
-
-    public NIR getNir() {
-        return nir;
-    }
-
-    public void setNir(NIR nir) {
-        this.nir = nir;
-    }
-
-    public GerenteEnfermagem getGerenteEnfermagem() {
-        return gerenteEnfermagem;
-    }
-
-    public void setGerenteEnfermagem(GerenteEnfermagem gerenteEnfermagem) {
-        this.gerenteEnfermagem = gerenteEnfermagem;
-    }
-
-    public Enfermeiro getEnfermeiro() {
-        return enfermeiro;
-    }
-
-    public void setEnfermeiro(Enfermeiro enfermeiro) {
-        this.enfermeiro = enfermeiro;
     }
 
     public Integer getAutorizacao() {

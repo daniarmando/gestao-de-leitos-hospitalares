@@ -18,6 +18,7 @@ import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
 import br.com.gestaohospitalar.nir.model.Usuario;
+import br.com.gestaohospitalar.nir.model.enumerator.TipoUsuario;
 import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
 import br.com.gestaohospitalar.nir.util.report.GerarRelatorio;
@@ -127,6 +128,7 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
                     autorizacoes.add(autorizacao);
 
                     this.usuarioGerenteEnfermagem.setAutorizacoes(autorizacoes);
+                    this.usuarioGerenteEnfermagem.setTipo(TipoUsuario.GERENTE_ENFERMAGEM.get());
                     this.usuarioGerenteEnfermagem.setStatus(true);
                     this.usuarioGerenteEnfermagem.setPessoa(this.gerenteEnfermagem);
 

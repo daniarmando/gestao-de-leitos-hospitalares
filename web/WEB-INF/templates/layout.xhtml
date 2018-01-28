@@ -33,7 +33,7 @@
 
                 <h:graphicImage library="nir" name="imagens/logo.png" />
 
-                <h:outputLink id="sair" title="Sair" class="nir-alternarmenu" value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
+                <h:outputLink id="sair" title="Sair" class="nir-alternarmenu" value="#{usuarioBean.sair}">
                     <i class="fa fa-sign-out"></i>
                 </h:outputLink>
                 <p:tooltip id="toolTipSair" for="sair" position="bottom"/>

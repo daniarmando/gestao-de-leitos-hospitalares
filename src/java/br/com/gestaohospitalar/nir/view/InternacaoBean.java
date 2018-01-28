@@ -555,6 +555,19 @@ public class InternacaoBean implements Serializable {
         List<Object> listaObjetos = new ArrayList<>(this.internacoes);
         relatorio.getRelatorio(listaObjetos, nomeRelatorio);
     }
+    
+    public void gerarRelatorioPorInternacao(Integer idInternacao) {
+        String nomeRelatorio = "relatorioInternacao";
+        GerarRelatorio relatorio = new GerarRelatorio();
+        this.daoInternacao = new InternacaoDAOImpl();
+        
+        Internacao internacaoRelatorio = this.daoInternacao.porId(idInternacao);               
+
+        List<Object> listaObjetos = new ArrayList<>();
+        listaObjetos.add(internacaoRelatorio);
+        
+        relatorio.getRelatorio(listaObjetos, nomeRelatorio);
+    }
 
     /**
      * método que busca internação por id

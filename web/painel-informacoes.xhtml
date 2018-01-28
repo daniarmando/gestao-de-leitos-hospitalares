@@ -165,7 +165,10 @@
                             <p:commandButton id="resumo" icon="fa  fa-file-text" actionListener="#{internacaoBean.internacaoPorId(leito.internacao.idInternacao)}" update=":frm:resumoInternacao" oncomplete="PF('nbResumoInternacao').show();" rendered="#{leito.statusLeito eq 'INT'}" />
                             <p:tooltip id="toolTipFadeResumo" for="resumo" position="bottom" value="Resumo da Internação"/>
 
-                            <p:commandButton id="historico" icon="fa  fa-history" actionListener="#{leitoBean.listarHistoricoInternacoes(leito.idLeito)}" update=":historicoleito" oncomplete="PF('dlghistorico').show()" />                           
+                            <p:commandButton id="relatorio" icon="fa  fa-print" actionListener="#{internacaoBean.gerarRelatorioPorInternacao(leito.internacao.idInternacao)}" ajax="false" onclick="this.form.target = '_blank'" rendered="#{leito.statusLeito eq 'INT'}" />
+                            <p:tooltip id="toolTipFadeRelatorio" for="relatorio" position="bottom" value="Relatorio da Internação"/>
+
+                            <p:commandButton id="historico" icon="fa  fa-history" actionListener="#{leitoBean.listarHistoricoInternacoes(leito.idLeito)}" update=":formHistorico:historicoleito" oncomplete="PF('dlghistorico').show()" />                           
                             <p:tooltip id="toolTipFadeHistorico" for="historico" position="bottom" value="Histórico do Leito"/>
 
                             <p:commandButton id="cancelarInternacao" icon="fa  fa-close" actionListener="#{internacaoBean.cancelarInternacao(leito.internacao)}" rendered="#{leito.statusLeito eq 'INT'}">
@@ -449,58 +452,58 @@
         </p:dialog>
 
         <p:dialog id="dlghistorico" width="500" header="Histórico de Internações" widgetVar="dlghistorico" modal="true" showEffect="fade" hideEffect="fade" resizable="false" responsive="true" closeOnEscape="true" >
+            <h:form id="formHistorico">
+                <p:dataTable reflow="true" id="historicoleito" var="historico" 
+                             value="#{leitoBean.historicoInternacoesPorLeito}"
+                             emptyMessage="Não há dados de internações para o leito selecionado."
+                             scrollable="true" scrollWidth="700" scrollHeight="120">
+                    
+                    <p:column>
+                        <center>
+                            <p:commandButton id="relatorioDlg" icon="fa  fa-print" actionListener="#{internacaoBean.gerarRelatorioPorInternacao(historico.idInternacao)}" ajax="false" onclick="this.form.target = '_blank'" />
+                            <p:tooltip id="toolTipFadeRelatorioDlg" for="relatorioDlg" position="bottom" value="Relatório"/>
+                        </center>
+                    </p:column>
 
-            <p:dataTable reflow="true" id="historicoleito" var="historico" 
-                         value="#{leitoBean.historicoInternacoesPorLeito}"
-                         emptyMessage="Não há dados de internações para o leito selecionado."
-                         scrollable="true" scrollWidth="900" scrollHeight="200">
+                    <p:column headerText="Código">
+                        <h:outputText value="#{historico.idInternacao}-#{historico.codigoInternacaoHospital}" />
+                    </p:column>
 
-                <p:column headerText="Internação">
-                    <h:outputText value="#{historico.idInternacao}-#{historico.codigoInternacaoHospital}" />
-                </p:column>
+                    <p:column headerText="Entrada">
+                        <h:outputText value="#{historico.dataEntrada}" >
+                            <f:convertDateTime pattern="dd/MM/yy HH:mm" locale="pt_BR" />
+                        </h:outputText>
+                    </p:column>
 
-                <p:column headerText="Paciente">
-                    <h:outputText value="#{historico.paciente.nomePessoa}" />
-                </p:column>
+                    <p:column headerText="Vencimento">
+                        <h:outputText value="#{historico.dataHoraLimiteVermelho}" >
+                            <f:convertDateTime pattern="dd/MM/yy HH:mm" locale="pt_BR" />
+                        </h:outputText>
+                    </p:column>
 
-                <p:column headerText="Médico">
-                    <h:outputText value="#{historico.medico.nomePessoa}" />
-                </p:column>
+                    <p:column headerText="Previsão">
+                        <h:outputText value="Não informado" rendered="#{empty historico.dataPrevisaoAlta}" />
+                        <h:outputText value="#{historico.dataPrevisaoAlta}" rendered="#{not empty historico.dataPrevisaoAlta}">
+                            <f:convertDateTime pattern="dd/MM/yy HH:mm" locale="pt_BR" />
+                        </h:outputText>
+                    </p:column>
 
-                <p:column headerText="Entrada">
-                    <h:outputText value="#{historico.dataEntrada}" >
-                        <f:convertDateTime pattern="dd/MM/yy 'as' HH:mm" locale="pt_BR" />
-                    </h:outputText>
-                </p:column>
+                    <p:column headerText="Alta">
+                        <h:outputText value="Não informado" rendered="#{empty historico.dataAlta}" />
+                        <h:outputText value="#{historico.dataAlta}" rendered="#{not empty historico.dataAlta}">
+                            <f:convertDateTime pattern="dd/MM/yy HH:mm" locale="pt_BR" />
+                        </h:outputText>
+                    </p:column>
 
-                <p:column headerText="Vencimento">
-                    <h:outputText value="#{historico.dataHoraLimiteVermelho}" >
-                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
-                    </h:outputText>
-                </p:column>
+                    <p:column headerText="Saída">
+                        <h:outputText value="Não informado" rendered="#{empty historico.dataSaidaLeito}"/>
+                        <h:outputText value="#{historico.dataSaidaLeito}" rendered="#{not empty historico.dataSaidaLeito}">
+                            <f:convertDateTime pattern="dd/MM/yy HH:mm" locale="pt_BR" />
+                        </h:outputText>
+                    </p:column>
 
-                <p:column headerText="Previsão" >
-                    <h:outputText value="Não informado" rendered="#{empty historico.dataPrevisaoAlta}" />
-                    <h:outputText value="#{historico.dataPrevisaoAlta}" rendered="#{not empty historico.dataPrevisaoAlta}">
-                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
-                    </h:outputText>
-                </p:column>
-
-                <p:column headerText="Alta" >
-                    <h:outputText value="Não informado" rendered="#{empty historico.dataAlta}" />
-                    <h:outputText value="#{historico.dataAlta}" rendered="#{not empty historico.dataAlta}">
-                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
-                    </h:outputText>
-                </p:column>
-
-                <p:column headerText="Saída" >
-                    <h:outputText value="Não informado" rendered="#{empty historico.dataSaidaLeito}"/>
-                    <h:outputText value="#{historico.dataSaidaLeito}" rendered="#{not empty historico.dataSaidaLeito}">
-                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
-                    </h:outputText>
-                </p:column>
-
-            </p:dataTable>
+                </p:dataTable>
+            </h:form>
         </p:dialog>
 
         <h:form>

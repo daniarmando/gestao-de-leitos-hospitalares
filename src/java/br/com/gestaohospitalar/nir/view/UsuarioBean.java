@@ -13,6 +13,7 @@ import br.com.gestaohospitalar.nir.model.enumerator.TipoUsuario;
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import org.primefaces.context.RequestContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -85,6 +86,10 @@ public final class UsuarioBean implements Serializable {
             }
         }
     }
+    
+    public String getSair() {
+        return FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/j_spring_security_logout";
+    }
 
     public Usuario getUsuario() {
         return usuario;
@@ -100,7 +105,7 @@ public final class UsuarioBean implements Serializable {
     
     public Hospital getHospital() {
         return this.hospital;
-    } 
+    }    
     
     public void abreFechaNB() {
         if (this.isOpenNBChat) {

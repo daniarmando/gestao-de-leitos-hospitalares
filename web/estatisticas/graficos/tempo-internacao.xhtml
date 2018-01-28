@@ -40,7 +40,7 @@
                     <h:outputLabel value="até" style="margin: 0 3px 0 3px;"/>
                     <p:calendar id="datafinal" label="Data Final" placeholder="Data Final" locale="pt" mask="99/99/9999" value="#{graficoTempoInternacaoBean.dataFinal}" required="true" pattern="dd/MM/yyyy" />
 
-                    <p:commandButton icon="fa fa-bar-chart" value="Montar" actionListener="#{graficoTempoInternacaoBean.prepararGrafico()}" update="@form" style="margin-left: 10px;"/>
+                    <p:commandButton icon="fa fa-bar-chart" value="Gerar" actionListener="#{graficoTempoInternacaoBean.prepararGrafico()}" update="@form" style="margin-left: 10px;"/>
 
                 </p:toolbarGroup>
 

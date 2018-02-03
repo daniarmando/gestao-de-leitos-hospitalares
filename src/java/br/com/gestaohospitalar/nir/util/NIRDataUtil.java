@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.gestaohospitalar.nir.converter;
+package br.com.gestaohospitalar.nir.util;
 
 import br.com.gestaohospitalar.nir.DAO.SigtapUploadLogDAOImpl;
 import java.text.SimpleDateFormat;
@@ -20,7 +20,7 @@ import java.util.Date;
  * 
  * @author Daniel
  */
-public class ConverterDataHora {
+public class NIRDataUtil {
 
     /**
      * método que retorna uma data formatada (dd/MM/yyyy as HH:mm:ss)

@@ -7,7 +7,7 @@ package br.com.gestaohospitalar.nir.view;
 
 import br.com.gestaohospitalar.nir.DAO.HospitalDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Hospital;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
@@ -148,7 +148,7 @@ public class HospitalBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = daoLog.ultimoPorObjeto("hospital");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora()) +
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.getLog().getDataHora()) +
                                   " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 

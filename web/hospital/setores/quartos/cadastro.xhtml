@@ -46,11 +46,11 @@
                             <p:selectOneMenu label="Setor" id="setor" value="#{quartoBean.quarto.setor}" required="true" converter="converterSetor">
                                 <f:selectItem itemLabel="Selecione" />
                                 <f:selectItems value="#{quartoBean.setores}" var="setor" 
-                                               itemValue="#{setor}" itemLabel="#{setor.tipoSetor}" />
+                                               itemValue="#{setor}" itemLabel="#{setor.descricaoSetor}" />
                             </p:selectOneMenu>
 
-                            <p:outputLabel value="Tipo" for="tipo" />
-                            <p:inputText id="tipo" maxlength="45" required="true" value="#{quartoBean.quarto.tipoQuarto}" >
+                            <p:outputLabel value="Descrição" for="descricao" />
+                            <p:inputText id="tipo" maxlength="45" required="true" value="#{quartoBean.quarto.descricaoQuarto}" >
                                 <f:validateLength minimum="3" maximum="45" />
                             </p:inputText>
 

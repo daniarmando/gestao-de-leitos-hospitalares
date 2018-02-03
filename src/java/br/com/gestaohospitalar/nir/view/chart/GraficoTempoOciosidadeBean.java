@@ -7,7 +7,7 @@ package br.com.gestaohospitalar.nir.view.chart;
 
 import br.com.gestaohospitalar.nir.DAO.EstatisticasDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SetorDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Estatisticas;
 import br.com.gestaohospitalar.nir.model.Setor;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
@@ -121,7 +121,7 @@ public class GraficoTempoOciosidadeBean implements Serializable {
         //para cada setor encontrado adiciona uma série
         //passando o idSetor e rótulo
         this.setores.forEach((setor) -> {
-            adicionarSerie(setor.getIdSetor(), (setor.getIdSetor() + " - " + setor.getTipoSetor()), false);
+            adicionarSerie(setor.getIdSetor(), (setor.getIdSetor() + " - " + setor.getDescricaoSetor()), false);
         });
 
     }
@@ -251,11 +251,11 @@ public class GraficoTempoOciosidadeBean implements Serializable {
         this.daoEstatisticas = new EstatisticasDAOImpl();
 
         //convertendo a data inicial para Calendar
-        Calendar cDataInicial = ConverterDataHora.paraCalendar(dataInicial);
+        Calendar cDataInicial = NIRDataUtil.paraCalendar(dataInicial);
 
         //convertendo as datas inicial e final para LocalDate
-        LocalDate ldDataInicial = ConverterDataHora.paraLocalDate(dataInicial);
-        LocalDate ldDataFinal = ConverterDataHora.paraLocalDate(dataFinal);
+        LocalDate ldDataInicial = NIRDataUtil.paraLocalDate(dataInicial);
+        LocalDate ldDataFinal = NIRDataUtil.paraLocalDate(dataFinal);
         //extraindo a quantidade de meses entre as datas inicial e final
         long qtdMesesPeriodo = ChronoUnit.MONTHS.between(ldDataInicial, ldDataFinal);
 

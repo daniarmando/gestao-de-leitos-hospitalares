@@ -8,7 +8,7 @@ package br.com.gestaohospitalar.nir.view;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.QuartoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SetorDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
 import br.com.gestaohospitalar.nir.model.Quarto;
@@ -148,8 +148,8 @@ public class QuartoBean implements InterfaceBean, Serializable {
             detalhe = "";
 
             //compara os atributos para verificar quais foram as alterações feitas para salvar 
-            if (!this.quarto.getTipoQuarto().equals(this.cloneQuarto.getTipoQuarto())) {
-                detalhe += " tipo de " + this.cloneQuarto.getTipoQuarto() + " para " + this.quarto.getTipoQuarto() + ",";
+            if (!this.quarto.getDescricaoQuarto().equals(this.cloneQuarto.getDescricaoQuarto())) {
+                detalhe += " descrição de " + this.cloneQuarto.getDescricaoQuarto() + " para " + this.quarto.getDescricaoQuarto() + ",";
             }
 
             if (!this.quarto.getStatusQuarto().equals(this.cloneQuarto.getStatusQuarto())) {
@@ -160,8 +160,8 @@ public class QuartoBean implements InterfaceBean, Serializable {
                         + ",";
             }
 
-            if (!this.quarto.getSetor().getTipoSetor().equals(this.cloneQuarto.getSetor().getTipoSetor())) {
-                detalhe += " setor de " + this.cloneQuarto.getSetor().getTipoSetor() + " para " + this.quarto.getSetor().getTipoSetor() + ",";
+            if (!this.quarto.getSetor().getDescricaoSetor().equals(this.cloneQuarto.getSetor().getDescricaoSetor())) {
+                detalhe += " setor de " + this.cloneQuarto.getSetor().getDescricaoSetor() + " para " + this.quarto.getSetor().getDescricaoSetor() + ",";
             }
 
             //removendo última vírgula e adicionando ponto final
@@ -183,7 +183,7 @@ public class QuartoBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("quarto");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) +
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) +
                                   " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 

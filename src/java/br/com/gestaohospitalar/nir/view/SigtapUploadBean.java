@@ -10,7 +10,7 @@ import br.com.gestaohospitalar.nir.DAO.LeitoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SigtapUploadDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SigtapUploadLogDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.sigtap.RL_PROCEDIMENTO_CID;
 import br.com.gestaohospitalar.nir.model.sigtap.RL_PROCEDIMENTO_LEITO;
@@ -94,7 +94,7 @@ public class SigtapUploadBean implements Serializable {
     private final SimpleDateFormat fmtData = new SimpleDateFormat("ddyyMM");
 
     //monta a chave MesAno
-    private final String chaveMesAno = ConverterDataHora.gerarChaveMesAno();
+    private final String chaveMesAno = NIRDataUtil.gerarChaveMesAno();
 
     //cria uma data atual
     private final Date data = new Date();
@@ -112,7 +112,7 @@ public class SigtapUploadBean implements Serializable {
      * @return mesTexto
      */
     public String mostrarMes() {
-        return ConverterDataHora.paraMes(data);
+        return NIRDataUtil.paraMes(data);
     }
 
     /**
@@ -413,7 +413,7 @@ public class SigtapUploadBean implements Serializable {
      */
     public String ultimoLog() {
         this.log = new LogDAOImpl().ultimoPorObjeto("sigtapUpload");
-        return this.log != null ? "Última importação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última importação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     //abaixo estão os métodos que fazem a leitura linha a linha dos txts e os 

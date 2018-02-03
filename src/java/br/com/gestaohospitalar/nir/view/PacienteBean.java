@@ -8,7 +8,7 @@ package br.com.gestaohospitalar.nir.view;
 import br.com.gestaohospitalar.nir.DAO.EstadoCidadeDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.PacienteDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Cidade;
 import br.com.gestaohospitalar.nir.model.Estado;
 import br.com.gestaohospitalar.nir.model.Log;
@@ -188,7 +188,7 @@ public class PacienteBean implements InterfaceBean, Serializable {
             }
 
             if (!this.paciente.getDataNascimentoPessoa().equals(this.clonePaciente.getDataNascimentoPessoa())) {
-                detalhe += " data de nascimento de " + ConverterDataHora.formatarData(this.clonePaciente.getDataNascimentoPessoa()) + " para " + ConverterDataHora.formatarData(this.paciente.getDataNascimentoPessoa()) + ",";
+                detalhe += " data de nascimento de " + NIRDataUtil.formatarData(this.clonePaciente.getDataNascimentoPessoa()) + " para " + NIRDataUtil.formatarData(this.paciente.getDataNascimentoPessoa()) + ",";
             }
 
             if (!this.paciente.getTelefonePessoa().equals(this.clonePaciente.getTelefonePessoa())) {
@@ -260,7 +260,7 @@ public class PacienteBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("paciente");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override

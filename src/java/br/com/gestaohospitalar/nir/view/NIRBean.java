@@ -9,7 +9,7 @@ import br.com.gestaohospitalar.nir.DAO.EstadoCidadeDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.NIRDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.UsuarioDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Autorizacao;
 import br.com.gestaohospitalar.nir.model.Cidade;
 import br.com.gestaohospitalar.nir.model.Estado;
@@ -176,7 +176,7 @@ public class NIRBean implements InterfaceBean, Serializable {
             }
 
             if (!this.NIR.getDataNascimentoPessoa().equals(this.cloneNIR.getDataNascimentoPessoa())) {
-                detalhe += " data de nascimento de " + ConverterDataHora.formatarData(this.cloneNIR.getDataNascimentoPessoa()) + " para " + ConverterDataHora.formatarData(this.NIR.getDataNascimentoPessoa()) + ",";
+                detalhe += " data de nascimento de " + NIRDataUtil.formatarData(this.cloneNIR.getDataNascimentoPessoa()) + " para " + NIRDataUtil.formatarData(this.NIR.getDataNascimentoPessoa()) + ",";
             }
 
             if (!this.NIR.getTelefonePessoa().equals(this.cloneNIR.getTelefonePessoa())) {
@@ -255,7 +255,7 @@ public class NIRBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("nir");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override
@@ -315,7 +315,7 @@ public class NIRBean implements InterfaceBean, Serializable {
     }
 
     public Date getMaxDate() {
-       return ConverterDataHora.gerarDataMaiorDeIdade();
+       return NIRDataUtil.gerarDataMaiorDeIdade();
     }
 
     public Usuario getUsuarioNIR() {

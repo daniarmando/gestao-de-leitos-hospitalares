@@ -5,7 +5,7 @@
  */
 package br.com.gestaohospitalar.nir.model;
 
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_PROCEDIMENTO;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_CID;
 import java.io.Serializable;
@@ -331,17 +331,17 @@ public class Internacao implements Serializable {
         //verde
         Long verde = Math.round(((this.procedimento.getQT_DIAS_PERMANENCIA() * 24) * kanban.getValorVerdeKanban()) / 100.0);
         LocalDateTime tempoLimiteVerde = dataEntrada.plusHours(verde);
-        this.dataHoraLimiteVerde = ConverterDataHora.paraDate(tempoLimiteVerde);
+        this.dataHoraLimiteVerde = NIRDataUtil.paraDate(tempoLimiteVerde);
         
         //amarelo
         Long amarelo = verde + Math.round(((this.procedimento.getQT_DIAS_PERMANENCIA() * 24) * kanban.getValorAmareloKanban()) / 100.0);
         LocalDateTime tempoLimiteAmarelo = dataEntrada.plusHours(amarelo);
-        this.dataHoraLimiteAmarelo = ConverterDataHora.paraDate(tempoLimiteAmarelo);
+        this.dataHoraLimiteAmarelo = NIRDataUtil.paraDate(tempoLimiteAmarelo);
         
         //vermelho
         Long vermelho = Long.valueOf(this.procedimento.getQT_DIAS_PERMANENCIA() * 24);
         LocalDateTime tempoLimiteVermelho = dataEntrada.plusHours(vermelho);
-        this.dataHoraLimiteVermelho = ConverterDataHora.paraDate(tempoLimiteVermelho);
+        this.dataHoraLimiteVermelho = NIRDataUtil.paraDate(tempoLimiteVermelho);
     }
     
     /**

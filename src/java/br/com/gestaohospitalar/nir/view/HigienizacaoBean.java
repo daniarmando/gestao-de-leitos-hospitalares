@@ -10,7 +10,7 @@ import br.com.gestaohospitalar.nir.DAO.HigienizacaoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.InternacaoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LeitoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Funcionario;
 import br.com.gestaohospitalar.nir.model.Higienizacao;
 import br.com.gestaohospitalar.nir.model.Internacao;
@@ -115,7 +115,7 @@ public class HigienizacaoBean implements InterfaceBean, Serializable {
 //                this.daoHigienizacao.excluirFuncionarios(this.higienizacao.getIdHigienizacao());
 //            }
                 //salvando a higienização
-                this.higienizacao.setTempoHigienizacaoMinutos(ConverterDataHora.diferencaEmMinutos(this.higienizacao.getDataHoraInicio(), this.higienizacao.getDataHoraFim()));
+                this.higienizacao.setTempoHigienizacaoMinutos(NIRDataUtil.diferencaEmMinutos(this.higienizacao.getDataHoraInicio(), this.higienizacao.getDataHoraFim()));
                 this.daoHigienizacao.salvar(this.higienizacao);
 
                 //salvando o log
@@ -179,11 +179,11 @@ public class HigienizacaoBean implements InterfaceBean, Serializable {
 
             //compara os atributos para verificar quais foram as alterações feitas para salvar 
             if (!this.higienizacao.getDataHoraInicio().equals(this.cloneHigienizacao.getDataHoraInicio())) {
-                detalhe += " data e hora de início de " + ConverterDataHora.formatarDataHora(this.cloneHigienizacao.getDataHoraInicio()) + " para " + ConverterDataHora.formatarDataHora(this.higienizacao.getDataHoraInicio()) + ",";
+                detalhe += " data e hora de início de " + NIRDataUtil.formatarDataHora(this.cloneHigienizacao.getDataHoraInicio()) + " para " + NIRDataUtil.formatarDataHora(this.higienizacao.getDataHoraInicio()) + ",";
             }
 
             if (!this.higienizacao.getDataHoraFim().equals(this.cloneHigienizacao.getDataHoraFim())) {
-                detalhe += " data e hora final de " + ConverterDataHora.formatarDataHora(this.cloneHigienizacao.getDataHoraFim()) + " para " + ConverterDataHora.formatarDataHora(this.higienizacao.getDataHoraFim()) + ",";
+                detalhe += " data e hora final de " + NIRDataUtil.formatarDataHora(this.cloneHigienizacao.getDataHoraFim()) + " para " + NIRDataUtil.formatarDataHora(this.higienizacao.getDataHoraFim()) + ",";
             }
 
             if (!this.higienizacao.getTempoHigienizacaoMinutos().equals(this.cloneHigienizacao.getTempoHigienizacaoMinutos())) {
@@ -214,7 +214,7 @@ public class HigienizacaoBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("internacao");
-        return this.log != null ? "Última modificação em processo de internação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação em processo de internação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override

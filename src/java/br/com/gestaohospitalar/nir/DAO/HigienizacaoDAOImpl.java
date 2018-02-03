@@ -5,7 +5,7 @@
  */
 package br.com.gestaohospitalar.nir.DAO;
 
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Higienizacao;
 import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
@@ -24,7 +24,7 @@ public class HigienizacaoDAOImpl {
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
     //Busca a última chaveMesAno
-    String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+    String chaveMesAno = NIRDataUtil.ultimaChaveMesAno();
     
     public Higienizacao porId(Integer id) {
         return (Higienizacao) this.session.get(Higienizacao.class, id);

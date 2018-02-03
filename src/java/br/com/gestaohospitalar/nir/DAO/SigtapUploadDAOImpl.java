@@ -5,7 +5,7 @@
  */
 package br.com.gestaohospitalar.nir.DAO;
 
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.sigtap.RL_PROCEDIMENTO_CID;
 import br.com.gestaohospitalar.nir.model.sigtap.RL_PROCEDIMENTO_LEITO;
 import br.com.gestaohospitalar.nir.model.SigtapUploadLog;
@@ -32,7 +32,7 @@ public class SigtapUploadDAOImpl {
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
     //Busca a última chaveMesAno
-    private String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+    private String chaveMesAno = NIRDataUtil.ultimaChaveMesAno();
 
     public TB_TIPO_LEITO tb_tipo_leitoPorCodigo(String co_tipo_leito) {
         return (TB_TIPO_LEITO) this.session.get(TB_TIPO_LEITO.class, co_tipo_leito);
@@ -169,7 +169,7 @@ public class SigtapUploadDAOImpl {
     public List<TB_TIPO_LEITO> listar() {
 
         if (this.chaveMesAno == null) {
-            this.chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+            this.chaveMesAno = NIRDataUtil.ultimaChaveMesAno();
         }
         return (List<TB_TIPO_LEITO>) this.session.createCriteria(TB_TIPO_LEITO.class)
                 .add(Restrictions.eq("chaveMesAno", this.chaveMesAno))

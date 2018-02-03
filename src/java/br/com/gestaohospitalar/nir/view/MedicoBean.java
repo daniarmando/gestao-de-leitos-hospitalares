@@ -8,7 +8,7 @@ package br.com.gestaohospitalar.nir.view;
 import br.com.gestaohospitalar.nir.DAO.EstadoCidadeDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.MedicoDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Cidade;
 import br.com.gestaohospitalar.nir.model.Estado;
 import br.com.gestaohospitalar.nir.model.Log;
@@ -208,7 +208,7 @@ public class MedicoBean implements InterfaceBean, Serializable {
             }
 
             if (!this.medico.getDataNascimentoPessoa().equals(this.cloneMedico.getDataNascimentoPessoa())) {
-                detalhe += " data de nascimento de " + ConverterDataHora.formatarData(this.cloneMedico.getDataNascimentoPessoa()) + " para " + ConverterDataHora.formatarData(this.medico.getDataNascimentoPessoa()) + ",";
+                detalhe += " data de nascimento de " + NIRDataUtil.formatarData(this.cloneMedico.getDataNascimentoPessoa()) + " para " + NIRDataUtil.formatarData(this.medico.getDataNascimentoPessoa()) + ",";
             }
 
             if (!this.medico.getTelefonePessoa().equals(this.cloneMedico.getTelefonePessoa())) {
@@ -280,7 +280,7 @@ public class MedicoBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("medico");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override
@@ -336,7 +336,7 @@ public class MedicoBean implements InterfaceBean, Serializable {
     }
 
     public Date getMaxDate() {
-        return ConverterDataHora.gerarDataMaiorDeIdade();
+        return NIRDataUtil.gerarDataMaiorDeIdade();
     }
 
     public List<Medico> getMedicos() {

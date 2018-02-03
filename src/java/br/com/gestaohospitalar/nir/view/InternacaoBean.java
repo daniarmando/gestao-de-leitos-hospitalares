@@ -14,7 +14,7 @@ import br.com.gestaohospitalar.nir.DAO.InternacaoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LeitoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.MedicoDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Alta;
 import br.com.gestaohospitalar.nir.model.AltaQualificada;
 import br.com.gestaohospitalar.nir.model.ConfiguracaoKanban;
@@ -225,7 +225,7 @@ public class InternacaoBean implements Serializable {
             this.internacao.setStatusInternacao(Status.ABERTA.get());
 
             //passando a chaveMesAno SigTap
-            String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+            String chaveMesAno = NIRDataUtil.ultimaChaveMesAno();
             this.internacao.setChaveMesAnoProcedimento(chaveMesAno);
             this.internacao.setChaveMesAnoCID(chaveMesAno);
 
@@ -233,7 +233,7 @@ public class InternacaoBean implements Serializable {
             ConfiguracaoKanban configuracaoKanban = new ConfiguracaoKanbanDAOImpl().porIdHospital(this.usuario.getHospital().getIdHospital());
 
             //converte a data de entrada para o tipo LocalDateTime para fazer o cálculo
-            LocalDateTime dataEntrada = ConverterDataHora.paraLocalDateTime(this.internacao.getDataEntrada());
+            LocalDateTime dataEntrada = NIRDataUtil.paraLocalDateTime(this.internacao.getDataEntrada());
 
             //calculando e passando para classe o limite de tempo para as cores do kanban
             this.internacao.calcularLimiteTempoCoresKanban(configuracaoKanban, dataEntrada);
@@ -427,7 +427,7 @@ public class InternacaoBean implements Serializable {
                 FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "A data e hora de início não pode ser maior que a data e hora final!");
             } else {
                 //salvando a higienização
-                this.higienizacao.setTempoHigienizacaoMinutos(ConverterDataHora.diferencaEmMinutos(this.higienizacao.getDataHoraInicio(), this.higienizacao.getDataHoraFim()));
+                this.higienizacao.setTempoHigienizacaoMinutos(NIRDataUtil.diferencaEmMinutos(this.higienizacao.getDataHoraInicio(), this.higienizacao.getDataHoraFim()));
                 daoHigienizacao.salvar(this.higienizacao);
 
                 //salvando o log
@@ -532,7 +532,7 @@ public class InternacaoBean implements Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("internacao");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     /**

@@ -9,7 +9,7 @@ import br.com.gestaohospitalar.nir.DAO.EstadoCidadeDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.GerenteEnfermagemDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.UsuarioDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Autorizacao;
 import br.com.gestaohospitalar.nir.model.Cidade;
 import br.com.gestaohospitalar.nir.model.Estado;
@@ -225,7 +225,7 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
             }
 
             if (!this.gerenteEnfermagem.getDataNascimentoPessoa().equals(this.cloneGerenteEnfermagem.getDataNascimentoPessoa())) {
-                detalhe += " data de nascimento de " + ConverterDataHora.formatarData(this.cloneGerenteEnfermagem.getDataNascimentoPessoa()) + " para " + ConverterDataHora.formatarData(this.gerenteEnfermagem.getDataNascimentoPessoa()) + ",";
+                detalhe += " data de nascimento de " + NIRDataUtil.formatarData(this.cloneGerenteEnfermagem.getDataNascimentoPessoa()) + " para " + NIRDataUtil.formatarData(this.gerenteEnfermagem.getDataNascimentoPessoa()) + ",";
             }
 
             if (!this.gerenteEnfermagem.getTelefonePessoa().equals(this.cloneGerenteEnfermagem.getTelefonePessoa())) {
@@ -297,7 +297,7 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("gerenteEnfermagem");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override
@@ -353,7 +353,7 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
     }
 
     public Date getMaxDate() {
-        return ConverterDataHora.gerarDataMaiorDeIdade();
+        return NIRDataUtil.gerarDataMaiorDeIdade();
     }
 
     public List<GerenteEnfermagem> getGerentesEnfermagem() {

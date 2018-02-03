@@ -23,16 +23,16 @@ import javax.persistence.Table;
 public class Quarto implements Serializable {
 
     private Integer idQuarto;
-    private String tipoQuarto;
+    private String descricaoQuarto;
     private String statusQuarto;
     private Setor setor;
 
     public Quarto() {
     }
 
-    public Quarto(Integer idQuarto, String tipoQuarto, String statusQuarto, Setor setor) {
+    public Quarto(Integer idQuarto, String descricaoQuarto, String statusQuarto, Setor setor) {
         this.idQuarto = idQuarto;
-        this.tipoQuarto = tipoQuarto;
+        this.descricaoQuarto = descricaoQuarto;
         this.statusQuarto = statusQuarto;
         this.setor = setor;
     }
@@ -54,17 +54,17 @@ public class Quarto implements Serializable {
     }
 
     /**
-     * @return the tipoQuarto
+     * @return the descricaoQuarto
      */
-    public String getTipoQuarto() {
-        return tipoQuarto;
+    public String getDescricaoQuarto() {
+        return descricaoQuarto;
     }
 
     /**
-     * @param tipoQuarto the tipoQuarto to set
+     * @param descricaoQuarto the descricaoQuarto to set
      */
-    public void setTipoQuarto(String tipoQuarto) {
-        this.tipoQuarto = tipoQuarto;
+    public void setDescricaoQuarto(String descricaoQuarto) {
+        this.descricaoQuarto = descricaoQuarto;
     }
 
     /**
@@ -106,7 +106,7 @@ public class Quarto implements Serializable {
     public Quarto clone() {
         Quarto clone = new Quarto();
         clone.setIdQuarto(idQuarto);
-        clone.setTipoQuarto(tipoQuarto);
+        clone.setDescricaoQuarto(descricaoQuarto);
         clone.setStatusQuarto(statusQuarto);
         clone.setSetor(setor);
 

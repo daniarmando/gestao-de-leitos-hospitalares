@@ -5,7 +5,7 @@
 	<property name="ireport.y" value="0"/>
 	<parameter name="LOGO" class="java.awt.Image"/>
 	<field name="idSetor" class="java.lang.String"/>
-	<field name="tipoSetor" class="java.lang.String"/>
+	<field name="descricaoSetor" class="java.lang.String"/>
 	<field name="hospital.nomeHospital" class="java.lang.String"/>
 	<group name="Group1">
 		<groupFooter>
@@ -55,7 +55,7 @@
 				<textElement>
 					<font size="10" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Tipo]]></text>
+				<text><![CDATA[Descrição]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="274" y="10" width="269" height="20" uuid="296716db-4568-45eb-9a76-9ecf44520000"/>
@@ -86,7 +86,7 @@
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{tipoSetor}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{descricaoSetor}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="274" y="12" width="269" height="20" uuid="d6c998ce-9ae7-4fed-8426-d6aad19e68bf"/>

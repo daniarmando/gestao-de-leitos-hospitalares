@@ -9,7 +9,7 @@ import br.com.gestaohospitalar.nir.DAO.EstatisticasDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LeitoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.QuartoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SetorDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Estatisticas;
 import br.com.gestaohospitalar.nir.model.Leito;
 import br.com.gestaohospitalar.nir.model.Quarto;
@@ -280,11 +280,11 @@ public class GraficoTempoSaidaBean implements Serializable {
         this.daoEstatisticas = new EstatisticasDAOImpl();
 
         //convertendo a data inicial para Calendar
-        Calendar cDataInicial = ConverterDataHora.paraCalendar(dataInicial);
+        Calendar cDataInicial = NIRDataUtil.paraCalendar(dataInicial);
 
         //convertendo as datas inicial e final para LocalDate
-        LocalDate ldDataInicial = ConverterDataHora.paraLocalDate(dataInicial);
-        LocalDate ldDataFinal = ConverterDataHora.paraLocalDate(dataFinal);
+        LocalDate ldDataInicial = NIRDataUtil.paraLocalDate(dataInicial);
+        LocalDate ldDataFinal = NIRDataUtil.paraLocalDate(dataFinal);
         //extraindo a quantidade de dias entre as datas inicial e final
         long qtdDiasPeriodo = ChronoUnit.DAYS.between(ldDataInicial, ldDataFinal);
 

@@ -26,14 +26,14 @@
                     <p:selectOneMenu id="setor" label="Setor" value="#{graficoTempoInternacaoBean.setor}" required="true" converter="converterSetor" style="width: 150px; margin: 0 3px 0 3px; top: 7px;" >
                         <f:selectItem itemLabel="Setor" />
                         <f:selectItems value="#{graficoTempoInternacaoBean.setores}" var="setor" 
-                                       itemValue="#{setor}" itemLabel="#{setor.tipoSetor}" />
+                                       itemValue="#{setor}" itemLabel="#{setor.descricaoSetor}" />
                         <f:ajax render="quarto" event="change" listener="#{graficoTempoInternacaoBean.listaQuartos}" />
                     </p:selectOneMenu>
 
                     <p:selectOneMenu id="quarto" label="Quarto" value="#{graficoTempoInternacaoBean.quarto}" required="true" converter="converterQuarto" style="width: 150px; margin-right: 10px; top: 7px;" >
                         <f:selectItem itemLabel="Quarto" />
                         <f:selectItems value="#{graficoTempoInternacaoBean.quartos}" var="quarto" 
-                                       itemValue="#{quarto}" itemLabel="#{quarto.tipoQuarto}" />
+                                       itemValue="#{quarto}" itemLabel="#{quarto.descricaoQuarto}" />
                     </p:selectOneMenu>
 
                     <p:calendar id="datainicial" label="Data Inicial" placeholder="Data Inicial" locale="pt" mask="99/99/9999" value="#{graficoTempoInternacaoBean.dataInicial}" required="true" pattern="dd/MM/yyyy" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioInternacao" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="719d0261-dd2b-4e18-961d-d14bd2b837a7">
 	<property name="ireport.zoom" value="1.4641000000000104"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="327"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="LOGO" class="java.awt.Image"/>
 	<field name="idInternacao" class="java.lang.String"/>
@@ -20,8 +20,8 @@
 	<field name="leito.idLeito" class="java.lang.String"/>
 	<field name="leito.descricaoLeito" class="java.lang.String"/>
 	<field name="statusInternacao" class="java.lang.String"/>
-	<field name="leito.quarto.tipoQuarto" class="java.lang.String"/>
-	<field name="leito.quarto.setor.tipoSetor" class="java.lang.String"/>
+	<field name="leito.quarto.descricaoQuarto" class="java.lang.String"/>
+	<field name="leito.quarto.setor.descricaoSetor" class="java.lang.String"/>
 	<group name="Group3">
 		<groupFooter>
 			<band/>
@@ -161,8 +161,8 @@
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{leito.quarto.setor.tipoSetor} + " " + 
-$F{leito.quarto.tipoQuarto} + "-" + 
+				<textFieldExpression><![CDATA[$F{leito.quarto.setor.descricaoSetor} + " " + 
+$F{leito.quarto.descricaoQuarto} + "-" + 
 $F{leito.descricaoLeito}]]></textFieldExpression>
 			</textField>
 			<textField>

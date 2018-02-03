@@ -7,7 +7,7 @@ package br.com.gestaohospitalar.nir.view;
 
 import br.com.gestaohospitalar.nir.DAO.ConfiguracaoKanbanDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.ConfiguracaoKanban;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.enumerator.TipoLog;
@@ -136,7 +136,7 @@ public class ConfiguracaoKanbanBean implements Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("configuracaoKanban");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     public ConfiguracaoKanban getConfiguracaoKanban() {

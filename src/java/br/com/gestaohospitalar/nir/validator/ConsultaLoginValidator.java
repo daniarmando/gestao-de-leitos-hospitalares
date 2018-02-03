@@ -16,7 +16,7 @@ import javax.faces.application.FacesMessage;
 
 public class ConsultaLoginValidator {
 
-    public static Boolean verificar(Usuario usuario, Usuario copiaUsuario) {
+    public static Boolean verificar(Usuario usuario, Usuario cloneUsuario) {
         
         UsuarioDAOImpl daoUsuario = new UsuarioDAOImpl();
 
@@ -31,7 +31,7 @@ public class ConsultaLoginValidator {
 
             //se for alteração
         } else {
-            if (!usuario.getLogin().equals(copiaUsuario.getLogin())) {
+            if (!usuario.getLogin().equals(cloneUsuario.getLogin())) {
                 if (daoUsuario.isLoginCadastrado(usuario.getLogin())) {
                     FacesUtil.adicionarMensagem(FacesMessage.SEVERITY_ERROR, "Login já cadastrado no sistema.");
                     return false;

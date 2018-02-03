@@ -7,7 +7,7 @@ package br.com.gestaohospitalar.nir.view;
 
 import br.com.gestaohospitalar.nir.DAO.ParametrosDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SigtapUploadDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Leito;
 import br.com.gestaohospitalar.nir.model.Paciente;
 import br.com.gestaohospitalar.nir.model.Parametros;
@@ -119,7 +119,7 @@ public class SelecaoProcedimentoBean implements Serializable {
         String msg = "";
 
         //calculando a idade do paciente
-        int idade = ConverterDataHora.calcularIdade(this.pacienteSelecionado.getDataNascimentoPessoa());
+        int idade = NIRDataUtil.calcularIdade(this.pacienteSelecionado.getDataNascimentoPessoa());
 
         //calculando a idade mínima e máxima da tabela sigtap, pois o valor é em meses
         int idadeMinProc = (this.procedimentoSelecionado.getVL_IDADE_MINIMA() > 0 && this.procedimentoSelecionado.getVL_IDADE_MINIMA() < 9999 ? this.procedimentoSelecionado.getVL_IDADE_MINIMA() / 12 : this.procedimentoSelecionado.getVL_IDADE_MINIMA());

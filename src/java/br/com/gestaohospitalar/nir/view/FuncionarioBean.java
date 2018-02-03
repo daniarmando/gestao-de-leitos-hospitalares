@@ -8,7 +8,7 @@ package br.com.gestaohospitalar.nir.view;
 import br.com.gestaohospitalar.nir.DAO.EstadoCidadeDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.FuncionarioDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Cidade;
 import br.com.gestaohospitalar.nir.model.Estado;
 import br.com.gestaohospitalar.nir.model.Funcionario;
@@ -177,7 +177,7 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
             }
 
             if (!this.funcionario.getDataNascimentoPessoa().equals(this.cloneFuncionario.getDataNascimentoPessoa())) {
-                detalhe += " data de nascimento de " + ConverterDataHora.formatarData(this.cloneFuncionario.getDataNascimentoPessoa()) + " para " + ConverterDataHora.formatarData(this.funcionario.getDataNascimentoPessoa()) + ",";
+                detalhe += " data de nascimento de " + NIRDataUtil.formatarData(this.cloneFuncionario.getDataNascimentoPessoa()) + " para " + NIRDataUtil.formatarData(this.funcionario.getDataNascimentoPessoa()) + ",";
             }
 
             if (!this.funcionario.getTelefonePessoa().equals(this.cloneFuncionario.getTelefonePessoa())) {
@@ -249,7 +249,7 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("funcionario");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override
@@ -305,7 +305,7 @@ public class FuncionarioBean implements InterfaceBean, Serializable {
     }
 
     public Date getMaxDate() {
-        return ConverterDataHora.gerarDataMaiorDeIdade();
+        return NIRDataUtil.gerarDataMaiorDeIdade();
     }
 
     public List<Funcionario> getFuncionarios() {

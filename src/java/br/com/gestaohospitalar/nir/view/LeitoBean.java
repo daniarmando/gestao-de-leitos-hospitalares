@@ -11,7 +11,7 @@ import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.MedicoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.QuartoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SigtapUploadDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Internacao;
 import br.com.gestaohospitalar.nir.model.sigtap.TB_TIPO_LEITO;
 import br.com.gestaohospitalar.nir.model.Leito;
@@ -115,7 +115,7 @@ public class LeitoBean implements InterfaceBean, Serializable {
 
             //passando a chaveMesAno se for incluir um novo registro
             if (this.leito.getIdLeito() == null || this.leito.getIdLeito() == 0) {
-                this.leito.setChaveMesAnoTipoLeito(ConverterDataHora.ultimaChaveMesAno());
+                this.leito.setChaveMesAnoTipoLeito(NIRDataUtil.ultimaChaveMesAno());
             }
 
             this.daoLeito.salvar(this.leito);
@@ -192,8 +192,8 @@ public class LeitoBean implements InterfaceBean, Serializable {
                         + ",";
             }
 
-            if (!this.leito.getQuarto().getTipoQuarto().equals(this.cloneLeito.getQuarto().getTipoQuarto())) {
-                detalhe += " quarto de " + this.cloneLeito.getQuarto().getTipoQuarto() + " para " + this.leito.getQuarto().getTipoQuarto() + ",";
+            if (!this.leito.getQuarto().getDescricaoQuarto().equals(this.cloneLeito.getQuarto().getDescricaoQuarto())) {
+                detalhe += " quarto de " + this.cloneLeito.getQuarto().getDescricaoQuarto() + " para " + this.leito.getQuarto().getDescricaoQuarto() + ",";
             }
 
             if (!this.leito.getTipo_leito().getNO_TIPO_LEITO().equals(this.cloneLeito.getTipo_leito().getNO_TIPO_LEITO())) {
@@ -235,7 +235,7 @@ public class LeitoBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("leito");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.getLog().getDataHora())
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.getLog().getDataHora())
                 + " por " + this.getLog().getUsuario().getLogin() + "." : "";
     }
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioEstatisticas" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f1c520fc-2c6f-4cf3-9127-5d8447895d80">
 	<property name="ireport.zoom" value="1.948717100000024"/>
-	<property name="ireport.x" value="395"/>
-	<property name="ireport.y" value="61"/>
+	<property name="ireport.x" value="371"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="data_inicial" class="java.util.Date">
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
@@ -52,9 +52,9 @@ estatisticas.`tempoInternacao` AS tempoInternacaoSegundos,
      internacao.`codigoInternacaoHospital` AS internacao_codigoInternacaoHospital,
      internacao.`dataHoraLimiteVermelho` AS internacao_dataHoraLimiteVermelho,
      setor.`idSetor` AS setor_idSetor,
-     setor.`tipoSetor` AS setor_tipoSetor,
+     setor.`descricaoSetor` AS setor_descricaoSetor,
      quarto.`idQuarto` AS quarto_idQuarto,
-     quarto.`tipoQuarto` AS quarto_tipoQuarto,
+     quarto.`descricaoQuarto` AS quarto_descricaoQuarto,
      leito.`idLeito` AS leito_idLeito,
      leito.`codigoLeito` AS leito_codigoLeito,
      leito.`descricaoLeito` AS leito_descricaoLeito,
@@ -114,9 +114,9 @@ ORDER BY
 	<field name="internacao_codigoInternacaoHospital" class="java.lang.Integer"/>
 	<field name="internacao_dataHoraLimiteVermelho" class="java.sql.Timestamp"/>
 	<field name="setor_idSetor" class="java.lang.Integer"/>
-	<field name="setor_tipoSetor" class="java.lang.String"/>
+	<field name="setor_descricaoSetor" class="java.lang.String"/>
 	<field name="quarto_idQuarto" class="java.lang.Integer"/>
-	<field name="quarto_tipoQuarto" class="java.lang.String"/>
+	<field name="quarto_descricaoQuarto" class="java.lang.String"/>
 	<field name="leito_idLeito" class="java.lang.Integer"/>
 	<field name="leito_codigoLeito" class="java.lang.String"/>
 	<field name="leito_descricaoLeito" class="java.lang.String"/>
@@ -206,7 +206,7 @@ ORDER BY
 					<textElement>
 						<font size="10" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{quarto_tipoQuarto} + "-" +
+					<textFieldExpression><![CDATA[$F{quarto_descricaoQuarto} + "-" +
 $F{leito_descricaoLeito}]]></textFieldExpression>
 				</textField>
 			</band>
@@ -264,7 +264,7 @@ $F{leito_descricaoLeito}]]></textFieldExpression>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Setor: " + $F{setor_tipoSetor}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Setor: " + $F{setor_descricaoSetor}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

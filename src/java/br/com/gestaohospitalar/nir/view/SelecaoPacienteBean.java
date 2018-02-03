@@ -7,7 +7,7 @@ package br.com.gestaohospitalar.nir.view;
 
 import br.com.gestaohospitalar.nir.DAO.PacienteDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.ParametrosDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Leito;
 import br.com.gestaohospitalar.nir.model.Paciente;
 import br.com.gestaohospitalar.nir.model.Parametros;
@@ -119,7 +119,7 @@ public class SelecaoPacienteBean implements Serializable {
         String msg = "";
 
         //calculando a idade do paciente
-        int idade = ConverterDataHora.calcularIdade(this.pacienteSelecionado.getDataNascimentoPessoa());
+        int idade = NIRDataUtil.calcularIdade(this.pacienteSelecionado.getDataNascimentoPessoa());
 
         //se a idade do paciente está incompatível com a idade mínima e máxima aceitas para o leito selecionado
         if (idade < this.leitoSelecionado.getIdadeMinima() || idade > this.leitoSelecionado.getIdadeMaxima()) {
@@ -166,7 +166,7 @@ public class SelecaoPacienteBean implements Serializable {
      * @return idadePaciente
      */
     public int idadePaciente(Date dataNascimento) {
-        return ConverterDataHora.calcularIdade(dataNascimento);
+        return NIRDataUtil.calcularIdade(dataNascimento);
     }
 
     /**

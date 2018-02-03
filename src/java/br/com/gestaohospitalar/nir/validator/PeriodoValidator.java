@@ -5,7 +5,7 @@
  */
 package br.com.gestaohospitalar.nir.validator;
 
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -42,8 +42,8 @@ public class PeriodoValidator {
     public static Boolean qtdDias(Date dataInicial, Date dataFinal, int limiteDias) {
 
         //converte as datas de Date para LocalDate
-        LocalDate ldDataInicial = ConverterDataHora.paraLocalDate(dataInicial);
-        LocalDate ldDataFinal = ConverterDataHora.paraLocalDate(dataFinal);
+        LocalDate ldDataInicial = NIRDataUtil.paraLocalDate(dataInicial);
+        LocalDate ldDataFinal = NIRDataUtil.paraLocalDate(dataFinal);
 
         //pega a quantidade de dias entre as duas datas
         long dias = ChronoUnit.DAYS.between(ldDataInicial, ldDataFinal);
@@ -66,8 +66,8 @@ public class PeriodoValidator {
     public static Boolean qtdMeses(Date dataInicial, Date dataFinal, int limiteMeses) {
 
         //converte as datas de Date para LocalDate
-        LocalDate ldDataInicial = ConverterDataHora.paraLocalDate(dataInicial);
-        LocalDate ldDataFinal = ConverterDataHora.paraLocalDate(dataFinal);
+        LocalDate ldDataInicial = NIRDataUtil.paraLocalDate(dataInicial);
+        LocalDate ldDataFinal = NIRDataUtil.paraLocalDate(dataFinal);
 
         //pega a quantidade de meses entre as duas datas
         long meses = ChronoUnit.MONTHS.between(ldDataInicial, ldDataFinal);

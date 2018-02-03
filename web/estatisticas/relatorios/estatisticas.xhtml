@@ -19,7 +19,7 @@
                     <p:selectOneMenu id="setor" label="Setor" value="#{relatorioEstatisticasBean.setor}" required="true" converter="converterSetor" style="width: 150px; margin: 0 3px 0 3px; top: 7px;" >
                         <f:selectItem itemLabel="Setor" />
                         <f:selectItems value="#{relatorioEstatisticasBean.setores}" var="setor" 
-                                       itemValue="#{setor}" itemLabel="#{setor.tipoSetor}" />
+                                       itemValue="#{setor}" itemLabel="#{setor.descricaoSetor}" />
                     </p:selectOneMenu>
 
                     <p:calendar id="datainicial" label="Data Inicial" placeholder="Data Inicial" locale="pt" mask="99/99/9999" value="#{relatorioEstatisticasBean.dataInicial}" required="true" pattern="dd/MM/yyyy" />

@@ -23,16 +23,16 @@ import javax.persistence.Table;
 public class Setor implements Serializable {
     
     private Integer idSetor;
-    private String tipoSetor;
+    private String descricaoSetor;
     private String statusSetor; 
     private Hospital hospital;
     
     public Setor() {
     }
 
-    public Setor(Integer idSetor, String tipoSetor, String statusSetor, Hospital hospital) {
+    public Setor(Integer idSetor, String descricaoSetor, String statusSetor, Hospital hospital) {
         this.idSetor = idSetor;
-        this.tipoSetor = tipoSetor;
+        this.descricaoSetor = descricaoSetor;
         this.statusSetor = statusSetor;
         this.hospital = hospital;
     }
@@ -54,17 +54,17 @@ public class Setor implements Serializable {
     }
 
     /**
-     * @return the tipoSetor
+     * @return the descricaoSetor
      */
-    public String getTipoSetor() {
-        return tipoSetor;
+    public String getDescricaoSetor() {
+        return descricaoSetor;
     }
 
     /**
-     * @param tipoSetor the tipoSetor to set
+     * @param descricaoSetor the descricaoSetor to set
      */
-    public void setTipoSetor(String tipoSetor) {
-        this.tipoSetor = tipoSetor;
+    public void setDescricaoSetor(String descricaoSetor) {
+        this.descricaoSetor = descricaoSetor;
     }
 
     /**
@@ -106,7 +106,7 @@ public class Setor implements Serializable {
     public Setor clone() {
         Setor clone = new Setor();
         clone.setIdSetor(idSetor);
-        clone.setTipoSetor(tipoSetor);
+        clone.setDescricaoSetor(descricaoSetor);
         clone.setStatusSetor(statusSetor);
         clone.setHospital(hospital);
 

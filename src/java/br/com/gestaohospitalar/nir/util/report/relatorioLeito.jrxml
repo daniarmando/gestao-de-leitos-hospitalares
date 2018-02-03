@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="relatorioLeito" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="719d0261-dd2b-4e18-961d-d14bd2b837a7">
 	<property name="ireport.zoom" value="1.6105100000000077"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="115"/>
+	<property name="ireport.y" value="72"/>
 	<parameter name="LOGO" class="java.awt.Image"/>
 	<field name="idLeito" class="java.lang.String"/>
 	<field name="codigoLeito" class="java.lang.String"/>
@@ -13,9 +13,9 @@
 	<field name="idadeMaxima" class="java.lang.String"/>
 	<field name="quarto.idQuarto" class="java.lang.String"/>
 	<field name="quarto.setor.idSetor" class="java.lang.String"/>
-	<field name="quarto.setor.tipoSetor" class="java.lang.String"/>
+	<field name="quarto.setor.descricaoSetor" class="java.lang.String"/>
 	<field name="quarto.setor.hospital.nomeHospital" class="java.lang.String"/>
-	<field name="quarto.tipoQuarto" class="java.lang.String"/>
+	<field name="quarto.descricaoQuarto" class="java.lang.String"/>
 	<group name="Group3">
 		<groupFooter>
 			<band/>
@@ -162,11 +162,11 @@ $F{tipoSexo}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="59" y="7" width="129" height="20" uuid="71f87d2e-a236-4450-8b8a-5fdd1cae88f0"/>
-				<textFieldExpression><![CDATA[$F{quarto.idQuarto} + " - " + $F{quarto.tipoQuarto}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{quarto.idQuarto} + " - " + $F{quarto.descricaoQuarto}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="198" y="7" width="129" height="20" uuid="3ff396dc-8ef8-4aa1-8e30-7557036c5fff"/>
-				<textFieldExpression><![CDATA[$F{quarto.setor.idSetor} + " - " + $F{quarto.setor.tipoSetor}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{quarto.setor.idSetor} + " - " + $F{quarto.setor.descricaoSetor}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="337" y="7" width="156" height="20" uuid="b6dc2a47-aa2a-4ea0-b491-9fc444c9e900"/>

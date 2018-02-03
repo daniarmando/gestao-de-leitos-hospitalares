@@ -47,11 +47,11 @@
                 <p:column headerText="Código" sortBy="#{quarto.idQuarto}" filterBy="#{quarto.idQuarto}">
                     <h:outputText value="#{quarto.idQuarto}" />
                 </p:column> 
-                <p:column headerText="Tipo" sortBy="#{quarto.tipoQuarto}" filterBy="#{quarto.tipoQuarto}">
-                    <h:outputText value="#{quarto.tipoQuarto}" />
+                <p:column headerText="Descrição" sortBy="#{quarto.descricaoQuarto}" filterBy="#{quarto.descricaoQuarto}">
+                    <h:outputText value="#{quarto.descricaoQuarto}" />
                 </p:column> 
-                <p:column headerText="Setor" filterBy="#{quarto.setor.tipoSetor}" filterStyle="display: none;">
-                    <h:outputText value="#{quarto.setor.tipoSetor}" />
+                <p:column headerText="Setor" filterBy="#{quarto.setor.descricaoSetor}" filterStyle="display: none;">
+                    <h:outputText value="#{quarto.setor.descricaoSetor}" />
                 </p:column> 
                 <p:column>
                     <center>
@@ -98,7 +98,7 @@
                             paginatorPosition="bottom"
                             emptyMessage="Não há eventos">
                     <f:facet name="header">     
-                        #{quartoBean.quarto.tipoQuarto}
+                        #{quartoBean.quarto.descricaoQuarto}
                     </f:facet>
                     <h:outputText value="#{log.dataHora}" style="margin-left: 10px;">
                         <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss '-'" locale="pt_BR" />

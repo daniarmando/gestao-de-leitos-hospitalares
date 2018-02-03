@@ -315,11 +315,11 @@ public class Pessoa implements Serializable {
     }
     
     public String nomeReduzidoPessoa() {
-        return this.nomePessoa.split(" ")[0];
+        return this.nomePessoa.trim().split(" ")[0];
     }
 
     public String nomeReduzidoPessoa(String nome) {
-        return nome.split(" ")[0];
+        return nome.trim().split(" ")[0];
     }
 
     @Override

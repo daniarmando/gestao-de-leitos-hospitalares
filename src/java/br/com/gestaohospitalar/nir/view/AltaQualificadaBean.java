@@ -8,7 +8,7 @@ package br.com.gestaohospitalar.nir.view;
 import br.com.gestaohospitalar.nir.DAO.AltaQualificadaDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.InternacaoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.AltaQualificada;
 import br.com.gestaohospitalar.nir.model.Internacao;
 import br.com.gestaohospitalar.nir.model.Log;
@@ -167,7 +167,7 @@ public class AltaQualificadaBean implements Serializable, InterfaceBean {
 
             //compara os atributos para verificar quais foram as alterações feitas para salvar 
             if (!this.altaQualificada.getDataHoraPrevisao().equals(this.cloneAltaQualificada.getDataHoraPrevisao())) {
-                detalhe += " data e hora da previsão de " + ConverterDataHora.formatarDataHora(this.cloneAltaQualificada.getDataHoraPrevisao()) + " para " + ConverterDataHora.formatarDataHora(this.altaQualificada.getDataHoraPrevisao()) + ",";
+                detalhe += " data e hora da previsão de " + NIRDataUtil.formatarDataHora(this.cloneAltaQualificada.getDataHoraPrevisao()) + " para " + NIRDataUtil.formatarDataHora(this.altaQualificada.getDataHoraPrevisao()) + ",";
             }
         } else {
             detalhe += "alta qualificada código de " + this.altaQualificada.getIdAltaQualificada() + ",";
@@ -190,7 +190,7 @@ public class AltaQualificadaBean implements Serializable, InterfaceBean {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("internacao");
-        return this.log != null ? "Última modificação em processo de internação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação em processo de internação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override

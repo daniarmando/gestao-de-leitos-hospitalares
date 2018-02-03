@@ -10,7 +10,7 @@ import br.com.gestaohospitalar.nir.DAO.AltaQualificadaDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.InternacaoDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.MedicoDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Alta;
 import br.com.gestaohospitalar.nir.model.Internacao;
 import br.com.gestaohospitalar.nir.model.Log;
@@ -183,7 +183,7 @@ public class AltaBean implements Serializable, InterfaceBean {
 
             //compara os atributos para verificar quais foram as alterações feitas para salvar 
             if (!this.alta.getDataHoraRealizacao().equals(this.cloneAlta.getDataHoraRealizacao())) {
-                detalhe += " data e hora da alta de " + ConverterDataHora.formatarDataHora(this.cloneAlta.getDataHoraRealizacao()) + " para " + ConverterDataHora.formatarDataHora(this.alta.getDataHoraRealizacao()) + ",";
+                detalhe += " data e hora da alta de " + NIRDataUtil.formatarDataHora(this.cloneAlta.getDataHoraRealizacao()) + " para " + NIRDataUtil.formatarDataHora(this.alta.getDataHoraRealizacao()) + ",";
             }
 
             if (!this.alta.getMedico().getNomePessoa().equals(this.cloneAlta.getMedico().getNomePessoa())) {
@@ -210,7 +210,7 @@ public class AltaBean implements Serializable, InterfaceBean {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("internacao");
-        return this.log != null ? "Última modificação em processo de internação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação em processo de internação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override

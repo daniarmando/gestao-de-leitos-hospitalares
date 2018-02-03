@@ -5,7 +5,7 @@
  */
 package br.com.gestaohospitalar.nir.DAO;
 
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Alta;
 import br.com.gestaohospitalar.nir.service.DAOException;
 import br.com.gestaohospitalar.nir.util.FacesUtil;
@@ -24,7 +24,7 @@ public class AltaDAOImpl {
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
     //Busca a última chaveMesAno
-    private final String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+    private final String chaveMesAno = NIRDataUtil.ultimaChaveMesAno();
     
     public Alta porId(Integer id) {
         return (Alta) this.session.get(Alta.class, id);

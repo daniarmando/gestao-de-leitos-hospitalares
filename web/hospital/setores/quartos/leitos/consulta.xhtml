@@ -63,8 +63,8 @@
                 <p:column headerText="Descrição" sortBy="#{leito.descricaoLeito}" filterBy="#{leito.descricaoLeito}">
                     <h:outputText value="#{leito.descricaoLeito}" />
                 </p:column> 
-                <p:column headerText="Quarto/Setor" filterBy="#{leito.quarto.tipoQuarto}" filterStyle="display: none;">
-                    <h:outputText value="#{leito.quarto.tipoQuarto}/#{leito.quarto.setor.tipoSetor}" />
+                <p:column headerText="Quarto/Setor" filterBy="#{leito.quarto.descricaoQuarto}" filterStyle="display: none;">
+                    <h:outputText value="#{leito.quarto.descricaoQuarto}/#{leito.quarto.setor.descricaoSetor}" />
                 </p:column>
                 <p:column style="width: 30px; text-align: center;" headerText="Tipo Sexo" filterBy="#{leito.tipoSexo}" filterStyle="display: none;">
                     <h:outputText value="#{leito.tipoSexo}" />

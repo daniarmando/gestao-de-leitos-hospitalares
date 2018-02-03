@@ -48,8 +48,8 @@
                 <p:column headerText="Código" sortBy="#{setor.idSetor}" filterBy="#{setor.idSetor}">
                     <h:outputText value="#{setor.idSetor}" />
                 </p:column> 
-                <p:column headerText="Tipo" sortBy="#{setor.tipoSetor}" filterBy="#{setor.tipoSetor}">
-                    <h:outputText value="#{setor.tipoSetor}" />
+                <p:column headerText="Tipo" sortBy="#{setor.descricaoSetor}" filterBy="#{setor.descricaoSetor}">
+                    <h:outputText value="#{setor.descricaoSetor}" />
                 </p:column> 
                 <p:column headerText="Hospital" filterBy="#{setor.hospital.nomeHospital}" filterStyle="display: none;">
                     <h:outputText value="#{setor.hospital.nomeHospital}" />
@@ -99,7 +99,7 @@
                             paginatorPosition="bottom"
                             emptyMessage="Não há eventos">
                     <f:facet name="header">     
-                        #{setorBean.setor.tipoSetor}
+                        #{setorBean.setor.descricaoSetor}
                     </f:facet>
                     <h:outputText value="#{log.dataHora}" style="margin-left: 10px;">
                         <f:convertDateTime pattern="dd/MM/yyyy 'as' HH:mm:ss '-'" locale="pt_BR" />

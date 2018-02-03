@@ -5,7 +5,7 @@
  */
 package br.com.gestaohospitalar.nir.DAO;
 
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Internacao;
 import br.com.gestaohospitalar.nir.model.Leito;
 import br.com.gestaohospitalar.nir.model.enumerator.Status;
@@ -28,7 +28,7 @@ public class LeitoDAOImpl {
     private final Session session = (Session) FacesUtil.getRequestAttribute("session");
 
     //Busca a última chaveMesAno
-    private final String chaveMesAno = ConverterDataHora.ultimaChaveMesAno();
+    private final String chaveMesAno = NIRDataUtil.ultimaChaveMesAno();
 
     public Leito porId(Integer id) {
         return (Leito) this.session.get(Leito.class, id);

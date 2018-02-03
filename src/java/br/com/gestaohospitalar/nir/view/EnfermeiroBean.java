@@ -10,7 +10,7 @@ import br.com.gestaohospitalar.nir.DAO.EnfermeiroDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.GerenteEnfermagemDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.UsuarioDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Autorizacao;
 import br.com.gestaohospitalar.nir.model.Cidade;
 import br.com.gestaohospitalar.nir.model.Estado;
@@ -234,7 +234,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
             }
 
             if (!this.enfermeiro.getDataNascimentoPessoa().equals(this.cloneEnfermeiro.getDataNascimentoPessoa())) {
-                detalhe += " data de nascimento de " + ConverterDataHora.formatarData(this.cloneEnfermeiro.getDataNascimentoPessoa()) + " para " + ConverterDataHora.formatarData(this.enfermeiro.getDataNascimentoPessoa()) + ",";
+                detalhe += " data de nascimento de " + NIRDataUtil.formatarData(this.cloneEnfermeiro.getDataNascimentoPessoa()) + " para " + NIRDataUtil.formatarData(this.enfermeiro.getDataNascimentoPessoa()) + ",";
             }
 
             if (!this.enfermeiro.getTelefonePessoa().equals(this.cloneEnfermeiro.getTelefonePessoa())) {
@@ -306,7 +306,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("enfermeiro");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) + " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 
     @Override
@@ -370,7 +370,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
     }
 
     public Date getMaxDate() {
-        return ConverterDataHora.gerarDataMaiorDeIdade();
+        return NIRDataUtil.gerarDataMaiorDeIdade();
     }
 
     public List<Enfermeiro> getEnfermeiros() {

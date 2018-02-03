@@ -8,7 +8,7 @@ package br.com.gestaohospitalar.nir.view;
 import br.com.gestaohospitalar.nir.DAO.HospitalDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.LogDAOImpl;
 import br.com.gestaohospitalar.nir.DAO.SetorDAOImpl;
-import br.com.gestaohospitalar.nir.converter.ConverterDataHora;
+import br.com.gestaohospitalar.nir.util.NIRDataUtil;
 import br.com.gestaohospitalar.nir.model.Hospital;
 import br.com.gestaohospitalar.nir.model.Log;
 import br.com.gestaohospitalar.nir.model.Setor;
@@ -150,8 +150,8 @@ public class SetorBean implements InterfaceBean, Serializable {
             detalhe = "";
 
             //compara os atributos para verificar quais foram as alterações feitas para salvar 
-            if (!this.setor.getTipoSetor().equals(this.cloneSetor.getTipoSetor())) {
-                detalhe += " tipo de " + this.cloneSetor.getTipoSetor() + " para " + this.setor.getTipoSetor() + ",";
+            if (!this.setor.getDescricaoSetor().equals(this.cloneSetor.getDescricaoSetor())) {
+                detalhe += " descrição de " + this.cloneSetor.getDescricaoSetor() + " para " + this.setor.getDescricaoSetor() + ",";
             }
 
             if (!this.setor.getStatusSetor().equals(this.cloneSetor.getStatusSetor())) {
@@ -184,7 +184,7 @@ public class SetorBean implements InterfaceBean, Serializable {
     public String ultimoLog() {
         this.daoLog = new LogDAOImpl();
         this.log = this.daoLog.ultimoPorObjeto("setor");
-        return this.log != null ? "Última modificação feita em " + ConverterDataHora.formatarDataHora(this.log.getDataHora()) +
+        return this.log != null ? "Última modificação feita em " + NIRDataUtil.formatarDataHora(this.log.getDataHora()) +
                                   " por " + this.log.getUsuario().getLogin() + "." : "";
     }
 

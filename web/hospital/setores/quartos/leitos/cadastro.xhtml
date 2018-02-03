@@ -58,7 +58,7 @@
                             <p:selectOneMenu label="Quarto" id="quarto" value="#{leitoBean.leito.quarto}" required="true" converter="converterQuarto" disabled="#{sigtapUploadBean.isTabelaImportada() eq false}">
                                 <f:selectItem itemLabel="Selecione" />
                                 <f:selectItems value="#{leitoBean.quartos}" var="quarto" 
-                                               itemValue="#{quarto}" itemLabel="#{quarto.tipoQuarto}" />
+                                               itemValue="#{quarto}" itemLabel="#{quarto.descricaoQuarto}" />
                             </p:selectOneMenu>
 
                             <p:outputLabel value="Código" for="codigo" />

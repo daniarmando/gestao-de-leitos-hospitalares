@@ -51,7 +51,7 @@ public class EstatisticasDAOImpl {
         this.calculo = tipoCalculo == 1 ? "AVG(e.tempoOciosidade) AS tempoOciosidade" : "SUM(e.tempoOciosidade) AS tempoOciosidade";
 
         //montando comando SQL
-        String sql = "SELECT s.idSetor, s.tipoSetor, " + this.calculo + ", h.dataHoraFim, e.* "
+        String sql = "SELECT s.idSetor, s.descricaoSetor, " + this.calculo + ", h.dataHoraFim, e.* "
                 + "FROM estatisticas e, internacao i, leito l, quarto q, setor s, higienizacao h "
                 + "WHERE i.idInternacao = e.idInternacao "
                 + "AND l.idLeito = e.idLeito "

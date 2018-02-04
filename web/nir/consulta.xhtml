@@ -61,8 +61,7 @@
                                          oncomplete="PF('detalhesDialog').show()" />
                         <p:tooltip id="tpDetalhes" for="detalhes" value="Detalhes" position="bottom"/>
                         
-                        <p:button id="editar" icon="ui-icon-pencil" value="Editar" outcome="cadastro" accesskey="
-                                  "rendered="#{nIRBean.usuario.autorizacao eq 1}" >
+                        <p:button id="editar" icon="ui-icon-pencil" outcome="cadastro" rendered="#{nIRBean.usuario.autorizacao eq 1}" >
                             <f:param name="codigo" value="#{nir.idPessoa}" />
                         </p:button>
                         <p:tooltip id="tpEditar" for="editar" value="Editar" position="bottom"/>

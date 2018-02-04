@@ -78,7 +78,7 @@ public class NIRBean implements InterfaceBean, Serializable {
     public void inicializarCadastro() {
 
         if (isEditar()) {
-
+          inicializarEdicao();
         } else {
             this.daoEstadoCidade = new EstadoCidadeDAOImpl();
             this.log = new Log(TipoLog.INCLUSAO.get());
@@ -123,8 +123,11 @@ public class NIRBean implements InterfaceBean, Serializable {
                 autorizacao.setNome("ROLE_nir");
                 autorizacoes.add(autorizacao);
 
+                if (isEditar() == false || (isEditar() && !this.usuarioNIR.getSenha().equals(this.cloneUsuarioNIR.getSenha()))) {
+                    this.usuarioNIR.criptografarSenha();
+                }
                 this.usuarioNIR.setAutorizacoes(autorizacoes);
-                this.usuarioNIR.setTipo(TipoUsuario.NIR.get());
+                this.usuarioNIR.setTipo(TipoUsuario.NIR);
                 this.usuarioNIR.setStatus(true);
                 this.usuarioNIR.setPessoa(this.NIR);
 
@@ -148,7 +151,7 @@ public class NIRBean implements InterfaceBean, Serializable {
     @Override
     public void salvarLog() {
         this.daoLog = new LogDAOImpl();
-        String detalhe = null;
+        String detalhe = "";
 
         //se for alteração
         if (this.log.getTipo().equals(TipoLog.ALTERACAO.get())) {
@@ -227,10 +230,12 @@ public class NIRBean implements InterfaceBean, Serializable {
 
             if (!this.NIR.getCidade().getNomeCidade().equals(this.cloneNIR.getCidade().getNomeCidade())) {
                 detalhe += " cidade de " + this.cloneNIR.getCidade().getNomeCidade() + " para " + this.NIR.getCidade().getNomeCidade() + ",";
-            }
+            }            
 
             //removendo última vírgula e adicionando ponto final
-            detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
+            if (detalhe.length() > 0) {
+                detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
+            }
         }
 
         //passando as demais informações 

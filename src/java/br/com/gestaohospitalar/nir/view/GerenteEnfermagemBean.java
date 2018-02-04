@@ -127,8 +127,11 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
                     autorizacao.setNome("ROLE_gen");
                     autorizacoes.add(autorizacao);
 
+                    if(isEditar() == false || (isEditar() && !this.usuarioGerenteEnfermagem.getSenha().equals(this.cloneUsuarioGerenteEnfermagem.getSenha()))) {
+                        this.usuarioGerenteEnfermagem.criptografarSenha();
+                    }
                     this.usuarioGerenteEnfermagem.setAutorizacoes(autorizacoes);
-                    this.usuarioGerenteEnfermagem.setTipo(TipoUsuario.GERENTE_ENFERMAGEM.get());
+                    this.usuarioGerenteEnfermagem.setTipo(TipoUsuario.GER_ENFERMAGEM);
                     this.usuarioGerenteEnfermagem.setStatus(true);
                     this.usuarioGerenteEnfermagem.setPessoa(this.gerenteEnfermagem);
 
@@ -193,7 +196,7 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
     @Override
     public void salvarLog() {
         this.daoLog = new LogDAOImpl();
-        String detalhe = null;
+        String detalhe = "";
 
         //se for alteração
         if (this.log.getTipo().equals(TipoLog.ALTERACAO.get())) {
@@ -279,7 +282,9 @@ public class GerenteEnfermagemBean implements InterfaceBean, Serializable {
             }
 
             //removendo última vírgula e adicionando ponto final
-            detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
+            if (detalhe.length() > 0) {
+                detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
+            }
 
         }
 

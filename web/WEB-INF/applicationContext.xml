@@ -69,6 +69,7 @@
     
     <authentication-manager>
         <authentication-provider>
+            <password-encoder hash="md5"/>
             <jdbc-user-service data-source-ref="dataSource"
                                users-by-username-query="SELECT login as username, senha as password, status as enable FROM usuario WHERE login=?"
                                authorities-by-username-query="SELECT u.login as username, ua.autorizacoes_nome as authority FROM usuario u, usuario_autorizacao ua WHERE u.id = ua.usuario_id and u.login=?"

@@ -88,7 +88,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
             this.log = new Log(TipoLog.INCLUSAO.get());
 
             this.gerentesEnfermagem = new GerenteEnfermagemDAOImpl().ativos();
-            this.estados = this.daoEstadoCidade.todosEstados();            
+            this.estados = this.daoEstadoCidade.todosEstados();
         }
     }
 
@@ -105,7 +105,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
         this.cloneUsuarioEnfermeiro = this.usuarioEnfermeiro.clone();
         this.gerentesEnfermagem = new GerenteEnfermagemDAOImpl().ativos();
         this.estados = this.daoEstadoCidade.todosEstados();
-        this.cidades = this.daoEstadoCidade.cidadesPorEstado(this.enfermeiro.getEstado());        
+        this.cidades = this.daoEstadoCidade.cidadesPorEstado(this.enfermeiro.getEstado());
     }
 
     @Override
@@ -133,8 +133,12 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
                     autorizacao.setNome("ROLE_enf");
                     autorizacoes.add(autorizacao);
 
+                    if (isEditar() == false || (isEditar() && !this.usuarioEnfermeiro.getSenha().equals(this.cloneUsuarioEnfermeiro.getSenha()))) {
+                        this.usuarioEnfermeiro.criptografarSenha();
+                    }
+                    this.usuarioEnfermeiro.criptografarSenha();
                     this.usuarioEnfermeiro.setAutorizacoes(autorizacoes);
-                    this.usuarioEnfermeiro.setTipo(TipoUsuario.ENFERMEIRO.get());
+                    this.usuarioEnfermeiro.setTipo(TipoUsuario.ENFERMEIRO);
                     this.usuarioEnfermeiro.setStatus(true);
                     this.usuarioEnfermeiro.setPessoa(this.enfermeiro);
 
@@ -198,7 +202,7 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
     @Override
     public void salvarLog() {
         this.daoLog = new LogDAOImpl();
-        String detalhe = null;
+        String detalhe = "";
 
         //se for alteração
         if (this.log.getTipo().equals(TipoLog.ALTERACAO.get())) {
@@ -288,7 +292,9 @@ public class EnfermeiroBean implements InterfaceBean, Serializable {
             }
 
             //removendo última vírgula e adicionando ponto final
-            detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
+            if (detalhe.length() > 0) {
+                detalhe = detalhe.substring(0, detalhe.length() - 1).trim() + ".";
+            }
 
         }
 

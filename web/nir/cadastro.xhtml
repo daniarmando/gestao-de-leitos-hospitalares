@@ -9,6 +9,7 @@
     <ui:define name="conteudo">
         
         <f:metadata>
+            <f:viewParam name="codigo" value="#{nIRBean.NIR.idPessoa}" />
             <f:viewAction action="#{nIRBean.inicializarCadastro()}"  />
         </f:metadata>
         
@@ -47,7 +48,7 @@
                             </p:inputText>
                             
                             <p:outputLabel value="Data de Nascimento" for="datanascimento"/>
-                            <p:calendar id="datanascimento" locale="pt" required="true" mask="true" pattern="dd/MM/yyyy" value="#{medicoBean.medico.dataNascimentoPessoa}" maxdate="#{medicoBean.maxDate}" >
+                            <p:calendar id="datanascimento" locale="pt" required="true" mask="true" pattern="dd/MM/yyyy" value="#{nIRBean.NIR.dataNascimentoPessoa}" maxdate="#{medicoBean.maxDate}" >
                                 <f:validator validatorId="br.com.gestaohospitalar.nir.DataNascimentoValidator" />
                             </p:calendar>
                             
@@ -60,7 +61,7 @@
                             <p:inputText id="rg" maxlength="9" required="true" value="#{nIRBean.NIR.rgPessoa}" />
                             
                             <p:outputLabel value="Sexo" for="sexo" />
-                            <p:selectOneRadio id="sexo" value="#{pacienteBean.paciente.sexoPessoa}" required="true" >
+                            <p:selectOneRadio id="sexo" value="#{nIRBean.NIR.sexoPessoa}" required="true" >
                                 <f:selectItem itemLabel="Masculino" itemValue="M" />
                                 <f:selectItem itemLabel="Feminino" itemValue="F" />
                             </p:selectOneRadio>
@@ -143,13 +144,13 @@
                             </p:inputText>
 
                             <p:outputLabel value="Senha" for="senha" />
-                            <p:password feedback="true" match="senha2" inline="true" id="senha" required="true" value="#{nIRBean.usuarioNIR.senha}"
+                            <p:password feedback="true" match="senha2" inline="true" id="senha" required="#{nIRBean.isEditar() eq false}" value="#{nIRBean.usuarioNIR.senha}" maxlength="20"
                                         promptLabel="Força da senha" weakLabel="Fraca" goodLabel="Boa" strongLabel="Excelente" validatorMessage="Senhas não conferem">
                                 <f:validateLength minimum="3" maximum="45" />
                             </p:password>
                             
                             <p:outputLabel value="Repita Senha" for="senha2" />
-                            <p:password  id="senha2" required="true" >
+                            <p:password  id="senha2" required="#{nIRBean.isEditar() eq false}" maxlength="20" >
                                 <f:validateLength minimum="3" maximum="45" />
                             </p:password>
 

@@ -147,13 +147,13 @@
                             </p:inputText>
 
                             <p:outputLabel value="Senha" for="senha" />
-                            <p:password feedback="true" match="senha2" inline="true" id="senha" required="true" value="#{gerenteEnfermagemBean.usuarioGerenteEnfermagem.senha}"
-                                        promptLabel="Força da senha" weakLabel="Fraca" goodLabel="Boa" strongLabel="Excelente" validatorMessage="Senhas não conferem">
+                            <p:password feedback="true" match="senha2" inline="true" id="senha" required="#{gerenteEnfermagemBean.isEditar() eq false}" value="#{gerenteEnfermagemBean.usuarioGerenteEnfermagem.senha}"
+                                        maxlength="20" promptLabel="Força da senha" weakLabel="Fraca" goodLabel="Boa" strongLabel="Excelente" validatorMessage="Senhas não conferem">
                                 <f:validateLength minimum="3" maximum="45" />
                             </p:password>
                             
                             <p:outputLabel value="Repita Senha" for="senha2" />
-                            <p:password id="senha2" required="true" >
+                            <p:password id="senha2" required="#{gerenteEnfermagemBean.isEditar() eq false}" maxlength="20" >
                                 <f:validateLength minimum="3" maximum="45" />
                             </p:password>
 

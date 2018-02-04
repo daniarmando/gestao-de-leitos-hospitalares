@@ -5,11 +5,15 @@
  */
 package br.com.gestaohospitalar.nir.model;
 
+import br.com.gestaohospitalar.nir.model.enumerator.TipoUsuario;
+import br.com.gestaohospitalar.nir.util.NIRCriptografiaUtil;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -28,7 +32,7 @@ public class Usuario implements Serializable, Cloneable {
     private Integer id;
     private String login;
     private String senha;
-    private String tipo;
+    private TipoUsuario tipo;
     private boolean status;
     private List<Autorizacao> autorizacoes;
     private Pessoa pessoa;
@@ -36,7 +40,7 @@ public class Usuario implements Serializable, Cloneable {
     public Usuario() {
     }
 
-    public Usuario(Integer id, String login, String senha, String tipo, boolean status, List<Autorizacao> autorizacoes, Pessoa pessoa) {
+    public Usuario(Integer id, String login, String senha, TipoUsuario tipo, boolean status, List<Autorizacao> autorizacoes, Pessoa pessoa) {
         this.id = id;
         this.login = login;
         this.senha = senha;
@@ -81,7 +85,7 @@ public class Usuario implements Serializable, Cloneable {
      */
     public String getSenha() {
         return senha;
-    }
+    }      
 
     /**
      * @param senha the senha to set
@@ -90,11 +94,12 @@ public class Usuario implements Serializable, Cloneable {
         this.senha = senha;
     }
     
-    public String getTipo() {
+    @Enumerated(EnumType.STRING)
+    public TipoUsuario getTipo() {
         return this.tipo;
     }
     
-    public void setTipo(String tipo) {
+    public void setTipo(TipoUsuario tipo) {
         this.tipo = tipo;
     }
 
@@ -142,6 +147,10 @@ public class Usuario implements Serializable, Cloneable {
      */
     public void setPessoa(Pessoa pessoa) {
         this.pessoa = pessoa;
+    }
+    
+     public void criptografarSenha() {
+        this.senha =  NIRCriptografiaUtil.md5(this.senha);
     }
 
     /**

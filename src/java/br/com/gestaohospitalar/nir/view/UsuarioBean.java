@@ -28,7 +28,7 @@ import org.springframework.security.core.userdetails.User;
 @SessionScoped
 public final class UsuarioBean implements Serializable {
 
-    private UsuarioDAOImpl daoUsuario;
+    private final UsuarioDAOImpl daoUsuario;
     private Usuario usuario;       
     
     private Hospital hospital;
@@ -40,10 +40,14 @@ public final class UsuarioBean implements Serializable {
     private boolean isOpenNBChat = true; 
 
     public UsuarioBean() {
-
         this.usuario = new Usuario();
         this.daoUsuario = new UsuarioDAOImpl();
-
+        
+        //monta as informações do usuário para a sessão
+        this.montarDadosUsuario();
+    }
+    
+    public void montarDadosUsuario() {
         SecurityContext context = SecurityContextHolder.getContext();
         if (context instanceof SecurityContext) {
             Authentication authentication = context.getAuthentication();
@@ -64,12 +68,12 @@ public final class UsuarioBean implements Serializable {
 
                 
                 //monta a autorizaçao do usuario
-                switch (TipoUsuario.valueOf(this.usuario.getTipo())) {
+                switch (this.usuario.getTipo()) {
                     case NIR:
                         this.autorizacao = 1;
                         break;
                     case MEDICO:
-                    case GERENTE_ENFERMAGEM:
+                    case GER_ENFERMAGEM:
                         this.autorizacao = 2;
                         break;
                     case ENFERMEIRO:

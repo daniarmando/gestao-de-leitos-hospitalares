@@ -12,9 +12,9 @@ package br.com.gestaohospitalar.nir.model.enumerator;
 public enum TipoUsuario {
     
     NIR("NIR"),
-    GERENTE_ENFERMAGEM("GEN"),
-    ENFERMEIRO("ENF"),
-    MEDICO("MED");
+    GER_ENFERMAGEM("Gerente de Enfermagem"),
+    ENFERMEIRO("Enfermeiro"),
+    MEDICO("Médico");
     
     private final String tipoUsuario;
     

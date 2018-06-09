@@ -2,5 +2,7 @@
 /build.xml
 /dist/
 /nbproject/
-
+/src/conf/persistence.xml
+/src/java/hibernate.cfg.xml
+/web/WEB-INF/applicationContext.xml
 

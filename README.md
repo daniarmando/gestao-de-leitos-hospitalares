@@ -62,7 +62,7 @@ Idealizado em 2016 através de processo de estágio supervisionado exigido como 
   <img src="https://github.com/daniarmando/gestaodeleitoshospitalares/blob/master/screenshots/Menu/5%20-%20Estat%C3%ADsticas/1%20-%20Gr%C3%A1ficos/6%20-%20Tempo%20Ociosidade/2%20-%20Gr%C3%A1fico%20Tempo%20Ociosidade.png" width="290"/>    
 </div>
 
-    - Gera gráficos e relatórios relacionados ao tempo gasto em cada etapa de internações nos leitos para análise.
+    - Gera gráficos e relatórios relacionados ao tempo gasto em cada etapa de internações nos leitos para análise.    
     
  <br>
  

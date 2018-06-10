@@ -1,6 +1,7 @@
 /build/
 /build.xml
 /dist/
+/docs/
 /src/conf/persistence.xml
 /src/java/hibernate.cfg.xml
 /web/WEB-INF/applicationContext.xml

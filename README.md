@@ -67,5 +67,5 @@ Idealizado em 2016 através de processo de estágio supervisionado exigido como 
  <br>
  
 <a href="https://github.com/daniarmando/gestaodeleitoshospitalares/tree/master/screenshots">Clique aqui para visualizar mais imagens</a>   
-   *as imagens refletem as telas reais do software, porém todos os dados exibidos são fictícios.
+   *os dados exibidos nas imagens que foram capturadas do software são ficitícios.
     
